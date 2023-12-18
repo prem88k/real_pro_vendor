@@ -233,7 +233,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                     },
                     child: Container(
                       height: ScreenUtil().setHeight(65),
-                      width: ScreenUtil().setHeight(90),
+                      width: ScreenUtil().setWidth(90),
                       decoration: BoxDecoration(
                           color: secondaryColor,
                           borderRadius: BorderRadius.circular(10)),
@@ -269,7 +269,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                     },
                     child: Container(
                       height: ScreenUtil().setHeight(65),
-                      width: ScreenUtil().setHeight(90),
+                      width: ScreenUtil().setWidth(90),
                       decoration: BoxDecoration(
                           color: secondaryColor,
                           borderRadius: BorderRadius.circular(10)),
@@ -301,7 +301,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                   SizedBox(width: ScreenUtil().setWidth(5)),
                   Container(
                     height: ScreenUtil().setHeight(65),
-                    width: ScreenUtil().setHeight(90),
+                    width: ScreenUtil().setWidth(90),
                     decoration: BoxDecoration(
                         color: secondaryColor,
                         borderRadius: BorderRadius.circular(10)),

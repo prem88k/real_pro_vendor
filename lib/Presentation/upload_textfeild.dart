@@ -107,7 +107,7 @@ class _TextFieldUploadState extends State<TextFieldUpload> {
             counterText: '',
             hintStyle: TextStyle(
                 fontSize: ScreenUtil().setWidth(12.5),
-              color: widget.title=="Search Here"?secondaryColor: darkTextColor,
+              color: widget.title=="Search Here"?secondaryColor: primaryTextColor,
               fontFamily: 'work',
                 fontWeight: FontWeight.w800
 

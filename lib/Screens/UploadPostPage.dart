@@ -312,7 +312,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                 "Select Category",
                                 style: TextStyle(
                                     color: primaryColor,
-                                    fontFamily: 'railway',
+                                    fontFamily: 'work',
                                     fontSize: ScreenUtil().setHeight(12.5),
                                     fontWeight: FontWeight.normal),
                               ),
@@ -332,7 +332,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                   Text(
                                     value.name!,
                                     style: TextStyle(
-                                        fontFamily: 'railway',
+                                        fontFamily: 'work',
                                         color: primaryColor,
                                         fontSize: ScreenUtil().setHeight(12.5),
                                         fontWeight: FontWeight.normal),
@@ -368,10 +368,12 @@ class _UploadPostPageState extends State<UploadPostPage> {
                               right: ScreenUtil().setWidth(10)
                           ),
                         child: DropdownButton<String>(
-                          iconSize: 30,
+                          iconSize: ScreenUtil().setWidth(22),
                           style: TextStyle(
-                            color: primaryTextColor,
-                          ),
+                              color: primaryTextColor,
+                              fontFamily: 'work',
+                              fontSize: ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w400),
                           dropdownColor: secondaryColor,
                           isExpanded: true,
                           value: dropdownvalue,
@@ -386,8 +388,8 @@ class _UploadPostPageState extends State<UploadPostPage> {
                             "Select Property Type",
                             style: TextStyle(
                                 color: primaryTextColor,
-                                fontFamily: 'poppins',
-                                fontSize: ScreenUtil().setHeight(12.5),
+                                fontFamily: 'work',
+                                fontSize: ScreenUtil().setHeight(12),
                                 fontWeight: FontWeight.w400),
                           ),
                           icon: Icon(
@@ -404,7 +406,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                   Text(
                                     _languages,
                                     style: TextStyle(
-                                        fontFamily: 'poppins',
+                                        fontFamily: 'work',
                                         color: primaryColor,
                                         fontSize:
                                         ScreenUtil().setHeight(12.5),
@@ -465,13 +467,13 @@ class _UploadPostPageState extends State<UploadPostPage> {
                       ),
                       Container(
                         height: ScreenUtil().setHeight(50),
-                        width: ScreenUtil().setWidth(113),
+                        width: ScreenUtil().setWidth(100),
                         child: TextFormField(
                           controller: _bedroomController,
                           keyboardType: TextInputType.text,
                           textAlignVertical: TextAlignVertical.center,
                           style: TextStyle(
-                            fontSize: ScreenUtil().setHeight(14),
+                            fontSize: ScreenUtil().setHeight(13),
                             color: primaryColor,
                             fontWeight: FontWeight.w400,
                             fontFamily: 'work',
@@ -482,7 +484,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                             hintText: "Bedroom",
                             hintStyle: TextStyle(
                                 fontFamily: 'work',
-                                fontSize: ScreenUtil().setHeight(14),
+                                fontSize: ScreenUtil().setHeight(13),
                                 fontWeight: FontWeight.w400,
                                 color: primaryColor),
                             border: OutlineInputBorder(
@@ -494,6 +496,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                       ),
                     ],
                   ),
+                  SizedBox(width: ScreenUtil().setWidth(10),),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -522,13 +525,13 @@ class _UploadPostPageState extends State<UploadPostPage> {
                       ),
                       Container(
                         height: ScreenUtil().setHeight(50),
-                        width: ScreenUtil().setWidth(113),
+                        width: ScreenUtil().setWidth(100),
                         child: TextFormField(
                           controller: _toiletController,
                           keyboardType: TextInputType.text,
                           textAlignVertical: TextAlignVertical.center,
                           style: TextStyle(
-                            fontSize: ScreenUtil().setHeight(14),
+                            fontSize: ScreenUtil().setHeight(13),
                             color: primaryColor,
                             fontWeight: FontWeight.w400,
                             fontFamily: 'work',
@@ -539,7 +542,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                             hintText: "Toilet",
                             hintStyle: TextStyle(
                                 fontFamily: 'work',
-                                fontSize: ScreenUtil().setHeight(14),
+                                fontSize: ScreenUtil().setHeight(13),
                                 fontWeight: FontWeight.w400,
                                 color: primaryColor),
                             border: OutlineInputBorder(
@@ -551,6 +554,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                       ),
                     ],
                   ),
+                  SizedBox(width: ScreenUtil().setWidth(10),),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -579,13 +583,13 @@ class _UploadPostPageState extends State<UploadPostPage> {
                       ),
                       Container(
                         height: ScreenUtil().setHeight(50),
-                        width: ScreenUtil().setWidth(113),
+                        width: ScreenUtil().setWidth(100),
                         child: TextFormField(
                           controller: _sqftController,
                           keyboardType: TextInputType.text,
                           textAlignVertical: TextAlignVertical.center,
                           style: TextStyle(
-                            fontSize: ScreenUtil().setHeight(14),
+                            fontSize: ScreenUtil().setHeight(13),
                             color: primaryColor,
                             fontWeight: FontWeight.w400,
                             fontFamily: 'work',
@@ -596,7 +600,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                             hintText: "Sqft",
                             hintStyle: TextStyle(
                                 fontFamily: 'work',
-                                fontSize: ScreenUtil().setHeight(14),
+                                fontSize: ScreenUtil().setHeight(13),
                                 fontWeight: FontWeight.w400,
                                 color: primaryColor),
                             border: OutlineInputBorder(
@@ -712,7 +716,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                             label: Text(
                               value.name.toString(),
                               style: TextStyle(
-                                  fontFamily: 'railway',
+                                  fontFamily: 'work',
                                   fontWeight: FontWeight.normal,
                                   fontSize: ScreenUtil().setHeight(14),
                                   color: _selectedAmenities.contains(value)
@@ -827,7 +831,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                   "Location":
                                   _locationController.text,
                                     style: TextStyle(
-                                        fontFamily: 'railway',
+                                        fontFamily: 'work',
                                         fontSize: ScreenUtil().setHeight(14),
                                         fontWeight: FontWeight.normal,
                                         color: primaryColor),),

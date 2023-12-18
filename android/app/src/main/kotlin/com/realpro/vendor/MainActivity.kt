@@ -1,4 +1,4 @@
-package com.example.real_pro_vendor
+package com.realpro.vendor
 
 import io.flutter.embedding.android.FlutterActivity
 

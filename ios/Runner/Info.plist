@@ -34,6 +34,53 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+<key>UIBackgroundModes</key>
+        <array>
+            <string>fetch</string>
+            <string>remote-notification</string>
+        </array>
+	<key>FacebookAppID</key>
+    <string>fb197774540062818</string>
+    <key>FacebookClientToken</key>
+    <string>090ab9308bba6d012fd8efff03ade9f3</string>
+	<key>CFBundleURLTypes</key>
+    <array>
+    		<dict>
+    			<key>CFBundleURLSchemes</key>
+    			<array>
+    				<string>fb197774540062818</string>
+    			</array>
+    		</dict>
+    		<dict>
+    			<key>CFBundleTypeRole</key>
+    			<string>Editor</string>
+    			<key>CFBundleURLSchemes</key>
+    			<array>
+    				<string>com.googleusercontent.apps.996579167363-c86nkcjlib1594ertgds5bhps8c990rj</string>
+    			</array>
+    		</dict>
+    	</array>
+    	<key>NSAppTransportSecurity</key>
+            <dict>
+                <key>NSAllowsArbitraryLoads</key>
+                <true/>
+                <key>NSAllowsArbitraryLoadsInWebContent</key>
+                <true/>
+                <key>NSAllowsLocalNetworking</key>
+                	<true/>
+            </dict>
+<key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>yourang.io</key>
+            <dict>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+            </dict>
+        </dict>
+    </dict>
+    <key>NSPhotoLibraryUsageDescription</key> <string>RealproPhoto Library Access </string>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

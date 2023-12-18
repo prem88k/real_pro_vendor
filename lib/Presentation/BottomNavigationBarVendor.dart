@@ -70,7 +70,7 @@ class _BottomNavigationBarVendorState extends State<BottomNavigationBarVendor> {
           /// ADD
           SalomonBottomBarItem(
             icon: Icon(Icons.grid_view,color: currentIndex == 1?appColor:borderColor,),
-            title: Text("Add",style:  TextStyle(
+            title: Text("Upload",style:  TextStyle(
                 fontFamily: 'work',
                 fontSize: ScreenUtil().setHeight(13),
                 fontWeight: FontWeight.bold,

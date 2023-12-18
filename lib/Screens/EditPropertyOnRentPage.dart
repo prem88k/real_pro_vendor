@@ -384,7 +384,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                 "House Category",
                                 style: TextStyle(
                                     color: primaryColor,
-                                    fontFamily: 'railway',
+                                    fontFamily: 'work',
                                     fontSize: ScreenUtil().setHeight(12.5),
                                     fontWeight: FontWeight.normal),
                               ),
@@ -404,7 +404,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                   Text(
                                     value.name!,
                                     style: TextStyle(
-                                        fontFamily: 'railway',
+                                        fontFamily: 'work',
                                         color: primaryColor,
                                         fontSize: ScreenUtil().setHeight(12.5),
                                         fontWeight: FontWeight.normal),
@@ -981,7 +981,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                             label: Text(
                               value.name.toString(),
                               style: TextStyle(
-                                  fontFamily: 'railway',
+                                  fontFamily: 'work',
                                   fontWeight: FontWeight.normal,
                                   fontSize: ScreenUtil().setHeight(14),
                                   color: _selectedLanguage.contains(amenitiesList)
@@ -1096,7 +1096,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                   "Location":
                                   _locationController.text,
                                     style: TextStyle(
-                                        fontFamily: 'railway',
+                                        fontFamily: 'work',
                                         fontSize: ScreenUtil().setHeight(14),
                                         fontWeight: FontWeight.normal,
                                         color: primaryColor),),

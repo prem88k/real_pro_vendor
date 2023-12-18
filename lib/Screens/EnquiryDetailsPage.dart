@@ -80,7 +80,7 @@ class _EnquiryDetailsPageState extends State<EnquiryDetailsPage> {
               style: TextStyle(
                   fontSize: ScreenUtil().setWidth(16),
                   color: lightTextColor,
-                  fontFamily: 'poppins',
+                  fontFamily: 'work',
                   fontWeight: FontWeight.w400)),
         )
         : SingleChildScrollView(
@@ -99,7 +99,7 @@ class _EnquiryDetailsPageState extends State<EnquiryDetailsPage> {
                       style: TextStyle(
                           fontSize: ScreenUtil().setWidth(17),
                           color: primaryColor,
-                          fontFamily: 'poppins',
+                          fontFamily: 'work',
                           fontWeight: FontWeight.w600)),
                 ],
               ),
@@ -187,7 +187,7 @@ class _EnquiryDetailsPageState extends State<EnquiryDetailsPage> {
                                     style: TextStyle(
                                         fontSize: ScreenUtil().setWidth(16),
                                         color: primaryColor,
-                                        fontFamily: 'poppins',
+                                        fontFamily: 'work',
                                         fontWeight: FontWeight.w600)),
                                 Container(
                                   height: ScreenUtil().setHeight(18),
@@ -200,7 +200,7 @@ class _EnquiryDetailsPageState extends State<EnquiryDetailsPage> {
                                         style: TextStyle(
                                             fontSize: ScreenUtil().setWidth(10),
                                             color: secondaryColor,
-                                            fontFamily: 'poppins',
+                                            fontFamily: 'work',
                                             fontWeight: FontWeight.w400)),
                                   ),
                                 )
@@ -223,7 +223,7 @@ class _EnquiryDetailsPageState extends State<EnquiryDetailsPage> {
                                     style: TextStyle(
                                         fontSize: ScreenUtil().setWidth(12),
                                         color: primaryColor,
-                                        fontFamily: 'poppins',
+                                        fontFamily: 'work',
                                         fontWeight: FontWeight.w400)),
                               ],
                             ),
@@ -243,7 +243,7 @@ class _EnquiryDetailsPageState extends State<EnquiryDetailsPage> {
                                     style: TextStyle(
                                         fontSize: ScreenUtil().setWidth(12),
                                         color: primaryColor,
-                                        fontFamily: 'poppins',
+                                        fontFamily: 'work',
                                         fontWeight: FontWeight.w400)),
                               ],
                             ),
@@ -260,7 +260,7 @@ class _EnquiryDetailsPageState extends State<EnquiryDetailsPage> {
                                         style: TextStyle(
                                             fontSize: ScreenUtil().setWidth(10),
                                             color: appColor,
-                                            fontFamily: 'poppins',
+                                            fontFamily: 'work',
                                             fontWeight: FontWeight.w400)),
                                     Padding(
                                       padding: EdgeInsets.only(
@@ -279,7 +279,7 @@ class _EnquiryDetailsPageState extends State<EnquiryDetailsPage> {
                                     style: TextStyle(
                                         fontSize: ScreenUtil().setWidth(10),
                                         color: Color(0xffC9C9C9),
-                                        fontFamily: 'poppins',
+                                        fontFamily: 'work',
                                         fontWeight: FontWeight.w400)),
                               ],
                             ),
