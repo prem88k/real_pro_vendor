@@ -1,0 +1,151 @@
+{
+  "project_info": {
+    "project_number": "996579167363",
+    "firebase_url": "https://clarityapp-9e141-default-rtdb.firebaseio.com",
+    "project_id": "clarityapp-9e141",
+    "storage_bucket": "clarityapp-9e141.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996579167363:android:6464e1ac0477866f4ddfb6",
+        "android_client_info": {
+          "package_name": "com.app.realpro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "996579167363-hsaldlvlpqh031ikgafpq1ltgjt4kg29.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.realpro",
+            "certificate_hash": "1005ca7ff78a64123caeee6dd865a220ddce0780"
+          }
+        },
+        {
+          "client_id": "996579167363-f58lhaog2v11garc8rcbhabn9kl0er61.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_8nYShYvIFKysfedMNgU1eATxOvbJFEA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "996579167363-dqucics2fm37f9k2s9ro41jtql6tahl1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "996579167363-c86nkcjlib1594ertgds5bhps8c990rj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.realpro"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996579167363:android:a23b44e1cad9d7524ddfb6",
+        "android_client_info": {
+          "package_name": "com.example.clarity_chat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "996579167363-83agmfe9q591ud9bf0bqgjb8tg582dec.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.clarity_chat_app",
+            "certificate_hash": "1005ca7ff78a64123caeee6dd865a220ddce0780"
+          }
+        },
+        {
+          "client_id": "996579167363-b28pfo7vf3kp3aq1palrdd1785b3qcf4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.clarity_chat_app",
+            "certificate_hash": "7be2e5ccdb06f8961584d8a1ad93bbee83af0099"
+          }
+        },
+        {
+          "client_id": "996579167363-hlb69i2f8is122cdm5b105l31ahvvp2f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.clarity_chat_app",
+            "certificate_hash": "0d69557ebb52f5ba0f13e2405a2036a6df131212"
+          }
+        },
+        {
+          "client_id": "996579167363-f58lhaog2v11garc8rcbhabn9kl0er61.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_8nYShYvIFKysfedMNgU1eATxOvbJFEA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "996579167363-dqucics2fm37f9k2s9ro41jtql6tahl1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "996579167363-c86nkcjlib1594ertgds5bhps8c990rj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.realpro"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996579167363:android:3a45e0298998a3504ddfb6",
+        "android_client_info": {
+          "package_name": "com.realpro.vendor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "996579167363-f58lhaog2v11garc8rcbhabn9kl0er61.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_8nYShYvIFKysfedMNgU1eATxOvbJFEA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "996579167363-dqucics2fm37f9k2s9ro41jtql6tahl1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "996579167363-c86nkcjlib1594ertgds5bhps8c990rj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.realpro"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
