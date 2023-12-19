@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../Constants/Api.dart';
 import '../Constants/Colors.dart';
 import '../Presentation/upload_textfeild.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:convert';
@@ -142,47 +141,62 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
           ),
         ),
       ),
-      body: Stepper(
-        type: StepperType.horizontal,
-        currentStep: _activeCurrentStep,
-        steps: stepList(),
+      body: Column(
+        children: [
+          Container(
+            height: ScreenUtil().setHeight(90),
+            alignment: Alignment.center,
+            child: Image(
+              image: AssetImage("assets/images/login_bg.png"),
+              fit: BoxFit.fill,
+              height: ScreenUtil().setHeight(90),
+              width: double.infinity,
+            ),
+          ),
+          Expanded(
+            child: Stepper(
+              type: StepperType.horizontal,
+              currentStep: _activeCurrentStep,
+              steps: stepList(),
+              onStepContinue: () {
+                if (_activeCurrentStep < (stepList().length - 1)) {
+                  setState(() {
+                    _activeCurrentStep += 1;
+                  });
+                }
+                else if(_activeCurrentStep == 1){
+                  setState(() {
+                    checkValidation();
+                    /*Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return BottomNavigationBarVendor();
+                        },
+                      ),
+                    );*/
+                  });
+                }
+              },
 
-        onStepContinue: () {
-          if (_activeCurrentStep < (stepList().length - 1)) {
-            setState(() {
-              _activeCurrentStep += 1;
-            });
-          }
-          else if(_activeCurrentStep == 1){
-            setState(() {
-              checkValidation();
-              /*Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return BottomNavigationBarVendor();
-                  },
-                ),
-              );*/
-            });
-          }
-        },
+              onStepCancel: () {
+                if (_activeCurrentStep == 0) {
+                  return;
+                }
+                setState(() {
+                  _activeCurrentStep -= 1;
+                });
+              },
 
-        onStepCancel: () {
-          if (_activeCurrentStep == 0) {
-            return;
-          }
-          setState(() {
-            _activeCurrentStep -= 1;
-          });
-        },
+              onStepTapped: (int index) {
+                setState(() {
+                  _activeCurrentStep = index;
+                });
+              },
 
-        onStepTapped: (int index) {
-          setState(() {
-            _activeCurrentStep = index;
-          });
-        },
-
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -229,7 +243,6 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     });
     String? token = await FirebaseMessaging.instance.getToken();
     print("Tpkoen::$token");
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
     var uri = Uri.https(
       apiBaseUrl,
       '/realpro/api/auth/user/registerotp',
@@ -249,7 +262,6 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       'agent_brn': _brnController.text,
       'dld_no': _dldController.text
     };
-    String jsonBody = json.encode(body);
     final encoding = Encoding.getByName('utf-8');
 
     Response response = await post(
@@ -282,7 +294,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
             context,
             MaterialPageRoute(
               builder: (context) {
-                return  RegistrationOtpVendor(_passwordController.text,_emailController.text, _nameController.text,_phoneController.text);;
+                return  RegistrationOtpVendor(_passwordController.text,_emailController.text, _nameController.text,_phoneController.text);
               },
             ),
           );

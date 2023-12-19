@@ -490,7 +490,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                             border: OutlineInputBorder(
                                 borderSide: BorderSide.none,
                                 borderRadius: BorderRadius.circular(10)),
-                            contentPadding: EdgeInsets.only(left: 20),
+                            contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
                           ),
                         ),
                       ),
@@ -548,7 +548,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                             border: OutlineInputBorder(
                                 borderSide: BorderSide.none,
                                 borderRadius: BorderRadius.circular(10)),
-                            contentPadding: EdgeInsets.only(left: 20),
+                            contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
                           ),
                         ),
                       ),
@@ -606,7 +606,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                             border: OutlineInputBorder(
                                 borderSide: BorderSide.none,
                                 borderRadius: BorderRadius.circular(10)),
-                            contentPadding: EdgeInsets.only(left: 20),
+                            contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(20)),
                           ),
                         ),
                       ),
@@ -618,6 +618,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 height: ScreenUtil().setHeight(10),
               ),
               Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
@@ -759,6 +760,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 height: ScreenUtil().setHeight(10),
               ),
               Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
@@ -775,7 +777,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                     height: ScreenUtil().setHeight(7),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 7),
+                    padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(0), vertical:ScreenUtil().setWidth(5)),
                     height: ScreenUtil().setHeight(50),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
@@ -819,22 +821,23 @@ class _UploadPostPageState extends State<UploadPostPage> {
                               });
                             }
                           },
-                          child:Padding(
-                            padding: EdgeInsets.all(0),
-                            child: Container(
-                              padding: EdgeInsets.all(0),
-                              width: MediaQuery.of(context).size.width - 40,
+                          child:Container(
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: ScreenUtil().setWidth(20),
+                                  right: ScreenUtil().setWidth(20)
+                              ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(_locationController.text.isEmpty ?
-                                  "Location":
-                                  _locationController.text,
-                                    style: TextStyle(
-                                        fontFamily: 'work',
-                                        fontSize: ScreenUtil().setHeight(14),
-                                        fontWeight: FontWeight.normal,
-                                        color: primaryColor),),
+                                    "Location":
+                                    _locationController.text,
+                                      style: TextStyle(
+                                          fontFamily: 'work',
+                                          fontSize: ScreenUtil().setHeight(12.5),
+                                          fontWeight: FontWeight.w400,
+                                          color: primaryColor),),
 
                                   Icon(Icons.my_location,
                                       color: appColor, size: ScreenUtil().setHeight(14)),
@@ -854,6 +857,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 height: ScreenUtil().setHeight(10),
               ),
               Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
@@ -894,7 +898,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                     color: primaryColor,
                                     fontFamily: 'work',
                                     fontWeight:
-                                    FontWeight.w600)),
+                                    FontWeight.w400)),
                           ),
                         ],
                       ),
@@ -919,7 +923,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                     color: primaryColor,
                                     fontFamily: 'work',
                                     fontWeight:
-                                    FontWeight.w600)),
+                                    FontWeight.w400)),
                           ),
                         ],
                       ),
@@ -944,7 +948,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                     color: primaryColor,
                                     fontFamily: 'work',
                                     fontWeight:
-                                    FontWeight.w600)),
+                                    FontWeight.w400)),
                           ),
                         ],
                       ),
@@ -969,7 +973,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                     color: primaryColor,
                                     fontFamily: 'work',
                                     fontWeight:
-                                    FontWeight.w600)),
+                                    FontWeight.w400)),
                           ),
                         ],
                       ),
@@ -1023,16 +1027,45 @@ class _UploadPostPageState extends State<UploadPostPage> {
       physics: NeverScrollableScrollPhysics(),
       itemCount: _fields.length,
       itemBuilder: (context, index) {
-        return Container(
-          margin: EdgeInsets.all(5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                height: ScreenUtil().setHeight(50),
-                width: ScreenUtil().setWidth(280),
-                child: TextFormField(
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              height: ScreenUtil().setHeight(50),
+              width: ScreenUtil().setWidth(290),
+              child: TextFormField(
+                controller: _controllers[index],
+                keyboardType: TextInputType.text,
+                textAlignVertical: TextAlignVertical.center,
+                style: TextStyle(
+                  fontSize: ScreenUtil().setHeight(14),
+                  color: primaryColor,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: 'work',
+                ),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: secondaryColor,
+                  hintText: "Feature",
+                  hintStyle: TextStyle(
+                      fontFamily: 'work',
+                      fontSize: ScreenUtil().setHeight(14),
+                      fontWeight: FontWeight.w400,
+                      color: primaryColor),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(10)),
+                  contentPadding: EdgeInsets.only(left: 20),
+                ),
+              ),
+            ),
+            IconButton(
+              icon: Icon( index == 0 ? Icons.add_circle_outline  : Icons.remove_circle_outline),
+              color: appColor,
+              onPressed: () async {
+                final controller = TextEditingController();
+                final field = TextFormField(
                   controller: _controllers[index],
                   keyboardType: TextInputType.text,
                   textAlignVertical: TextAlignVertical.center,
@@ -1045,7 +1078,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: secondaryColor,
-                    hintText: "Feature",
+                    hintText: "Feature ${_controllers.length + 1}",
                     hintStyle: TextStyle(
                         fontFamily: 'work',
                         fontSize: ScreenUtil().setHeight(14),
@@ -1056,52 +1089,20 @@ class _UploadPostPageState extends State<UploadPostPage> {
                         borderRadius: BorderRadius.circular(10)),
                     contentPadding: EdgeInsets.only(left: 20),
                   ),
-                ),
-              ),
-              IconButton(
-                icon: Icon( index == 0 ? Icons.add_circle_outline  : Icons.remove_circle_outline),
-                color: appColor,
-                onPressed: () async {
-                  final controller = TextEditingController();
-                  final field = TextFormField(
-                    controller: _controllers[index],
-                    keyboardType: TextInputType.text,
-                    textAlignVertical: TextAlignVertical.center,
-                    style: TextStyle(
-                      fontSize: ScreenUtil().setHeight(14),
-                      color: primaryColor,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'work',
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: secondaryColor,
-                      hintText: "Feature ${_controllers.length + 1}",
-                      hintStyle: TextStyle(
-                          fontFamily: 'work',
-                          fontSize: ScreenUtil().setHeight(14),
-                          fontWeight: FontWeight.w400,
-                          color: primaryColor),
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(10)),
-                      contentPadding: EdgeInsets.only(left: 20),
-                    ),
-                  );
-                  setState(() {
-                    if(index == 0) {
-                      _controllers.add(controller);
-                      _fields.add(field);
-                    }
-                    else{
-                      _controllers.removeAt(index);
-                      _fields.removeAt(index);
-                    }
+                );
+                setState(() {
+                  if(index == 0) {
+                    _controllers.add(controller);
+                    _fields.add(field);
+                  }
+                  else{
+                    _controllers.removeAt(index);
+                    _fields.removeAt(index);
+                  }
 
-                  });
-                },)
-            ],
-          ),
+                });
+              },)
+          ],
         );
       },
     );
@@ -1276,15 +1277,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 imageFilePathList![i].path
             ));
       }
-
-    /*if(_image != null)
-    {
-      request.files.add(
-          await http.MultipartFile.fromPath(
-              'image[]',
-              _image!.path
-          ));
-    }*/
 
 
     request.send().then((response) {

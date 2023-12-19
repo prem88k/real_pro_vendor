@@ -15,4 +15,11 @@
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
+
+    <string name="app_name">"RealPro"</string>
+
+    <string name="facebook_application_id" translatable="false">197774540062818</string>
+
+    <string name="fb_login_protocol_scheme">fb197774540062818</string>
+    <string name="facebook_client_token">090ab9308bba6d012fd8efff03ade9f3</string>
 </resources>

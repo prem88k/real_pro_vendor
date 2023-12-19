@@ -6,7 +6,6 @@ import '../../Constants/Colors.dart';
 import '../Presentation/BottomNavigationBarVendor.dart';
 import 'InttroductionPage.dart';
 
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 

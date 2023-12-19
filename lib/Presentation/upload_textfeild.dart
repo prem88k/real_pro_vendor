@@ -45,7 +45,7 @@ class _TextFieldUploadState extends State<TextFieldUpload> {
               fontSize: ScreenUtil().setWidth(12.5),
               color: widget.title=="Search Here"?secondaryColor: darkTextColor,
               fontFamily: 'work',
-              fontWeight: FontWeight.w800
+              fontWeight: FontWeight.w400
             ),
             inputFormatters: [
           ],
@@ -87,11 +87,7 @@ class _TextFieldUploadState extends State<TextFieldUpload> {
             fillColor: secondaryColor,
             filled: true,
             border: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: widget.title=="Search Here"?secondaryColor: lineColor,
-                width: 0.5,
-
-              ),
+                borderSide: BorderSide.none
             ),
             enabledBorder: OutlineInputBorder(
 
@@ -109,7 +105,7 @@ class _TextFieldUploadState extends State<TextFieldUpload> {
                 fontSize: ScreenUtil().setWidth(12.5),
               color: widget.title=="Search Here"?secondaryColor: primaryTextColor,
               fontFamily: 'work',
-                fontWeight: FontWeight.w800
+                fontWeight: FontWeight.w400
 
             ),
             contentPadding: EdgeInsets.only(left:  ScreenUtil().setWidth(20),top:  ScreenUtil().setHeight(20)),
@@ -130,11 +126,7 @@ class _TextFieldUploadState extends State<TextFieldUpload> {
             fillColor: secondaryColor,
             filled: true,
             border: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: widget.title=="Search Here"?secondaryColor: lineColor,
-                width: 0.5,
-
-              ),
+                borderSide: BorderSide.none
             ),
 
             enabledBorder: OutlineInputBorder(
@@ -151,7 +143,7 @@ class _TextFieldUploadState extends State<TextFieldUpload> {
             hintStyle: TextStyle(
               fontSize: ScreenUtil().setWidth(12.5),
               color: darkTextColor,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w400,
               fontFamily: 'work',
             ),
             contentPadding: EdgeInsets.only(left:  ScreenUtil().setWidth(20)),

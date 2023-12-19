@@ -1,3 +1,5 @@
+import 'GetAmenitiesData.dart';
+
 class GetPropertyDetails {
   bool? status;
   List<PropertyDetails>? data;
@@ -42,7 +44,7 @@ class PropertyDetails {
   String? purpose;
   String? refNum;
   String? addon;
-  List<Amenities>? amenities;
+  List<AmenitiesList>? amenities;
   int? isverified;
   String? thamblain;
   List<Images>? images;
@@ -111,9 +113,9 @@ class PropertyDetails {
     refNum = json['ref_num'];
     addon = json['addon'];
     if (json['amenities'] != null) {
-      amenities = <Amenities>[];
+      amenities = <AmenitiesList>[];
       json['amenities'].forEach((v) {
-        amenities!.add(new Amenities.fromJson(v));
+        amenities!.add(new AmenitiesList.fromJson(v));
       });
     }
     isverified = json['isverified'];

@@ -4,13 +4,15 @@ class GetProfileData {
   bool? isFollow;
   User? user;
   List<PostList>? post;
+  List<Null>? likes;
 
   GetProfileData(
       {this.status,
         this.like,
         this.isFollow,
         this.user,
-        this.post,});
+        this.post,
+        this.likes});
 
   GetProfileData.fromJson(Map<String, dynamic> json) {
     status = json['status'];
@@ -23,6 +25,12 @@ class GetProfileData {
         post!.add(new PostList.fromJson(v));
       });
     }
+   /* if (json['Likes'] != null) {
+      likes = <Null>[];
+      json['Likes'].forEach((v) {
+        likes!.add(new Like.fromJson(v));
+      });
+    }*/
   }
 
   Map<String, dynamic> toJson() {
@@ -36,7 +44,9 @@ class GetProfileData {
     if (this.post != null) {
       data['Post'] = this.post!.map((v) => v.toJson()).toList();
     }
-
+  /*  if (this.likes != null) {
+      data['Likes'] = this.likes!.map((v) => v.toJson()).toList();
+    }*/
     return data;
   }
 }
@@ -112,7 +122,7 @@ class PostList {
   Null? salePrice;
   int? propertySize;
   bool? liked;
-  String? propertyAddress;
+  Null? propertyAddress;
   int? bedroomCount;
   int? kitchenCount;
   int? bathroomCount;
@@ -124,7 +134,7 @@ class PostList {
   int? shopId;
   String? description;
   CreatedBy? createdBy;
-  Category? category;
+  List<Null>? category;
   int? like;
   Null? view;
   int? enquiry;
@@ -182,9 +192,12 @@ class PostList {
     createdBy = json['created_by'] != null
         ? new CreatedBy.fromJson(json['created_by'])
         : null;
-    category = json['category'] != null
-        ? new Category.fromJson(json['category'])
-        : null;
+/*    if (json['category'] != null) {
+      category = <Null>[];
+      json['category'].forEach((v) {
+        category!.add(new Null.fromJson(v));
+      });
+    }*/
     like = json['like'];
     view = json['view'];
     enquiry = json['enquiry'];
@@ -216,9 +229,9 @@ class PostList {
     if (this.createdBy != null) {
       data['created_by'] = this.createdBy!.toJson();
     }
-    if (this.category != null) {
-      data['category'] = this.category!.toJson();
-    }
+   /* if (this.category != null) {
+      data['category'] = this.category!.map((v) => v.toJson()).toList();
+    }*/
     data['like'] = this.like;
     data['view'] = this.view;
     data['enquiry'] = this.enquiry;
@@ -336,25 +349,6 @@ class CreatedBy {
     data['broker_orn'] = this.brokerOrn;
     data['location'] = this.location;
     data['social_login'] = this.socialLogin;
-    return data;
-  }
-}
-
-class Category {
-  int? id;
-  String? name;
-
-  Category({this.id, this.name});
-
-  Category.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
     return data;
   }
 }

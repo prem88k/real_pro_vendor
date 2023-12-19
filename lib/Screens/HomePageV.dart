@@ -40,6 +40,7 @@ class _HomePageVState extends State<HomePageV> {
   bool isloading = false;
   bool catloading = false;
   File? coverPhoto;
+
   Future<void> selectPhoto() async {
     try {
       final picker = ImagePicker();
@@ -190,7 +191,7 @@ class _HomePageVState extends State<HomePageV> {
                                                 getProfileData.user!.name.toString()  : "Real Estate",
                                                 style: TextStyle(
                                                     fontSize: ScreenUtil()
-                                                        .setHeight(20),
+                                                        .setHeight(17),
                                                     color: secondaryColor,
                                                     fontFamily: 'work',
                                                     fontWeight:
@@ -256,7 +257,7 @@ class _HomePageVState extends State<HomePageV> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      height: ScreenUtil().setHeight(125),
+                      height: ScreenUtil().setHeight(115),
                       width: ScreenUtil().setWidth(170),
                       padding: EdgeInsets.only(
                           top: ScreenUtil().setHeight(5),
@@ -276,7 +277,7 @@ class _HomePageVState extends State<HomePageV> {
                           ),
                           
                           SizedBox(
-                            height: ScreenUtil().setHeight(10),
+                            height: ScreenUtil().setHeight(5),
                           ),
                           
                           DottedLine(
@@ -295,14 +296,14 @@ class _HomePageVState extends State<HomePageV> {
                           ),
 
                           SizedBox(
-                            height: ScreenUtil().setHeight(10),
+                            height: ScreenUtil().setHeight(5),
                           ),
 
                           Container(
                             child: Text("Views",
                                 style: TextStyle(
                                     fontSize: ScreenUtil()
-                                        .setHeight(20),
+                                        .setHeight(17),
                                     color: secondaryColor,
                                     fontFamily: 'work',
                                     fontWeight:
@@ -328,7 +329,7 @@ class _HomePageVState extends State<HomePageV> {
                       ),
                     ),
                     Container(
-                      height: ScreenUtil().setHeight(125),
+                      height: ScreenUtil().setHeight(115),
                       width: ScreenUtil().setWidth(170),
                       padding: EdgeInsets.only(
                           top: ScreenUtil().setHeight(5),
@@ -348,7 +349,7 @@ class _HomePageVState extends State<HomePageV> {
                           ),
 
                           SizedBox(
-                            height: ScreenUtil().setHeight(10),
+                            height: ScreenUtil().setHeight(5),
                           ),
 
                           DottedLine(
@@ -367,14 +368,14 @@ class _HomePageVState extends State<HomePageV> {
                           ),
 
                           SizedBox(
-                            height: ScreenUtil().setHeight(10),
+                            height: ScreenUtil().setHeight(5),
                           ),
 
                           Container(
                             child: Text("Enquiries",
                                 style: TextStyle(
                                     fontSize: ScreenUtil()
-                                        .setHeight(20),
+                                        .setHeight(17),
                                     color: appColor,
                                     fontFamily: 'work',
                                     fontWeight:
@@ -396,6 +397,7 @@ class _HomePageVState extends State<HomePageV> {
                                     fontWeight:
                                     FontWeight.w600)),
                           ),
+
                         ],
                       ),
                     ),
@@ -451,7 +453,7 @@ class _HomePageVState extends State<HomePageV> {
                           child: Text("Add Property",
                               style: TextStyle(
                                   fontSize: ScreenUtil()
-                                      .setHeight(14),
+                                      .setHeight(12),
                                   color: primaryColor,
                                   fontFamily: 'work',
                                   fontWeight:
@@ -563,7 +565,7 @@ class _HomePageVState extends State<HomePageV> {
                                         color: secondaryColor,
                                         fontFamily: 'work',
                                         fontWeight:
-                                        FontWeight.w600)),
+                                        FontWeight.w400)),
                               ),
 
                               SizedBox(
@@ -574,7 +576,7 @@ class _HomePageVState extends State<HomePageV> {
                                 child: Text("AED 100",
                                     style: TextStyle(
                                         fontSize: ScreenUtil()
-                                            .setHeight(20),
+                                            .setHeight(17),
                                         color: secondaryColor,
                                         fontFamily: 'work',
                                         fontWeight:
@@ -594,7 +596,7 @@ class _HomePageVState extends State<HomePageV> {
                                         color: secondaryColor,
                                         fontFamily: 'work',
                                         fontWeight:
-                                        FontWeight.w600)),
+                                        FontWeight.w400)),
                               ),
                             ],
                           ),
@@ -638,7 +640,7 @@ class _HomePageVState extends State<HomePageV> {
                                         color: appColor,
                                         fontFamily: 'work',
                                         fontWeight:
-                                        FontWeight.w600)),
+                                        FontWeight.w400)),
                               ),
 
                               SizedBox(
@@ -649,7 +651,7 @@ class _HomePageVState extends State<HomePageV> {
                                 child: Text("AED 250",
                                     style: TextStyle(
                                         fontSize: ScreenUtil()
-                                            .setHeight(20),
+                                            .setHeight(17),
                                         color: appColor,
                                         fontFamily: 'work',
                                         fontWeight:
@@ -669,7 +671,7 @@ class _HomePageVState extends State<HomePageV> {
                                         color: appColor,
                                         fontFamily: 'work',
                                         fontWeight:
-                                        FontWeight.w600)),
+                                        FontWeight.w400)),
                               ),
                             ],
                           ),
