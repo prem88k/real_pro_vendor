@@ -2,19 +2,18 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../Constants/Api.dart';
 import '../Constants/Colors.dart';
 import '../Models/GetCaategoryData.dart';
 import '../Models/GetPropertyData.dart';
 import 'LoginPageVendor.dart';
+import 'PropertyDetailsPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -24,7 +23,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final TextEditingController _searchController = TextEditingController();
   int? selectedIndex = -1;
   late GecategoryData gecategoryData;
   List<CategoryList>? catList = [];
@@ -32,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   List<PropertyList>? proppertyList = [];
   late GetPropertyData getPropertyData;
   bool catloading = false;
-
+  PageController? controller1;
 
   @override
   void initState() {
@@ -40,6 +38,8 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     getCategory();
     getPropertyAPI("0");
+    controller1 =
+        PageController(viewportFraction: 0.9, initialPage: 0, keepPage: true);
   }
 
   @override
@@ -202,269 +202,405 @@ class _HomePageState extends State<HomePage> {
   Widget _buildProList(int i) {
     return proppertyList!.length == 0
         ? Container(
-            alignment: Alignment.center,
-            margin: EdgeInsets.only(top: ScreenUtil().setHeight(55)),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.asset(
-                  "assets/images/nodata.png",
-                  height: ScreenUtil().setHeight(130),
-                  width: ScreenUtil().setWidth(130),
-                  fit: BoxFit.contain,
-                ),
-                Text(
-                  "No Property Data found",
-                  style: TextStyle(
-                    color: lineColor,
-                    fontSize: ScreenUtil().setWidth(14),
-                    fontFamily: 'work',
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+      alignment: Alignment.center,
+      margin: EdgeInsets.only(top: ScreenUtil().setHeight(55)),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Image.asset(
+            "assets/images/nodata.png",
+            height: ScreenUtil().setHeight(130),
+            width: ScreenUtil().setWidth(130),
+            fit: BoxFit.contain,
+          ),
+          Text(
+            "No Property Data found",
+            style: TextStyle(
+              color: lineColor,
+              fontSize: ScreenUtil().setWidth(14),
+              fontFamily: 'work',
+              fontWeight: FontWeight.bold,
             ),
-          )
+          ),
+        ],
+      ),
+    )
         : GestureDetector(
-            onTap: () {
-              /*Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return PropertyDetailsPage(proppertyList![i].id.toString());
-                  },
-                ),
-              );*/
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return PropertyDetailsPage(proppertyList![i].id.toString());
             },
-            child: Container(
-              margin: EdgeInsets.only(bottom: ScreenUtil().setWidth(15)),
-              decoration: BoxDecoration(
-                  color: secondaryColor,
-                  border: Border.all(color: secondaryColor, width: 0.2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              height: ScreenUtil().setHeight(235),
-              child: Column(
-                children: [
-                  ColorFiltered(
-                    colorFilter: ColorFilter.mode(
-                      Colors.grey.shade100,
-                      BlendMode.darken,
-                    ),
-                    child: Container(
-                      height: ScreenUtil().setHeight(160),
-                      decoration: proppertyList![i].images != null
-                          ? BoxDecoration(
-                              image: DecorationImage(
-                                  image: CachedNetworkImageProvider(proppertyList![i].images![0].image!,),
-                                  fit: BoxFit.cover),
-                              border:
-                                  Border.all(color: secondaryColor, width: 0.2),
-                              borderRadius: BorderRadius.circular(5.0))
-                          : BoxDecoration(
-                              image: DecorationImage(
-                                  image: AssetImage(
-                                      "assets/images/property_img.png"),
-                                  fit: BoxFit.cover),
-                              border:
-                                  Border.all(color: secondaryColor, width: 0.2),
-                              borderRadius: BorderRadius.circular(5.0)),
-                      alignment: Alignment.center,
-                      child: Column(
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ),
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: ScreenUtil().setWidth(15)),
+        decoration: BoxDecoration(
+            color: secondaryColor,
+            border: Border.all(color: secondaryColor, width: 0.2),
+            borderRadius: BorderRadius.circular(10.0)),
+        height: ScreenUtil().setHeight(235),
+        child: Column(
+          children: [
+            ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                Colors.grey.shade100,
+                BlendMode.darken,
+              ),
+              child: Container(
+                height: ScreenUtil().setHeight(160),
+                child: Stack(
+                  children: [
+                    ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: proppertyList![i].images!.length,
+                      controller: controller1,
+                      itemBuilder: (BuildContext context, int index1) {
+                        return Container(
+                          margin:
+                          EdgeInsets.only(right: proppertyList![i].images!.length!=proppertyList![i].images!.length?ScreenUtil().setWidth(10):ScreenUtil().setWidth(1)),
+                          child: Stack(
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Padding(
+                              proppertyList![i].images!.length!=0?Container(
+                                height: ScreenUtil().setHeight(250),
+                                width:
+                                MediaQuery.of(context).size.width-ScreenUtil().setWidth(28),
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image: CachedNetworkImageProvider(
+                                          proppertyList![i].images![index1].image!),
+                                      fit: BoxFit.cover),
+                                ),
+                              ):Container(
+                                height: ScreenUtil().setHeight(250),
+                                width:
+                                MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image: AssetImage("assets/images/property_img.png"),
+                                      fit: BoxFit.cover),
+                                  border: Border.all(color: secondaryColor, width: 0.2),
+                                ),
+                              ),
+                              Container(
+                                  width: MediaQuery.of(context).size.width *
+                                      0.9,
+
+                                  padding: EdgeInsets.only(
+                                      bottom: ScreenUtil().setWidth(15),left:ScreenUtil().setWidth(15) ),
+                                  alignment: Alignment.bottomRight,
+                                  child: SmoothPageIndicator(
+                                    controller: controller1!,
+                                    count:  proppertyList![i].images!.length,
+                                    effect: ExpandingDotsEffect(
+                                        expansionFactor: 3,strokeWidth: .5,
+                                        spacing: 3.0,
+                                        radius: 2.0,
+                                        dotWidth: 5.0,
+                                        dotHeight: 5.0,
+                                        dotColor: borderColor,
+                                        activeDotColor: secondaryColor),
+                                  ))
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+
+                    Column(
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: ClipRRect(
+                                        borderRadius:
+                                        BorderRadius.circular(5),
+                                        child: Container(
+                                            height:
+                                            ScreenUtil().setHeight(26),
+                                            width: ScreenUtil().setWidth(80),
+                                            color: Color(0xffFFE500),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                              children: [
+                                                Image.asset(
+                                                    "assets/images/verified.png",
+                                                    height: ScreenUtil()
+                                                        .setHeight(14),
+                                                    width: ScreenUtil()
+                                                        .setWidth(18)),
+                                                SizedBox(
+                                                  width: ScreenUtil()
+                                                      .setWidth(5),
+                                                ),
+                                                Text(
+                                                  "Verified",
+                                                  style: TextStyle(
+                                                    color: appColor,
+                                                    fontSize: ScreenUtil()
+                                                        .setWidth(12),
+                                                    fontFamily: 'work',
+                                                    fontWeight:
+                                                    FontWeight.w400,
+                                                  ),
+                                                ),
+                                              ],
+                                            )),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        isLiked(proppertyList![i].id,
+                                            proppertyList![i]);
+                                      },
+                                      child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: ClipRRect(
                                           borderRadius:
-                                              BorderRadius.circular(5),
+                                          BorderRadius.circular(100),
                                           child: Container(
                                               height:
-                                                  ScreenUtil().setHeight(26),
-                                              width: ScreenUtil().setWidth(80),
-                                              color: Color(0xffFFE500),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Image.asset(
-                                                      "assets/images/verified.png",
-                                                      height: ScreenUtil()
-                                                          .setHeight(14),
-                                                      width: ScreenUtil()
-                                                          .setWidth(18)),
-                                                  SizedBox(
-                                                    width: ScreenUtil()
-                                                        .setWidth(5),
-                                                  ),
-                                                  Text(
-                                                    "Verified",
-                                                    style: TextStyle(
-                                                      color: appColor,
-                                                      fontSize: ScreenUtil()
-                                                          .setWidth(12),
-                                                      fontFamily: 'work',
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                    ),
-                                                  ),
-                                                ],
+                                              ScreenUtil().setHeight(26),
+                                              width:
+                                              ScreenUtil().setHeight(26),
+                                              color: secondaryColor,
+                                              child: Icon(
+                                                !proppertyList![i].liked!
+                                                    ? Icons.favorite_border
+                                                    : Icons.favorite,
+                                                color:
+                                                !proppertyList![i].liked!
+                                                    ? Color(0xff1C1B1F)
+                                                    : Colors.red,
+                                                size: ScreenUtil()
+                                                    .setHeight(14),
                                               )),
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          isLiked(proppertyList![i].id,
-                                              proppertyList![i]);
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                            child: Container(
-                                                height:
-                                                    ScreenUtil().setHeight(26),
-                                                width:
-                                                    ScreenUtil().setHeight(26),
-                                                color: secondaryColor,
-                                                child: Icon(
-                                                  !proppertyList![i].liked!
-                                                      ? Icons.favorite_border
-                                                      : Icons.favorite,
-                                                  color:
-                                                      !proppertyList![i].liked!
-                                                          ? Color(0xff1C1B1F)
-                                                          : Colors.red,
-                                                  size: ScreenUtil()
-                                                      .setHeight(14),
-                                                )),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: ScreenUtil().setHeight(30),
-                              ),
-                              Container(
-                                height: ScreenUtil().setHeight(80),
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                      left: ScreenUtil().setWidth(12),
-                                      top: ScreenUtil().setWidth(12)),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                proppertyList![i].propertyName!,
-                                                style: TextStyle(
-                                                  color: secondaryColor,
-                                                  fontSize:
-                                                      ScreenUtil().setWidth(12),
-                                                  fontFamily: 'work',
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: ScreenUtil().setHeight(5),
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "C203",
-                                                style: TextStyle(
-                                                  color: secondaryColor,
-                                                  fontSize:
-                                                      ScreenUtil().setWidth(15),
-                                                  fontFamily: 'work',
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: ScreenUtil().setHeight(5),
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                proppertyList![i]
-                                                            .propertyAddress !=
-                                                        null
-                                                    ? proppertyList![i]
-                                                        .propertyAddress!
-                                                    : "Dubai , UAE",
-                                                style: TextStyle(
-                                                  color: secondaryColor,
-                                                  fontSize:
-                                                      ScreenUtil().setWidth(12),
-                                                  fontFamily: 'work',
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: ScreenUtil().setHeight(40),
+                            ),
+                            Container(
+                              height: ScreenUtil().setHeight(80),
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                    left: ScreenUtil().setWidth(12),
+                                    top: ScreenUtil().setWidth(12)),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              proppertyList![i].propertyName!,
+                                              style: TextStyle(
+                                                color: secondaryColor,
+                                                fontSize:
+                                                ScreenUtil().setWidth(12),
+                                                fontFamily: 'work',
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: ScreenUtil().setHeight(5),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "AED "+proppertyList![i].price.toString(),
+                                              style: TextStyle(
+                                                color: secondaryColor,
+                                                fontSize:
+                                                ScreenUtil().setWidth(15),
+                                                fontFamily: 'work',
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: ScreenUtil().setHeight(5),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              proppertyList![i]
+                                                  .propertyAddress !=
+                                                  null
+                                                  ? proppertyList![i]
+                                                  .propertyAddress!
+                                                  : "Dubai , UAE",
+                                              style: TextStyle(
+                                                color: secondaryColor,
+                                                fontSize:
+                                                ScreenUtil().setWidth(12),
+                                                fontFamily: 'work',
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: ScreenUtil().setHeight(10),
+            ),
+            Container(
+              padding: EdgeInsets.only(
+                  left: ScreenUtil().setWidth(10),
+                  right: ScreenUtil().setWidth(10)),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Row(
+                        children: [
+                          Image.asset("assets/images/bed.png",
+                              height: ScreenUtil().setHeight(15),
+                              color: appColor,
+                              width: ScreenUtil().setWidth(18)),
+                          SizedBox(
+                            width: ScreenUtil().setWidth(5),
+                          ),
+                          Text(
+                            proppertyList![i].bedroomCount.toString(),
+                            style: TextStyle(
+                              color: darkTextColor,
+                              fontSize: ScreenUtil().setWidth(12),
+                              fontFamily: 'work',
+                              height: ScreenUtil().setWidth(1),
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
-                    ),
+                      SizedBox(
+                        width: ScreenUtil().setWidth(12),
+                      ),
+                      Row(
+                        children: [
+                          Image.asset("assets/images/bath.png",
+                              height: ScreenUtil().setHeight(15),
+                              color: appColor,
+                              width: ScreenUtil().setWidth(18)),
+                          SizedBox(
+                            width: ScreenUtil().setWidth(5),
+                          ),
+                          Text(
+                            proppertyList![i].bathroomCount.toString(),
+                            style: TextStyle(
+                              color: darkTextColor,
+                              fontSize: ScreenUtil().setWidth(12),
+                              fontFamily: 'work',
+                              height: ScreenUtil().setWidth(1),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        width: ScreenUtil().setWidth(12),
+                      ),
+                      Row(
+                        children: [
+                          Image.asset("assets/images/crop.png",
+                              height: ScreenUtil().setHeight(15),
+                              color: appColor,
+                              width: ScreenUtil().setWidth(18)),
+                          SizedBox(
+                            width: ScreenUtil().setWidth(5),
+                          ),
+                          Text(
+                            proppertyList![i].propertySize != null
+                                ? proppertyList![i].propertySize!.toString() +
+                                " SQFT"
+                                : "2300 SQFT",
+                            style: TextStyle(
+                              color: darkTextColor,
+                              fontSize: ScreenUtil().setWidth(12),
+                              fontFamily: 'work',
+                              height: ScreenUtil().setWidth(1),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   SizedBox(
                     height: ScreenUtil().setHeight(10),
                   ),
-                  Container(
-                    padding: EdgeInsets.only(
-                        left: ScreenUtil().setWidth(10),
-                        right: ScreenUtil().setWidth(10)),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Row(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          _callENquiryAPI(proppertyList![0], "phone");
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0),
+                            color: Color(0xffF5F6F8),
+                          ),
+                          width: ScreenUtil().setWidth(95),
+                          height: ScreenUtil().setHeight(32),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Image.asset("assets/images/bed.png",
+                                Image.asset("assets/images/call.png",
                                     height: ScreenUtil().setHeight(15),
                                     color: appColor,
                                     width: ScreenUtil().setWidth(18)),
@@ -472,196 +608,104 @@ class _HomePageState extends State<HomePage> {
                                   width: ScreenUtil().setWidth(5),
                                 ),
                                 Text(
-                                  proppertyList![i].bedroomCount.toString(),
+                                  "Call",
                                   style: TextStyle(
                                     color: darkTextColor,
                                     fontSize: ScreenUtil().setWidth(12),
                                     fontFamily: 'work',
                                     height: ScreenUtil().setWidth(1),
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w800,
                                   ),
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              width: ScreenUtil().setWidth(12),
-                            ),
-                            Row(
-                              children: [
-                                Image.asset("assets/images/bath.png",
-                                    height: ScreenUtil().setHeight(15),
-                                    color: appColor,
-                                    width: ScreenUtil().setWidth(18)),
-                                SizedBox(
-                                  width: ScreenUtil().setWidth(5),
-                                ),
-                                Text(
-                                  proppertyList![i].bathroomCount.toString(),
-                                  style: TextStyle(
-                                    color: darkTextColor,
-                                    fontSize: ScreenUtil().setWidth(12),
-                                    fontFamily: 'work',
-                                    height: ScreenUtil().setWidth(1),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              width: ScreenUtil().setWidth(12),
-                            ),
-                            Row(
-                              children: [
-                                Image.asset("assets/images/crop.png",
-                                    height: ScreenUtil().setHeight(15),
-                                    color: appColor,
-                                    width: ScreenUtil().setWidth(18)),
-                                SizedBox(
-                                  width: ScreenUtil().setWidth(5),
-                                ),
-                                Text(
-                                  proppertyList![i].propertySize != null
-                                      ? proppertyList![i].propertySize!.toString() +
-                                          " SQFT"
-                                      : "2300 SQFT",
-                                  style: TextStyle(
-                                    color: darkTextColor,
-                                    fontSize: ScreenUtil().setWidth(12),
-                                    fontFamily: 'work',
-                                    height: ScreenUtil().setWidth(1),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                          ),
                         ),
-                        SizedBox(
-                          height: ScreenUtil().setHeight(10),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          _callENquiryAPI(proppertyList![0], "mail");
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0),
+                            color: Color(0xffF5F6F8),
+                          ),
+                          width: ScreenUtil().setWidth(100),
+                          height: ScreenUtil().setHeight(32),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset("assets/images/mail.png",
+                                    height: ScreenUtil().setHeight(15),
+                                    color: appColor,
+                                    width: ScreenUtil().setWidth(18)),
+                                SizedBox(
+                                  width: ScreenUtil().setWidth(5),
+                                ),
+                                Text(
+                                  "E Mail",
+                                  style: TextStyle(
+                                    color: darkTextColor,
+                                    fontSize: ScreenUtil().setWidth(12),
+                                    fontFamily: 'work',
+                                    height: ScreenUtil().setWidth(1),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                _callENquiryAPI(proppertyList![0], "phone");
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  color: Color(0xffF5F6F8),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          _callENquiryAPI(proppertyList![0], "Whatsapp");
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0),
+                            color: Color(0xff00CA7D),
+                          ),
+                          width: ScreenUtil().setWidth(100),
+                          height: ScreenUtil().setHeight(32),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset("assets/images/wp.png",
+                                    height: ScreenUtil().setHeight(15),
+                                    width: ScreenUtil().setWidth(18)),
+                                SizedBox(
+                                  width: ScreenUtil().setWidth(5),
                                 ),
-                                width: ScreenUtil().setWidth(95),
-                                height: ScreenUtil().setHeight(32),
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.asset("assets/images/call.png",
-                                          height: ScreenUtil().setHeight(15),
-                                          color: appColor,
-                                          width: ScreenUtil().setWidth(18)),
-                                      SizedBox(
-                                        width: ScreenUtil().setWidth(5),
-                                      ),
-                                      Text(
-                                        "Call",
-                                        style: TextStyle(
-                                          color: darkTextColor,
-                                          fontSize: ScreenUtil().setWidth(12),
-                                          fontFamily: 'work',
-                                          height: ScreenUtil().setWidth(1),
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                    ],
+                                Text(
+                                  "Whatsapp",
+                                  style: TextStyle(
+                                    color: secondaryColor,
+                                    fontSize: ScreenUtil().setWidth(12),
+                                    fontFamily: 'work',
+                                    height: ScreenUtil().setWidth(1),
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                _callENquiryAPI(proppertyList![0], "mail");
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  color: Color(0xffF5F6F8),
-                                ),
-                                width: ScreenUtil().setWidth(100),
-                                height: ScreenUtil().setHeight(32),
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.asset("assets/images/mail.png",
-                                          height: ScreenUtil().setHeight(15),
-                                          color: appColor,
-                                          width: ScreenUtil().setWidth(18)),
-                                      SizedBox(
-                                        width: ScreenUtil().setWidth(5),
-                                      ),
-                                      Text(
-                                        "E Mail",
-                                        style: TextStyle(
-                                          color: darkTextColor,
-                                          fontSize: ScreenUtil().setWidth(12),
-                                          fontFamily: 'work',
-                                          height: ScreenUtil().setWidth(1),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                _callENquiryAPI(proppertyList![0], "Whatsapp");
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  color: Color(0xff00CA7D),
-                                ),
-                                width: ScreenUtil().setWidth(100),
-                                height: ScreenUtil().setHeight(32),
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.asset("assets/images/wp.png",
-                                          height: ScreenUtil().setHeight(15),
-                                          width: ScreenUtil().setWidth(18)),
-                                      SizedBox(
-                                        width: ScreenUtil().setWidth(5),
-                                      ),
-                                      Text(
-                                        "Whatsapp",
-                                        style: TextStyle(
-                                          color: secondaryColor,
-                                          fontSize: ScreenUtil().setWidth(12),
-                                          fontFamily: 'work',
-                                          height: ScreenUtil().setWidth(1),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        )
-                      ],
-                    ),
+                          ),
+                        ),
+                      )
+                    ],
                   )
                 ],
               ),
-            ),
-          );
+            )
+          ],
+        ),
+      ),
+    );
   }
+
 
   Future<void> getCategory() async {
     catList!.clear();
@@ -714,7 +758,7 @@ class _HomePageState extends State<HomePage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getproperty',
+      '/realpro/api/user/getMyproperty',
     );
     Map<String, dynamic> body = {
       'pagenumber': "1",

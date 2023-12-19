@@ -373,9 +373,9 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                 ),
                               ),
                             ),
-                            SizedBox(
+                           /* SizedBox(
                               width: ScreenUtil().setWidth(10),
-                            ),
+                            ),*/
                           ],
                         ),
                         SizedBox(
@@ -383,6 +383,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                         ),
                         Expanded(
                           child: GridView.builder(
+                              padding: EdgeInsets.all(0),
                               itemCount: getPropertyDetails.data![0].images!.length,
                               scrollDirection: Axis.horizontal,
                               gridDelegate:
@@ -392,25 +393,29 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                   crossAxisCount: 2),
                               itemBuilder: (BuildContext context, int index) {
                                 return Stack(
+                                  alignment: Alignment.topLeft,
                                   children:  <Widget>[
-                                    Container(
-                                        decoration:  BoxDecoration(
-                                            color: Colors.white, 
-                                            borderRadius: BorderRadius.circular(10)
-                                        ),
-                                         height: ScreenUtil().setHeight(84.4),
-                                         width: ScreenUtil().setWidth(83),
-                                        child:  Image.network( getPropertyDetails.data![0].images![0].image.toString(),
-                                          fit: BoxFit.fill,
-                                          height: ScreenUtil().setHeight(84.4),
-                                          width: ScreenUtil().setWidth(83),
+                                    ClipRRect(
+                                       borderRadius: BorderRadius.circular(ScreenUtil().setWidth(10)),
+                                      child: Image.network( getPropertyDetails.data![0].images![0].image.toString(),
+                                        fit: BoxFit.cover,
+                                        height: ScreenUtil().setHeight(84.4),
+                                        width: ScreenUtil().setWidth(83),
                                     ),
-                                ),
-                                    Align(
-                                      alignment: Alignment.center,
-                                      child: Icon(Icons.delete_outline, 
-                                        size: ScreenUtil().setHeight(19.7),
-                                        color: secondaryColor,),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(right: ScreenUtil().setWidth(10)),
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            child: Icon(Icons.delete_outline,
+                                              size: ScreenUtil().setHeight(19.7),
+                                              color: secondaryColor,),
+                                          ),
+                                        ),
+                                      ],
                                     )
                                   ],
                                 );
@@ -1717,7 +1722,6 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
               imageFilePathList![i].path
           ));
     }
-
 
     request.send().then((response) {
       if (response.statusCode == 200) {

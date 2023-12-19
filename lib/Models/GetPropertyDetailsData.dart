@@ -47,7 +47,7 @@ class PropertyDetails {
   List<AmenitiesList>? amenities;
   int? isverified;
   String? thamblain;
-  List<Images>? images;
+  List<ImagesList>? images;
   Null? privacyPolicy;
   String? createdAt;
   int? shopId;
@@ -121,9 +121,9 @@ class PropertyDetails {
     isverified = json['isverified'];
     thamblain = json['thamblain'];
     if (json['images'] != null) {
-      images = <Images>[];
+      images = <ImagesList>[];
       json['images'].forEach((v) {
-        images!.add(new Images.fromJson(v));
+        images!.add(new ImagesList.fromJson(v));
       });
     }
     privacyPolicy = json['privacy_policy'];
@@ -208,14 +208,14 @@ class Amenities {
   }
 }
 
-class Images {
+class ImagesList {
   int? id;
   int? productId;
   String? image;
 
-  Images({this.id, this.productId, this.image});
+  ImagesList({this.id, this.productId, this.image});
 
-  Images.fromJson(Map<String, dynamic> json) {
+  ImagesList.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     productId = json['product_id'];
     image = json['image'];
