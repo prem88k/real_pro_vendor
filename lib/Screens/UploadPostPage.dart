@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dotted_decoration/dotted_decoration.dart';
+import 'package:real_pro_vendor/Presentation/BottomNavigationBarVendor.dart';
 import '../Constants/Api.dart';
 import '../Constants/Colors.dart';
 import '../Models/GetAmenitiesData.dart';
@@ -19,8 +20,10 @@ import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_webservice/directions.dart';
 import 'package:google_maps_webservice/places.dart';
-
+import 'package:video_player/video_player.dart';
 import 'HomePageV.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:path_provider/path_provider.dart';
 
 class UploadPostPage extends StatefulWidget {
   const UploadPostPage({Key? key}) : super(key: key);
@@ -53,7 +56,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
   double? pickUpLat;
   double? pickUpLong;
 
-
+  late VideoPlayerController _videoPlayerController;
   final ImagePicker imagePicker = ImagePicker();
   List<XFile>? imageFileList = [];
   List<File>? imageFilePathList = [];
@@ -71,6 +74,25 @@ class _UploadPostPageState extends State<UploadPostPage> {
     setState((){});
   }
 
+   XFile? _video;
+   String? _path;
+
+  _pickVideo() async {
+    XFile? video = await imagePicker.pickVideo(source: ImageSource.gallery);
+    _video = video!;
+     _path = await VideoThumbnail.thumbnailFile(
+      video: _video!.path,
+      thumbnailPath: (await getTemporaryDirectory()).path, /// path_provider
+      imageFormat: ImageFormat.PNG,
+      maxHeight: 50,
+      quality: 50,
+    );
+    print(File(_path!));
+    _videoPlayerController = VideoPlayerController.file(File(_video!.path))..initialize().then((_) {
+      setState(() { });
+      _videoPlayerController.play();
+    });
+  }
 
   List<AmenitiesList> _selectedAmenities = [];
 
@@ -107,7 +129,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
 
   static List<TextEditingController> _controllers = [];
   List<Widget> _fields = [];
-
+  
   @override
   void initState() {
     getCategory();
@@ -116,11 +138,10 @@ class _UploadPostPageState extends State<UploadPostPage> {
     _locationController.addListener(() {
       /*_onChanged();*/
     });
+
     // TODO: implement initState
     super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -157,47 +178,12 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 height: ScreenUtil().setHeight(280),
                 width: ScreenUtil().screenWidth,
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-
-                          },
-                          child: Container(
-                            height: ScreenUtil().setHeight(83),
-                            width: ScreenUtil().setWidth(83),
-                            decoration: DottedDecoration(
-                                color: appColor,
-                                shape: Shape.box,
-                                borderRadius: BorderRadius.circular(10)
-                            ),// color of grid items
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_to_queue,
-                                  size: 34,
-                                  color: appColor,),
-                                SizedBox(
-                                  height: ScreenUtil().setHeight(10),
-                                ),
-                                Text(
-                                  "Upload Video",
-                                  style: TextStyle(
-                                      fontSize: ScreenUtil().setHeight(8),
-                                      color: appColor),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: ScreenUtil().setWidth(10),
-                        ),
                         GestureDetector(
                           onTap: () {
                             selectImages();
@@ -231,10 +217,10 @@ class _UploadPostPageState extends State<UploadPostPage> {
                             ),
                           ),
                         ),
-                        SizedBox(
-                          width: ScreenUtil().setWidth(10),
-                        ),
                       ],
+                    ),
+                    SizedBox(
+                      width: ScreenUtil().setWidth(10),
                     ),
                     SizedBox(
                       height: ScreenUtil().setHeight(10),
@@ -263,6 +249,63 @@ class _UploadPostPageState extends State<UploadPostPage> {
                     ),
                   ],
                 ),
+              ),
+
+              SizedBox(
+                height: ScreenUtil().setHeight(5),
+              ),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  if(_video != null)
+                    _videoPlayerController.value.isInitialized
+                        ? Container(
+                      height: ScreenUtil().setHeight(83),
+                      width: ScreenUtil().setWidth(83),
+                          margin: EdgeInsets.only(
+                            left: ScreenUtil().setWidth(10),
+                            right: ScreenUtil().setWidth(10),
+                          ),
+                          child:  VideoPlayer(_videoPlayerController),
+                        )
+                        : Container()
+                  else
+                    Text("Click on Pick Video to select video", style: TextStyle(fontSize: 10.0),),
+                  GestureDetector(
+                    onTap: () {
+                      _pickVideo();
+                    },
+                    child: Container(
+                      height: ScreenUtil().setHeight(83),
+                      width: ScreenUtil().setWidth(83),
+                      decoration: DottedDecoration(
+                          color: appColor,
+                          shape: Shape.box,
+                          borderRadius: BorderRadius.circular(10)
+                      ),// color of grid items
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_to_queue,
+                            size: 34,
+                            color: appColor,),
+                          SizedBox(
+                            height: ScreenUtil().setHeight(10),
+                          ),
+                          Text(
+                            "Upload Video",
+                            style: TextStyle(
+                                fontSize: ScreenUtil().setHeight(8),
+                                color: appColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
 
               SizedBox(
@@ -351,6 +394,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
               SizedBox(
                 height: ScreenUtil().setHeight(5),
               ),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -422,20 +466,25 @@ class _UploadPostPageState extends State<UploadPostPage> {
                   ),
                 ],
               ),
+
               SizedBox(
                 height: ScreenUtil().setHeight(5),
               ),
+
               TextFieldUpload(
                 title: 'House Title',
                 controller: _houseTitleController,
               ),
+
               TextFieldUpload(
                 title: 'Address',
                 controller: _addressController,
               ),
+
               SizedBox(
                 height: ScreenUtil().setHeight(10),
               ),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1244,6 +1293,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
     });
     String? token = await FirebaseMessaging.instance.getToken();
     print("Tpkoen::$token");
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var url = Uri.https(apiBaseUrl, '/realpro/api/user/addproperty');
     //----------------------------------------------------------
@@ -1268,7 +1318,16 @@ class _UploadPostPageState extends State<UploadPostPage> {
     request.fields['is_post'] = "1";
     request.fields['type'] = "1";
     request.fields['location'] = _locationController.text;
-
+    request.files.add(
+        await MultipartFile.fromPath(
+            'thamblain',
+             _path!
+        ));
+    request.files.add(
+        await MultipartFile.fromPath(
+            'video',
+             _video!.path
+        ));
     for(int i = 0; i<imageFilePathList!.length; i++)
       {
         request.files.add(
@@ -1278,7 +1337,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
             ));
       }
 
-
     request.send().then((response) {
       if (response.statusCode == 200) {
         print("Uploaded!");
@@ -1286,25 +1344,27 @@ class _UploadPostPageState extends State<UploadPostPage> {
         print("response::$response");
         response.stream.transform(utf8.decoder).listen((value) {
           print("ResponseSellerVerification" + value);
-          setState(() {
-            isloading = false;
-          });
-          FocusScope.of(context).requestFocus(FocusNode());
-          Message(context, "Add Property Successfully");
-
-          Future.delayed(const Duration(milliseconds: 1000), () {
+          var getdata = json.decode(value);
+          if (getdata["status"]) {
             setState(() {
-              // todo
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return HomePageV();
-                  },
-                ),
-              );
+              isloading = false;
             });
-          });
+            FocusScope.of(context).requestFocus(FocusNode());
+            Message(context, "Add Property Successfully");
+            Future.delayed(const Duration(milliseconds: 1000), () {
+              setState(() {
+                // todo
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return BottomNavigationBarVendor();
+                    },
+                  ),
+                );
+              });
+            });
+          }
         });
       } else {
         response.stream.transform(utf8.decoder).listen((value) {

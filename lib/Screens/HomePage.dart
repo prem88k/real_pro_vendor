@@ -12,6 +12,8 @@ import '../Constants/Api.dart';
 import '../Constants/Colors.dart';
 import '../Models/GetCaategoryData.dart';
 import '../Models/GetPropertyData.dart';
+import 'EditPropertyOnRentPage.dart';
+import 'EnquiryDetailsPage.dart';
 import 'LoginPageVendor.dart';
 import 'PropertyDetailsPage.dart';
 
@@ -371,34 +373,33 @@ class _HomePageState extends State<HomePage> {
                                   children: [
                                     GestureDetector(
                                       onTap: () {
-                                        isLiked(proppertyList![i].id,
-                                            proppertyList![i]);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) {
+                                              return EditPropertyOnRentPage(proppertyList![i].id.toString());
+                                            },
+                                          ),
+                                        );
+                                        /*    isLiked1(proppertyList![i].id,
+                                        proppertyList![0]);*/
                                       },
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: ClipRRect(
-                                          borderRadius:
-                                          BorderRadius.circular(100),
+                                          borderRadius: BorderRadius.circular(100),
                                           child: Container(
-                                              height:
-                                              ScreenUtil().setHeight(26),
-                                              width:
-                                              ScreenUtil().setHeight(26),
+                                              height: ScreenUtil().setHeight(26),
+                                              width: ScreenUtil().setHeight(26),
                                               color: secondaryColor,
                                               child: Icon(
-                                                !proppertyList![i].liked!
-                                                    ? Icons.favorite_border
-                                                    : Icons.favorite,
-                                                color:
-                                                !proppertyList![i].liked!
-                                                    ? Color(0xff1C1B1F)
-                                                    : Colors.red,
-                                                size: ScreenUtil()
-                                                    .setHeight(14),
+                                                Icons.edit_note_outlined,
+                                                color: Color(0xff1C1B1F),
+                                                size: ScreenUtil().setHeight(14),
                                               )),
                                         ),
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
                               ],
@@ -583,53 +584,24 @@ class _HomePageState extends State<HomePage> {
                     height: ScreenUtil().setHeight(10),
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       GestureDetector(
                         onTap: () {
-                          _callENquiryAPI(proppertyList![0], "phone");
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0),
-                            color: Color(0xffF5F6F8),
-                          ),
-                          width: ScreenUtil().setWidth(95),
-                          height: ScreenUtil().setHeight(32),
-                          child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset("assets/images/call.png",
-                                    height: ScreenUtil().setHeight(15),
-                                    color: appColor,
-                                    width: ScreenUtil().setWidth(18)),
-                                SizedBox(
-                                  width: ScreenUtil().setWidth(5),
-                                ),
-                                Text(
-                                  "Call",
-                                  style: TextStyle(
-                                    color: darkTextColor,
-                                    fontSize: ScreenUtil().setWidth(12),
-                                    fontFamily: 'work',
-                                    height: ScreenUtil().setWidth(1),
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ],
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return EnquiryDetailsPage(proppertyList![i].id);
+                              },
                             ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          _callENquiryAPI(proppertyList![0], "mail");
+                          );
+                        //  _callENquiryAPI(proppertyList![0], "Whatsapp");
                         },
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5.0),
-                            color: Color(0xffF5F6F8),
+                            color: appColor,
                           ),
                           width: ScreenUtil().setWidth(100),
                           height: ScreenUtil().setHeight(32),
@@ -637,57 +609,21 @@ class _HomePageState extends State<HomePage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Image.asset("assets/images/mail.png",
-                                    height: ScreenUtil().setHeight(15),
-                                    color: appColor,
-                                    width: ScreenUtil().setWidth(18)),
-                                SizedBox(
-                                  width: ScreenUtil().setWidth(5),
-                                ),
-                                Text(
-                                  "E Mail",
-                                  style: TextStyle(
-                                    color: darkTextColor,
-                                    fontSize: ScreenUtil().setWidth(12),
-                                    fontFamily: 'work',
-                                    height: ScreenUtil().setWidth(1),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          _callENquiryAPI(proppertyList![0], "Whatsapp");
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0),
-                            color: Color(0xff00CA7D),
-                          ),
-                          width: ScreenUtil().setWidth(100),
-                          height: ScreenUtil().setHeight(32),
-                          child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset("assets/images/wp.png",
+                                Image.asset("assets/images/enqyiry.png",
+                                    color: secondaryColor,
                                     height: ScreenUtil().setHeight(15),
                                     width: ScreenUtil().setWidth(18)),
                                 SizedBox(
                                   width: ScreenUtil().setWidth(5),
                                 ),
                                 Text(
-                                  "Whatsapp",
+                                  "Enquiry",
                                   style: TextStyle(
                                     color: secondaryColor,
                                     fontSize: ScreenUtil().setWidth(12),
                                     fontFamily: 'work',
                                     height: ScreenUtil().setWidth(1),
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ],

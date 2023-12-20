@@ -406,13 +406,18 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(right: ScreenUtil().setWidth(10)),
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            child: Icon(Icons.delete_outline,
-                                              size: ScreenUtil().setHeight(19.7),
-                                              color: secondaryColor,),
+                                        GestureDetector(
+                                          onTap: () {
+                                            deleteImage(getPropertyDetails.data![0].images![0].id.toString(), getPropertyDetails.data![0].images![0].productId.toString());
+                                          },
+                                          child: Padding(
+                                            padding: EdgeInsets.only(right: ScreenUtil().setWidth(10)),
+                                            child: Container(
+                                              alignment: Alignment.center,
+                                              child: Icon(Icons.delete_outline,
+                                                size: ScreenUtil().setHeight(19.7),
+                                                color: secondaryColor,),
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -1673,6 +1678,39 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
             _onJobLanguage(element , element.id);
         });
         });
+      } else {}
+    }
+  }
+
+  Future<void> deleteImage(String id, String product_id, ) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      isloading = true;
+    });
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/delete_image_by_property',
+    );
+    Map<String, dynamic> body = {
+      'product_id': product_id,
+      'image_id' : id
+    };
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await post(uri, headers: headers, body: body);
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("PropertyResposne::$responseBody");
+    if (statusCode == 200) {
+      if (mounted == true) {
+        setState(() {
+          isloading = false;
+        });
+      }
+      if (getdata["status"]) {
       } else {}
     }
   }
