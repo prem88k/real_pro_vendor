@@ -149,7 +149,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         bottomOpacity: 0,
-        iconTheme: IconThemeData(color: primaryColor),
         elevation: 0,
         centerTitle: true,
         title: Text(
@@ -174,82 +173,50 @@ class _UploadPostPageState extends State<UploadPostPage> {
               SizedBox(
                 height: ScreenUtil().setHeight(7),
               ),
-              Container(
-                height: ScreenUtil().setHeight(280),
-                width: ScreenUtil().screenWidth,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            selectImages();
-                          },
-                          child: Container(
-                            height: ScreenUtil().setHeight(83),
-                            width: ScreenUtil().setWidth(83),
-                            decoration: DottedDecoration(
-                                color: appColor,
-                                shape: Shape.box,
-                                borderRadius: BorderRadius.circular(10)
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_a_photo_outlined,
-                                  size: 34,
-                                  color: appColor,),
-                                SizedBox(
-                                  height: ScreenUtil().setHeight(10),
-                                ),
-                                Text(
-                                  "Upload Image",
-                                  style: TextStyle(
-                                      fontSize: ScreenUtil().setHeight(8),
-                                      color: appColor),
-                                ),
-                              ],
-                            ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      selectImages();
+                    },
+                    child: Container(
+                      height: ScreenUtil().setHeight(83),
+                      width: ScreenUtil().setWidth(83),
+                      decoration: DottedDecoration(
+                          color: appColor,
+                          shape: Shape.box,
+                          borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_a_photo_outlined,
+                            size: 34,
+                            color: appColor,),
+                          SizedBox(
+                            height: ScreenUtil().setHeight(10),
                           ),
-                        ),
-                      ],
+                          Text(
+                            "Upload Image",
+                            style: TextStyle(
+                                fontSize: ScreenUtil().setHeight(8),
+                                color: appColor),
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(
-                      width: ScreenUtil().setWidth(10),
-                    ),
-                    SizedBox(
-                      height: ScreenUtil().setHeight(10),
-                    ),
-                    Expanded(
-                      child: GridView.builder(
-                          itemCount: imageFileList!.length,
-                          scrollDirection: Axis.horizontal,
-                          gridDelegate:
-                          SliverGridDelegateWithFixedCrossAxisCount(
-                              mainAxisSpacing: 0,
-                              crossAxisSpacing: 0,
-                              crossAxisCount: 2),
-                          itemBuilder: (BuildContext context, int index) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Image.file(
-                                  File(imageFileList![index].path),
-                                  height: ScreenUtil().setHeight(83),
-                                  width: ScreenUtil().setWidth(83),
-                                  fit: BoxFit.fill,),
-                              ],
-                            );
-                          }),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+
+              SizedBox(
+                height: ScreenUtil().setHeight(10),
+              ),
+
+              _gridImageView(),
 
               SizedBox(
                 height: ScreenUtil().setHeight(5),
@@ -1458,6 +1425,29 @@ class _UploadPostPageState extends State<UploadPostPage> {
     _fields.add(field);
   }
 
+ Widget _gridImageView() {
+    return  Container(
+      child:  GridView.count(
+        shrinkWrap: true,
+        crossAxisCount: 2,
+        mainAxisSpacing: 0,
+        crossAxisSpacing: 0,
+        childAspectRatio: 1.8,
+        physics: const NeverScrollableScrollPhysics(),
+   children: List.generate(
+   imageFileList!.length,
+   (index) => Column(
+              children: [
+                Image.file(
+                  File(imageFileList![index].path),
+                  height: ScreenUtil().setHeight(83),
+                  width: ScreenUtil().setWidth(83),
+                  fit: BoxFit.fill,),
+              ],
+            )
+          ),
+    ));
+  }
 }
 
 ScaffoldFeatureController<SnackBar, SnackBarClosedReason> Message(
