@@ -4,11 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dotted_decoration/dotted_decoration.dart';
+import 'package:real_pro_vendor/Models/GetAreaData.dart';
+import 'package:real_pro_vendor/Models/GetCityData.dart';
+import 'package:real_pro_vendor/Models/GetTowerData.dart';
 import 'package:real_pro_vendor/Presentation/BottomNavigationBarVendor.dart';
 import '../Constants/Api.dart';
 import '../Constants/Colors.dart';
 import '../Models/GetAmenitiesData.dart';
+import '../Models/GetAmountTypeData.dart';
 import '../Models/GetCaategoryData.dart';
+import '../Models/GetPropertyTypeData.dart';
 import '../Presentation/common_button.dart';
 import '../Presentation/upload_textfeild.dart';
 import 'package:http/http.dart';
@@ -124,6 +129,30 @@ class _UploadPostPageState extends State<UploadPostPage> {
   late GetAmenitiesData getAmenitiesData;
   List<AmenitiesList>? amenitiesList = [];
 
+  late GetAmountTypeData getAmountTypeData;
+  List<AmountTypeList>? amountTypeList = [];
+
+  late GetPropertyTypeData getPropertyTypeData;
+  List<PropertyTypeList>? propertyTypeList = [];
+  String selectedProperty = "";
+  var dropdownPropertyValue;
+
+  late GetCityData getCityData;
+  List<CityList>? cityList = [];
+  String selectedCity = "";
+  var dropdownCityValue;
+
+  late GetAreaData getAreaData;
+  List<AreaList>? areaList = [];
+  String selectedArea = "";
+  var dropdownAreaValue;
+
+  late GetTowerData getTowerData;
+  List<TowerList>? towerList = [];
+  String selectedTower = "";
+  var dropdownTowerValue;
+
+
   bool isloading = false;
   bool catloading = false;
 
@@ -132,8 +161,10 @@ class _UploadPostPageState extends State<UploadPostPage> {
   
   @override
   void initState() {
-    getCategory();
+    getCity();
+    getAmount();
     getAmenities();
+    getProperty();
     getTextFormField();
     _locationController.addListener(() {
       /*_onChanged();*/
@@ -278,6 +309,93 @@ class _UploadPostPageState extends State<UploadPostPage> {
               SizedBox(
                 height: ScreenUtil().setHeight(5),
               ),
+              //Dropdown For Property-type
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    /* padding: EdgeInsets.only(
+                      left: size.width * 0.025,
+                      right: size.width * 0.05,
+                    ),*/
+                    //  margin: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: secondaryColor
+                    ),
+                    height: ScreenUtil().setHeight(50),
+                    width: ScreenUtil().setWidth(340),
+                    child: DropdownButtonHideUnderline(
+                      child:
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: ScreenUtil().setWidth(20),
+                            right: ScreenUtil().setWidth(10)
+                        ),
+                        child: DropdownButton<String>(
+                          iconSize: 30,
+                          style: TextStyle(
+                            color: primaryColor,
+                          ),
+                          dropdownColor: secondaryColor,
+                          isExpanded: true,
+                          value: dropdownPropertyValue,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownPropertyValue = newValue;
+                              print("Property Id::$newValue");
+                              selectedProperty = newValue!;
+                              getCategory(selectedProperty);
+                            });
+                          },
+                          hint: Row(
+                            children: [
+                              Text(
+                                "Property Type",
+                                style: TextStyle(
+                                    color: primaryColor,
+                                    fontFamily: 'work',
+                                    fontSize: ScreenUtil().setHeight(12.5),
+                                    fontWeight: FontWeight.normal),
+                              ),
+                            ],
+                          ),
+                          icon: Icon(
+                            // Add this
+                            Icons.arrow_drop_down, // Add this
+                            color: primaryColor, // Add this
+                          ),
+                          items: propertyTypeList!.map((PropertyTypeList value) {
+                            return DropdownMenuItem<String>(
+                              value: value.id.toString(),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    value.propertyName!,
+                                    style: TextStyle(
+                                        fontFamily: 'work',
+                                        color: primaryColor,
+                                        fontSize: ScreenUtil().setHeight(12.5),
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(
+                height: ScreenUtil().setHeight(5),
+              ),
+              SizedBox(
+                height: ScreenUtil().setHeight(5),
+              ),
               //Dropdown
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -341,6 +459,260 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                 children: [
                                   Text(
                                     value.name!,
+                                    style: TextStyle(
+                                        fontFamily: 'work',
+                                        color: primaryColor,
+                                        fontSize: ScreenUtil().setHeight(12.5),
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(
+                height: ScreenUtil().setHeight(5),
+              ),
+
+              //city
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    /* padding: EdgeInsets.only(
+                      left: size.width * 0.025,
+                      right: size.width * 0.05,
+                    ),*/
+                    //  margin: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: secondaryColor
+                    ),
+                    height: ScreenUtil().setHeight(50),
+                    width: ScreenUtil().setWidth(340),
+                    child: DropdownButtonHideUnderline(
+                      child:
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: ScreenUtil().setWidth(20),
+                            right: ScreenUtil().setWidth(10)
+                        ),
+                        child: DropdownButton<String>(
+                          iconSize: 30,
+                          style: TextStyle(
+                            color: primaryColor,
+                          ),
+                          dropdownColor: secondaryColor,
+                          isExpanded: true,
+                          value: dropdownCityValue,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownCityValue = newValue;
+                              print("City Id::$newValue");
+                              selectedCity = newValue!;
+                              getArea(selectedCity);
+                            });
+                          },
+                          hint: Row(
+                            children: [
+                              Text(
+                                "Select City",
+                                style: TextStyle(
+                                    color: primaryColor,
+                                    fontFamily: 'work',
+                                    fontSize: ScreenUtil().setHeight(12.5),
+                                    fontWeight: FontWeight.normal),
+                              ),
+                            ],
+                          ),
+                          icon: Icon(
+                            // Add this
+                            Icons.arrow_drop_down, // Add this
+                            color: primaryColor, // Add this
+                          ),
+                          items: cityList!.map((CityList value) {
+                            return DropdownMenuItem<String>(
+                              value: value.id.toString(),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    value.cityName!,
+                                    style: TextStyle(
+                                        fontFamily: 'work',
+                                        color: primaryColor,
+                                        fontSize: ScreenUtil().setHeight(12.5),
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(
+                height: ScreenUtil().setHeight(5),
+              ),
+
+              //area
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    /* padding: EdgeInsets.only(
+                      left: size.width * 0.025,
+                      right: size.width * 0.05,
+                    ),*/
+                    //  margin: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: secondaryColor
+                    ),
+                    height: ScreenUtil().setHeight(50),
+                    width: ScreenUtil().setWidth(340),
+                    child: DropdownButtonHideUnderline(
+                      child:
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: ScreenUtil().setWidth(20),
+                            right: ScreenUtil().setWidth(10)
+                        ),
+                        child: DropdownButton<String>(
+                          iconSize: 30,
+                          style: TextStyle(
+                            color: primaryColor,
+                          ),
+                          dropdownColor: secondaryColor,
+                          isExpanded: true,
+                          value: dropdownAreaValue,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownAreaValue = newValue;
+                              print("Area Id::$newValue");
+                              selectedArea = newValue!;
+                              getTower(selectedArea);
+                            });
+                          },
+                          hint: Row(
+                            children: [
+                              Text(
+                                "Select Area",
+                                style: TextStyle(
+                                    color: primaryColor,
+                                    fontFamily: 'work',
+                                    fontSize: ScreenUtil().setHeight(12.5),
+                                    fontWeight: FontWeight.normal),
+                              ),
+                            ],
+                          ),
+                          icon: Icon(
+                            // Add this
+                            Icons.arrow_drop_down, // Add this
+                            color: primaryColor, // Add this
+                          ),
+                          items: areaList!.map((AreaList value) {
+                            return DropdownMenuItem<String>(
+                              value: value.id.toString(),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    value.area!,
+                                    style: TextStyle(
+                                        fontFamily: 'work',
+                                        color: primaryColor,
+                                        fontSize: ScreenUtil().setHeight(12.5),
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(
+                height: ScreenUtil().setHeight(5),
+              ),
+
+              //tower
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    /* padding: EdgeInsets.only(
+                      left: size.width * 0.025,
+                      right: size.width * 0.05,
+                    ),*/
+                    //  margin: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: secondaryColor
+                    ),
+                    height: ScreenUtil().setHeight(50),
+                    width: ScreenUtil().setWidth(340),
+                    child: DropdownButtonHideUnderline(
+                      child:
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: ScreenUtil().setWidth(20),
+                            right: ScreenUtil().setWidth(10)
+                        ),
+                        child: DropdownButton<String>(
+                          iconSize: 30,
+                          style: TextStyle(
+                            color: primaryColor,
+                          ),
+                          dropdownColor: secondaryColor,
+                          isExpanded: true,
+                          value: dropdownTowerValue,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownTowerValue = newValue;
+                              print("Tower Id::$newValue");
+                              selectedTower = newValue!;
+                            });
+                          },
+                          hint: Row(
+                            children: [
+                              Text(
+                                "Select Tower",
+                                style: TextStyle(
+                                    color: primaryColor,
+                                    fontFamily: 'work',
+                                    fontSize: ScreenUtil().setHeight(12.5),
+                                    fontWeight: FontWeight.normal),
+                              ),
+                            ],
+                          ),
+                          icon: Icon(
+                            // Add this
+                            Icons.arrow_drop_down, // Add this
+                            color: primaryColor, // Add this
+                          ),
+                          items: towerList!.map((TowerList value) {
+                            return DropdownMenuItem<String>(
+                              value: value.id.toString(),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    value.towerName!,
                                     style: TextStyle(
                                         fontFamily: 'work',
                                         color: primaryColor,
@@ -755,8 +1127,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                            /* side: BorderSide(color: _selectedLanguage.contains(category)
                                 ? appColor
                                 : primaryColor, ),*/
-                            backgroundColor:
-                            _selectedAmenities.contains(value)
+                            backgroundColor: _selectedAmenities.contains(value)
                                 ? appColor
                                 : Color(0xffb8c8e3),
 
@@ -1124,7 +1495,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
     );
   }
 
-  Future<void> getCategory() async {
+  Future<void> getCategory(String id) async {
     catList!.clear();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -1133,7 +1504,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getcategory',
+      '/realpro/api/user/getcategory/${id}',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -1196,6 +1567,211 @@ class _UploadPostPageState extends State<UploadPostPage> {
       if (getdata["status"]) {
         getAmenitiesData = GetAmenitiesData.fromJson(jsonDecode(responseBody));
         amenitiesList!.addAll(getAmenitiesData.data!);
+      } else {}
+    }
+    else
+    {
+      setState(() {
+        catloading = false;
+      });
+    }
+  }
+
+  Future<void> getAmount() async {
+    amountTypeList!.clear();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      catloading = true;
+    });
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/get_packages',
+    );
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await get(
+      uri,
+      headers: headers,
+    );
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("Amount Resposne::$responseBody");
+    if (statusCode == 200) {
+      setState(() {
+        catloading = false;
+      });
+      if (mounted == true) {
+      }
+      if (getdata["status"]) {
+        getAmountTypeData = GetAmountTypeData.fromJson(jsonDecode(responseBody));
+        amountTypeList!.addAll(getAmountTypeData.data!);
+      } else {}
+    }
+    else
+    {
+      setState(() {
+        catloading = false;
+      });
+    }
+  }
+
+  Future<void> getProperty() async {
+    propertyTypeList!.clear();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      catloading = true;
+    });
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/get_propertytype',
+    );
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await get(
+      uri,
+      headers: headers,
+    );
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("Property Resposne::$responseBody");
+    if (statusCode == 200) {
+      setState(() {
+        catloading = false;
+      });
+      if (mounted == true) {
+      }
+      if (getdata["success"]) {
+        getPropertyTypeData = GetPropertyTypeData.fromJson(jsonDecode(responseBody));
+        propertyTypeList!.addAll(getPropertyTypeData.data!);
+      } else {}
+    }
+    else
+    {
+      setState(() {
+        catloading = false;
+      });
+    }
+  }
+
+  Future<void> getCity() async {
+    cityList!.clear();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      catloading = true;
+    });
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/getcity',
+    );
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await get(
+      uri,
+      headers: headers,
+    );
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("City Resposne::$responseBody");
+    if (statusCode == 200) {
+      setState(() {
+        catloading = false;
+      });
+      if (mounted == true) {
+      }
+      if (getdata["success"]) {
+        getCityData = GetCityData.fromJson(jsonDecode(responseBody));
+        cityList!.addAll(getCityData.data!);
+      } else {}
+    }
+    else
+    {
+      setState(() {
+        catloading = false;
+      });
+    }
+  }
+
+  Future<void> getArea(String id) async {
+    areaList!.clear();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      catloading = true;
+    });
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/getarea/${id}',
+    );
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await get(
+      uri,
+      headers: headers,
+    );
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("Area Resposne::$responseBody");
+    if (statusCode == 200) {
+      setState(() {
+        catloading = false;
+      });
+      if (mounted == true) {
+      }
+      if (getdata["success"]) {
+        getAreaData = GetAreaData.fromJson(jsonDecode(responseBody));
+        areaList!.addAll(getAreaData.data!);
+      } else {}
+    }
+    else
+    {
+      setState(() {
+        catloading = false;
+      });
+    }
+  }
+
+  Future<void> getTower(String id) async {
+    towerList!.clear();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      catloading = true;
+    });
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/gettower/${id}',
+    );
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await get(
+      uri,
+      headers: headers,
+    );
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("Tower Resposne::$responseBody");
+    if (statusCode == 200) {
+      setState(() {
+        catloading = false;
+      });
+      if (mounted == true) {
+      }
+      if (getdata["success"]) {
+        getTowerData = GetTowerData.fromJson(jsonDecode(responseBody));
+        towerList!.addAll(getTowerData.data!);
       } else {}
     }
     else
@@ -1270,6 +1846,10 @@ class _UploadPostPageState extends State<UploadPostPage> {
     request.fields['price'] = _amountController.text;
     request.fields['description'] = "ABC";
     request.fields['category_id'] = selectedCategory;
+    request.fields['property_id'] = selectedProperty;
+    request.fields['city_id'] = selectedCity;
+    request.fields['area_id'] = selectedArea;
+    request.fields['tower_id'] = selectedTower;
     request.fields['property_address'] = "Ahmedabad";
     request.fields['bedroom_count'] = _bedroomController.text;
     request.fields['kitchen_count'] = "1";

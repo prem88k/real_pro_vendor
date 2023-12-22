@@ -1,15 +1,15 @@
-class GecategoryData {
+class GetAmountTypeData {
   bool? status;
-  List<CategoryList>? data;
+  List<AmountTypeList>? data;
 
-  GecategoryData({this.status, this.data});
+  GetAmountTypeData({this.status, this.data});
 
-  GecategoryData.fromJson(Map<String, dynamic> json) {
+  GetAmountTypeData.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     if (json['data'] != null) {
-      data = <CategoryList>[];
+      data = <AmountTypeList>[];
       json['data'].forEach((v) {
-        data!.add(new CategoryList.fromJson(v));
+        data!.add(new AmountTypeList.fromJson(v));
       });
     }
   }
@@ -24,23 +24,20 @@ class GecategoryData {
   }
 }
 
-class CategoryList {
+class AmountTypeList {
   int? id;
-  int? propertyId;
   String? name;
 
-  CategoryList({this.id, this.propertyId, this.name});
+  AmountTypeList({this.id, this.name});
 
-  CategoryList.fromJson(Map<String, dynamic> json) {
+  AmountTypeList.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    propertyId = json['property_id'];
     name = json['name'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
-    data['property_id'] = this.propertyId;
     data['name'] = this.name;
     return data;
   }
