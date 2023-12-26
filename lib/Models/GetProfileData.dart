@@ -57,8 +57,8 @@ class User {
   String? email;
   String? mobileNumber;
   String? image;
-  Null? coverPhoto;
-  Null? description;
+  String? coverPhoto;
+  String? description;
   String? agentRef;
   String? agentBrn;
   String? dldNo;

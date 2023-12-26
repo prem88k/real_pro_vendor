@@ -6,6 +6,9 @@ import '../Models/GetCaategoryData.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:readmore/readmore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../Models/GetProfileData.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({Key? key}) : super(key: key);
@@ -16,7 +19,6 @@ class UserProfile extends StatefulWidget {
 
 class _UserProfileState extends State<UserProfile>
     with SingleTickerProviderStateMixin {
-
   TabController? tabController;
   final TextEditingController _searchController = TextEditingController();
   late GecategoryData gecategoryData;
@@ -24,12 +26,16 @@ class _UserProfileState extends State<UserProfile>
   bool isloading = false;
   bool catloading = false;
   int? selectedIndex = -1;
+  late GetProfileData getProfileData;
+  List<PostList>? postList = [];
 
   @override
   void initState() {
     getCategory();
+    getProfileData = GetProfileData();
     super.initState();
     tabController = TabController(length: 3, vsync: this);
+    getProfile();
   }
 
   @override
@@ -38,12 +44,16 @@ class _UserProfileState extends State<UserProfile>
     tabController!.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
     return Scaffold(
-      body: SafeArea(
+      body:  isloading || catloading
+          ? Center(
+          child: CircularProgressIndicator(
+            color: appColor,
+          ))
+          :  SafeArea(
         child: Container(
           padding: EdgeInsets.only(
             left: ScreenUtil().setWidth(10),
@@ -58,33 +68,33 @@ class _UserProfileState extends State<UserProfile>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  getProfileData.user?.image != null ?
                   CircleAvatar(
-                    backgroundImage: AssetImage(
-                      "assets/images/user_logo.png",),
-                    radius: ScreenUtil().setWidth(40),
+                      backgroundImage: CachedNetworkImageProvider(getProfileData.user!.image.toString()) ,radius: 40,)
+                 : CircleAvatar(
+                    backgroundImage:AssetImage("assets/images/dp.png",),
+                    radius: 40,
                   ),
-
                   Container(
                     width: ScreenUtil().setWidth(180),
                     child: Row(
-                      mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Container(
                               child: Text(
-                                '56',
+                                getProfileData.like != null ?
+                                getProfileData.like.toString()
+                                : '56',
                                 style: TextStyle(
-                                    fontSize: ScreenUtil()
-                                        .setHeight(16),
-                                    fontWeight: FontWeight.w400,
-                                    color: primaryColor,
-                                     fontFamily: 'work',),
+                                  fontSize: ScreenUtil().setHeight(16),
+                                  fontWeight: FontWeight.w400,
+                                  color: primaryColor,
+                                  fontFamily: 'work',
+                                ),
                               ),
                             ),
                             SizedBox(
@@ -94,11 +104,11 @@ class _UserProfileState extends State<UserProfile>
                               child: Text(
                                 'Likes',
                                 style: TextStyle(
-                                    fontSize: ScreenUtil()
-                                        .setHeight(12),
-                                    fontWeight: FontWeight.w400,
-                                    color: lightTextColor,
-                                     fontFamily: 'work',),
+                                  fontSize: ScreenUtil().setHeight(12),
+                                  fontWeight: FontWeight.w400,
+                                  color: lightTextColor,
+                                  fontFamily: 'work',
+                                ),
                               ),
                             ),
                           ],
@@ -107,32 +117,32 @@ class _UserProfileState extends State<UserProfile>
                           width: ScreenUtil().setWidth(4),
                         ),
                         Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Container(
                               child: Text(
                                 '14',
                                 style: TextStyle(
-                                    fontSize: ScreenUtil()
-                                        .setHeight(16),
-                                    fontWeight: FontWeight.w400,
-                                    color: primaryColor,
-                                     fontFamily: 'work',),
+                                  fontSize: ScreenUtil().setHeight(16),
+                                  fontWeight: FontWeight.w400,
+                                  color: primaryColor,
+                                  fontFamily: 'work',
+                                ),
                               ),
                             ),
                             SizedBox(
                               height: ScreenUtil().setHeight(4),
                             ),
+
                             Container(
                               child: Text(
                                 'Followers',
                                 style: TextStyle(
-                                    fontSize: ScreenUtil()
-                                        .setHeight(12),
-                                    fontWeight: FontWeight.w400,
-                                    color: lightTextColor,
-                                     fontFamily: 'work',),
+                                  fontSize: ScreenUtil().setHeight(12),
+                                  fontWeight: FontWeight.w400,
+                                  color: lightTextColor,
+                                  fontFamily: 'work',
+                                ),
                               ),
                             ),
                           ],
@@ -170,13 +180,14 @@ class _UserProfileState extends State<UserProfile>
                       Container(
                         width: ScreenUtil().setWidth(140),
                         child: Text(
-                          'John Doe',
+                          getProfileData.user?.name != null ?
+                          getProfileData.user!.name.toString()  : "Real Estate",
                           style: TextStyle(
-                              fontSize:
-                                  ScreenUtil().setHeight(20),
-                              fontWeight: FontWeight.w600,
-                              color: primaryColor,
-                               fontFamily: 'work',),
+                            fontSize: ScreenUtil().setHeight(20),
+                            fontWeight: FontWeight.w600,
+                            color: primaryColor,
+                            fontFamily: 'work',
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -185,13 +196,14 @@ class _UserProfileState extends State<UserProfile>
                       Container(
                         width: ScreenUtil().setWidth(140),
                         child: Text(
-                          'UID : 67843590021',
+                          getProfileData.user?.uid != null ?
+                          getProfileData.user!.uid.toString()  : "UID: 9876543210",
                           style: TextStyle(
-                              fontSize:
-                                  ScreenUtil().setHeight(12),
-                              fontWeight: FontWeight.w400,
-                              color: lightTextColor,
-                               fontFamily: 'work',),
+                            fontSize: ScreenUtil().setHeight(12),
+                            fontWeight: FontWeight.w400,
+                            color: lightTextColor,
+                            fontFamily: 'work',
+                          ),
                         ),
                       ),
                     ],
@@ -199,21 +211,20 @@ class _UserProfileState extends State<UserProfile>
                   SizedBox(
                     height: ScreenUtil().setHeight(14),
                   ),
-                  Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: ScreenUtil().setWidth(335),
-                          child: Text(
-                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget blandit euismod netus ornare.',
-                            style: TextStyle(
-                                fontSize: ScreenUtil().setHeight(12),
-                                fontWeight: FontWeight.w400,
-                                color: lightTextColor,
-                                 fontFamily: 'work',),
-                          ),
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Container(
+                      width: ScreenUtil().setWidth(335),
+                      child: Text(
+                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget blandit euismod netus ornare.',
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setHeight(12),
+                          fontWeight: FontWeight.w400,
+                          color: lightTextColor,
+                          fontFamily: 'work',
                         ),
-                      ]),
+                      ),
+                    ),
+                  ]),
                   SizedBox(
                     height: ScreenUtil().setHeight(10),
                   ),
@@ -231,16 +242,17 @@ class _UserProfileState extends State<UserProfile>
                         height: ScreenUtil().setHeight(44),
                         width: ScreenUtil().setWidth(225),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(10),
                             border: Border.all(color: primaryColor)),
                         child: Center(
                           child: Text(
                             'Follow',
-                              style: TextStyle(
-                                fontSize: ScreenUtil().setHeight(14),
-                                fontWeight: FontWeight.w400,
-                                color: primaryColor,
-                                 fontFamily: 'work',),
+                            style: TextStyle(
+                              fontSize: ScreenUtil().setHeight(14),
+                              fontWeight: FontWeight.w400,
+                              color: primaryColor,
+                              fontFamily: 'work',
+                            ),
                           ),
                         ),
                       ),
@@ -255,7 +267,8 @@ class _UserProfileState extends State<UserProfile>
                           child: Image(
                             image: AssetImage("assets/images/send.png"),
                             height: ScreenUtil().setHeight(25),
-                            color: secondaryColor,),
+                            color: secondaryColor,
+                          ),
                         ),
                       )
                     ],
@@ -269,9 +282,7 @@ class _UserProfileState extends State<UserProfile>
                 height: ScreenUtil().setHeight(5),
               ),
               Container(
-                decoration: BoxDecoration(
-                  color: Color(0xffEFEFEF)
-                ),
+                decoration: BoxDecoration(color: Color(0xffEFEFEF)),
                 child: TabBar(
                   controller: tabController,
                   labelColor: primaryColor,
@@ -308,15 +319,13 @@ class _UserProfileState extends State<UserProfile>
                 height: ScreenUtil().setHeight(0),
               ),
               Expanded(
-                child: TabBarView(
-                    controller: tabController, children: <Widget>[
-                    PostsWidget(),
-                    PostsWidget(),
-                    PostsWidget(),
+                child: TabBarView(controller: tabController, children: <Widget>[
+                  propertyWidget(),
+                  companyWidget(),
+                  agentWidget(),
                 ]),
               ),
               // Profile image
-
             ],
           ),
         ),
@@ -324,7 +333,7 @@ class _UserProfileState extends State<UserProfile>
     );
   }
 
-  PostsWidget() {
+  propertyWidget() {
     return SingleChildScrollView(
       child: Container(
         child: Column(
@@ -338,7 +347,7 @@ class _UserProfileState extends State<UserProfile>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  height:ScreenUtil().setHeight(45),
+                  height: ScreenUtil().setHeight(45),
                   width: ScreenUtil().setWidth(335),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15.0),
@@ -354,7 +363,10 @@ class _UserProfileState extends State<UserProfile>
                         fontWeight: FontWeight.normal,
                         color: primaryColor),
                     decoration: InputDecoration(
-                      suffixIcon: Icon(Icons.search, color: appColor,),
+                      suffixIcon: Icon(
+                        Icons.search,
+                        color: appColor,
+                      ),
                       hintText: 'Start Typing',
                       hintStyle: TextStyle(
                           fontFamily: 'poppins',
@@ -374,7 +386,8 @@ class _UserProfileState extends State<UserProfile>
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: secondaryColor, width: 1.0),
+                        borderSide:
+                            BorderSide(color: secondaryColor, width: 1.0),
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       contentPadding: EdgeInsets.only(left: 30),
@@ -393,13 +406,15 @@ class _UserProfileState extends State<UserProfile>
             Container(
               child: GridView.builder(
                 shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                itemCount: 5,
+                primary: false,
+                physics: NeverScrollableScrollPhysics(),
+                //    scrollDirection: Axis.vertical,
+                itemCount: postList!.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                 ),
-                itemBuilder: (BuildContext context, int index) {
-                  return _buildPostList();
+                itemBuilder: (BuildContext context, i) {
+                  return _buildPostList(i);
                 },
               ),
             ),
@@ -409,17 +424,15 @@ class _UserProfileState extends State<UserProfile>
     );
   }
 
-  Widget _buildPostList() {
+  Widget _buildPostList(int i) {
     return Container(
       child: Column(
         children: [
           Container(
-            height: ScreenUtil().setHeight(140),
+            height: ScreenUtil().setHeight(150),
             width: ScreenUtil().setWidth(200),
             child: GestureDetector(
-              onTap: () {
-
-              },
+              onTap: () {},
               child: Card(
                 semanticContainer: true,
                 shape: RoundedRectangleBorder(
@@ -428,18 +441,24 @@ class _UserProfileState extends State<UserProfile>
                 clipBehavior: Clip.antiAlias,
                 child: Stack(
                   children: <Widget>[
-                    Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('assets/images/bg_image.png'),
-                                fit: BoxFit.fill),
-                          ),
-                        )),
-
+                    Container(
+                      decoration:  postList![i].images != null
+                          ? BoxDecoration(
+                        image: DecorationImage(
+                            image: CachedNetworkImageProvider(
+                                postList![i].images.toString()),
+                            fit: BoxFit.cover),
+                        border: Border.all(color: secondaryColor, width: 0.2),
+                      )
+                          : BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage('assets/images/bg_image.png'),
+                            fit: BoxFit.fill),
+                      ),
+                    ),
                     Positioned(
                       top: 100,
-                      child:  Padding(
+                      child: Padding(
                         padding: EdgeInsets.only(
                             left: ScreenUtil().setWidth(5),
                             right: ScreenUtil().setWidth(5)),
@@ -450,40 +469,522 @@ class _UserProfileState extends State<UserProfile>
                             Container(
                               alignment: Alignment.topLeft,
                               child: Text(
-                                "AED 155,000",
+                                postList![i].price != null
+                                    ? postList![i].price.toString()
+                                    : "AED 155,000",
                                 style: TextStyle(
                                     color: secondaryColor,
                                     fontSize: ScreenUtil().setHeight(12),
-                                     fontFamily: 'work',
+                                    fontFamily: 'work',
                                     fontWeight: FontWeight.w600),
                               ),
                             ),
-                            SizedBox(height: ScreenUtil().setHeight(5),),
+                            SizedBox(
+                              height: ScreenUtil().setHeight(5),
+                            ),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
                                     width: ScreenUtil().setWidth(150),
                                     // padding: EdgeInsets.only(bottom: 13),
-                                    child: Text('For Rent: Villa in Al Majra, '
-                                        'Downtown Dubai, Dubai',
+                                    child: Text(
+                                      postList![i].propertyName != null
+                                          ? postList![i].propertyName.toString()
+                                          : "Villa",
+                                      /*'For Rent: Villa in Al Majra, '
+                                      'Downtown Dubai, Dubai',*/
                                       style: TextStyle(
                                         color: secondaryColor,
                                         fontSize: ScreenUtil().setHeight(10),
                                         fontWeight: FontWeight.w400,
-                                         fontFamily: 'work',),)),
+                                        fontFamily: 'work',
+                                      ),
+                                    )),
                               ],
                             ),
-                            SizedBox(height: ScreenUtil().setHeight(5),),
+                            SizedBox(
+                              height: ScreenUtil().setHeight(5),
+                            ),
                           ],
                         ),
                       ),
                     )
                   ],
-                ),),
+                ),
+              ),
             ),
           ),
+        ],
+      ),
+    );
+  }
 
+  companyWidget() {
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: ScreenUtil().setHeight(10),
+          ),
+
+          Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Color(0xffEFEFEF)
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: ScreenUtil().setHeight(10),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                         child: Image(image: AssetImage("assets/images/bg_image.png"),
+                             height: ScreenUtil().setHeight(85),
+                             width: ScreenUtil().setWidth(105),
+                            fit: BoxFit.cover,
+                         ),
+                        ),
+                        SizedBox(
+                          width: ScreenUtil().setWidth(15),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: ScreenUtil().setWidth(200),
+                              child: Text(
+                                'REAL ESTATE AGENCY',
+                                style: TextStyle(
+                                  fontSize:
+                                  ScreenUtil().setHeight(12),
+                                  fontWeight: FontWeight.w600,
+                                  color: primaryColor,
+                                  fontFamily: 'work',),
+                              ),
+                            ),
+                            SizedBox(
+                              height: ScreenUtil().setHeight(5),
+                            ),
+                            Container(
+                              width: ScreenUtil().setWidth(200),
+                              child: Text(
+                                'Capital Tower, 401, Floor 4, Business Bay, Dubai',
+                                style: TextStyle(
+                                  fontSize:
+                                  ScreenUtil().setHeight(12),
+                                  fontWeight: FontWeight.w600,
+                                  color: primaryColor,
+                                  fontFamily: 'work',),
+                              ),
+                            ),
+                            SizedBox(
+                              height: ScreenUtil().setHeight(5),
+                            ),
+                            Container(
+                              width: ScreenUtil().setWidth(200),
+                              child: Text(
+                                'ORN: 1234',
+                                style: TextStyle(
+                                  fontSize:
+                                  ScreenUtil().setHeight(12),
+                                  fontWeight: FontWeight.w600,
+                                  color: primaryColor,
+                                  fontFamily: 'work',),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(10),
+                    ),
+                    ReadMoreText(
+                      "Ryan is a seasoned professional in the world of real estate, "
+                          "encompassing eight years in the vibrant UAE market and "
+                          "four years in the UK. In 2017, Ryan made a significant move "
+                          "to Dubai, where he dedicated his ",
+                      style: TextStyle(
+                          fontSize: ScreenUtil().setWidth(12),
+                          color: Color(0xff979797),
+                          fontFamily: 'poppins',
+                          fontWeight: FontWeight.w400),
+                      trimLines: 3,
+                      colorClickableText: primaryColor,
+                      trimMode: TrimMode.Line,
+                      trimCollapsedText: 'more',
+                      trimExpandedText: '...less',
+                      lessStyle: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'poppins',
+                      ),
+                      moreStyle: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'poppins',
+                      ),
+                    ),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(10),
+                    ),
+                  ],
+                ),
+              )
+          ),
+
+          SizedBox(
+            height: ScreenUtil().setHeight(10),
+          ),
+
+          Text(
+            'Listed Properties',
+            style: TextStyle(
+              fontSize: ScreenUtil().setHeight(14),
+              fontWeight: FontWeight.w600,
+              color: primaryColor,
+              fontFamily: 'work',
+            ),
+          ),
+          SizedBox(
+            height: ScreenUtil().setHeight(10),
+          ),
+          Container(
+            child: GridView.builder(
+              shrinkWrap: true,
+              primary: false,
+              physics: NeverScrollableScrollPhysics(),
+              //    scrollDirection: Axis.vertical,
+              itemCount: postList!.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+              ),
+              itemBuilder: (BuildContext context, i) {
+                return _buildPostList(i);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  agentWidget() {
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          SizedBox(
+            height: ScreenUtil().setHeight(10),
+          ),
+
+          Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Color(0xffEFEFEF)
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: ScreenUtil().setHeight(10),
+                    ),
+                    Container(
+                      child: Text(
+                        'About Me',
+                        style: TextStyle(
+                          fontSize:
+                          ScreenUtil().setHeight(14),
+                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                          fontFamily: 'work',),
+                      ),
+                    ),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(10),
+                    ),
+                    ReadMoreText(
+                      "Ryan is a seasoned professional in the world of real estate, "
+                          "encompassing eight years in the vibrant UAE market and "
+                          "four years in the UK. In 2017, Ryan made a significant move "
+                          "to Dubai, where he dedicated his ",
+                      style: TextStyle(
+                          fontSize: ScreenUtil().setWidth(12),
+                          color: Color(0xff979797),
+                          fontFamily: 'poppins',
+                          fontWeight: FontWeight.w400),
+                      trimLines: 3,
+                      colorClickableText: primaryColor,
+                      trimMode: TrimMode.Line,
+                      trimCollapsedText: 'more',
+                      trimExpandedText: '...less',
+                      lessStyle: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'poppins',
+                      ),
+                      moreStyle: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'poppins',
+                      ),
+                    ),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(10),
+                    ),
+                  ],
+                ),
+              )
+          ),
+
+          SizedBox(
+            height: ScreenUtil().setHeight(10),
+          ),
+
+          Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Color(0xffEFEFEF)
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: ScreenUtil().setHeight(5),
+                    ),
+                    Container(
+                      child: Text(
+                        'Personal Information',
+                        style: TextStyle(
+                          fontSize:
+                          ScreenUtil().setHeight(14),
+                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                          fontFamily: 'work',),
+                      ),
+                    ),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(10),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: ScreenUtil().setWidth(130),
+                          child: Text(
+                            'Nationality :',
+                            style: TextStyle(
+                              fontSize:
+                              ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                              fontFamily: 'work',),
+                          ),
+                        ),
+                        Container(
+                          width: ScreenUtil().setWidth(175),
+                          child: Text(
+                            'United Kingdom',
+                            style: TextStyle(
+                              fontSize:
+                              ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                              fontFamily: 'work',),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(3),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: ScreenUtil().setWidth(130),
+                          child: Text(
+                            'Languages :',
+                            style: TextStyle(
+                              fontSize:
+                              ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                              fontFamily: 'work',),
+                          ),
+                        ),
+                        Container(
+                          width: ScreenUtil().setWidth(175),
+                          child: Text(
+                            'English',
+                            style: TextStyle(
+                              fontSize:
+                              ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                              fontFamily: 'work',),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(3),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: ScreenUtil().setWidth(130),
+                          child: Text(
+                            'BRN# :',
+                            style: TextStyle(
+                              fontSize:
+                              ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                              fontFamily: 'work',),
+                          ),
+                        ),
+                        Container(
+                          width: ScreenUtil().setWidth(175),
+                          child: Text(
+                            '40002',
+                            style: TextStyle(
+                              fontSize:
+                              ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                              fontFamily: 'work',),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(3),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: ScreenUtil().setWidth(130),
+                          child: Text(
+                            'Experience Since :',
+                            style: TextStyle(
+                              fontSize:
+                              ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                              fontFamily: 'work',),
+                          ),
+                        ),
+                        Container(
+                          width: ScreenUtil().setWidth(175),
+                          child: Text(
+                            '2014',
+                            style: TextStyle(
+                              fontSize:
+                              ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                              fontFamily: 'work',),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(3),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: ScreenUtil().setWidth(130),
+                          child: Text(
+                            'Areas :',
+                            style: TextStyle(
+                              fontSize:
+                              ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                              fontFamily: 'work',),
+                          ),
+                        ),
+                        Container(
+                          width: ScreenUtil().setWidth(175),
+                          child: Text(
+                            'Al Barari',
+                            style: TextStyle(
+                              fontSize:
+                              ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                              fontFamily: 'work',),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(10),
+                    ),
+                  ],
+                ),
+              )
+          ),
+
+          SizedBox(
+            height: ScreenUtil().setHeight(10),
+          ),
+          Text(
+            'Listed Properties',
+            style: TextStyle(
+              fontSize: ScreenUtil().setHeight(14),
+              fontWeight: FontWeight.w600,
+              color: primaryColor,
+              fontFamily: 'work',
+            ),
+          ),
+          SizedBox(
+            height: ScreenUtil().setHeight(10),
+          ),
+          Container(
+            child: GridView.builder(
+              shrinkWrap: true,
+              primary: false,
+              physics: NeverScrollableScrollPhysics(),
+              //    scrollDirection: Axis.vertical,
+              itemCount: postList!.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+              ),
+              itemBuilder: (BuildContext context, i) {
+                return _buildPostList(i);
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -510,7 +1011,7 @@ class _UserProfileState extends State<UserProfile>
         setState(() {
           selectedIndex = i;
         });
-       /* getPropertyAPI(catList![i].id.toString());*/
+        /* getPropertyAPI(catList![i].id.toString());*/
       },
       child: Container(
         margin: EdgeInsets.only(right: ScreenUtil().setWidth(10)),
@@ -530,7 +1031,7 @@ class _UserProfileState extends State<UserProfile>
               fontSize: ScreenUtil().setWidth(13),
               fontFamily: 'work',
               fontWeight:
-              selectedIndex == i ? FontWeight.w800 : FontWeight.w400,
+                  selectedIndex == i ? FontWeight.w800 : FontWeight.w400,
             ),
           ),
         ),
@@ -564,16 +1065,50 @@ class _UserProfileState extends State<UserProfile>
       setState(() {
         catloading = false;
       });
-      if (mounted == true) {
-
-      }
+      if (mounted == true) {}
       if (getdata["status"]) {
         gecategoryData = GecategoryData.fromJson(jsonDecode(responseBody));
         catList!.addAll(gecategoryData.data!);
       } else {}
+    } else {
+      setState(() {
+        catloading = false;
+      });
     }
-    else
-    {
+  }
+
+  Future<void> getProfile() async {
+    postList!.clear();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      catloading = true;
+    });
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/user_profile',
+    );
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await get(
+      uri,
+      headers: headers,
+    );
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("ProfileResposne::$responseBody");
+    if (statusCode == 200) {
+      setState(() {
+        catloading = false;
+      });
+      if (mounted == true) {}
+      if (getdata["status"]) {
+        getProfileData = GetProfileData.fromJson(jsonDecode(responseBody));
+        postList!.addAll(getProfileData.post!);
+      } else {}
+    } else {
       setState(() {
         catloading = false;
       });

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:real_pro_vendor/Screens/UserProfile.dart';
 import '../Constants/Colors.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../Screens/HomePage.dart';
 import '../Screens/UploadPostPage.dart';
-import '../Screens/VendorProfilePage.dart';
 
 class BottomNavigationBarVendor extends StatefulWidget {
 
@@ -25,7 +25,7 @@ class _BottomNavigationBarVendorState extends State<BottomNavigationBarVendor> {
       case 1:
         return new UploadPostPage();
       case 2:
-        return new VendorProfilePage();
+        return new UserProfile();
       default:
         return HomePage();
     }
