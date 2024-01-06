@@ -10,7 +10,6 @@ import '../Presentation/PagerState.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'EditProfileVendorPage.dart';
 import 'EditPropertyOnRentPage.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -216,14 +215,14 @@ class _HomePageVState extends State<HomePageV> {
                                       ),
                                       GestureDetector(
                                         onTap: () {
-                                          Navigator.push(
+                                          /*Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) {
-                                                return EditProfileVendorPage(getProfileData);
+                                                return EditProfileVendorPage(getCountData);
                                               }
                                             ),
-                                          );
+                                          );*/
                                         },
                                         child: Icon(
                                           Icons.border_color_outlined,
@@ -386,7 +385,7 @@ class _HomePageVState extends State<HomePageV> {
                             height: ScreenUtil().setHeight(10),
                           ),
 
-                          Container(
+                         /* Container(
                             width: ScreenUtil().setWidth(230),
                             child: Text("${getProfileData.post![0].enquiry == null ? "0" : getProfileData.post![0].enquiry.toString()} Enquiries",
                                 style: TextStyle(
@@ -396,7 +395,7 @@ class _HomePageVState extends State<HomePageV> {
                                     fontFamily: 'work',
                                     fontWeight:
                                     FontWeight.w600)),
-                          ),
+                          ),*/
 
                         ],
                       ),

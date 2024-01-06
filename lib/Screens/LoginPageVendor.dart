@@ -49,12 +49,13 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
   }
 
   late String token;
+  FocusNode _textFocus = FocusNode();
 
   @override
   void initState() {
     getToken();
-    _emailController.text = "fk@gmail.com";
-    _passwordController.text = "123456";
+  /*  _emailController.text = "fk@gmail.com";
+    _passwordController.text = "123456";*/
     // TODO: implement initState
     super.initState();
   }
@@ -63,7 +64,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
     //token = (await FirebaseMessaging.instance.getToken())!;
     //print("token $token");
   }
-
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
@@ -78,304 +79,357 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
           margin: EdgeInsets.only(
               left: ScreenUtil().setWidth(30),
               right: ScreenUtil().setWidth(30)),
-          child: Column(
-            children: [
-              Container(
-                height: ScreenUtil().setHeight(100),
-                alignment: Alignment.center,
-                child: Image(
-                  image: AssetImage("assets/images/login_bg.png"),
-                  fit: BoxFit.fill,
-                  height: ScreenUtil().setHeight(120),
-                  width: double.infinity,
-                ),
-              ),
-              Container(
-                alignment: Alignment.center,
-                child: Text(
-                  'Login',
-                  style: TextStyle(
-                    color: primaryTextColor,
-                    fontSize: ScreenUtil().setWidth(22),
-                    fontFamily: 'work',
-                    fontWeight: FontWeight.w600,
+          child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.always,
+            child: Column(
+              children: [
+                Container(
+                  height: ScreenUtil().setHeight(100),
+                  alignment: Alignment.center,
+                  child: Image(
+                    image: AssetImage("assets/images/login_bg.png"),
+                    fit: BoxFit.fill,
+                    height: ScreenUtil().setHeight(120),
+                    width: double.infinity,
                   ),
                 ),
-              ),
-              SizedBox(
-                height: ScreenUtil().setHeight(8),
-              ),
-              Container(
-                alignment: Alignment.center,
-                child: Text(
-                  'Welcome back you’ve been missed',
-                  style: TextStyle(
-                    color: primaryTextColor,
-                    fontSize: ScreenUtil().setWidth(16),
-                    fontFamily: 'work',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: ScreenUtil().setHeight(25),
-              ),
-              Container(
-                height: ScreenUtil().setHeight(55),
-                child: Column(
-                  children: [
-                    TextFieldWidget(
-                      controller: _emailController,
-                      title: "Email",
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                height: ScreenUtil().setHeight(55),
-                child: Column(
-                  children: [
-                    TextFieldWidget(
-                      controller: _passwordController,
-                      title: "Password",
-                      isPassword: true,
-                      obs: true,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: ScreenUtil().setHeight(10),
-              ),
-              isloading?CircularProgressIndicator(color: appColor,):GestureDetector(
-                onTap: () {
-                  checkValidation();
-                  /*      Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return CtaegoryInterestPage();
-                      },
-                    ),
-                  );*/
-                },
-                child: RoundedButton(
-                  text: 'Login',
-                  press: () {},
-                  color: appColor,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return ForgotPasswordPage();
-                      },
-                    ),
-                  );
-                },
-                child: Container(
-                  alignment: Alignment.centerRight,
-                  height: ScreenUtil().setHeight(40),
+                Container(
+                  alignment: Alignment.center,
                   child: Text(
-                    'Forgot Password?',
+                    'Login',
                     style: TextStyle(
-                      color: appColor,
-                      fontSize: ScreenUtil().setWidth(12),
+                      color: primaryTextColor,
+                      fontSize: ScreenUtil().setWidth(22),
                       fontFamily: 'work',
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: ScreenUtil().setHeight(8),
-              ),
-              Container(
-                child: Row(children: <Widget>[
-                  Expanded(
-                      child: Divider(
-                        color: primaryColor,
-                        height: 0.2,
-                      )),
-                  SizedBox(
-                    width: ScreenUtil().setHeight(15),
-                  ),
-                  Text(
-                    "OR",
+                SizedBox(
+                  height: ScreenUtil().setHeight(8),
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Welcome back you’ve been missed',
                     style: TextStyle(
-                        fontFamily: 'work',
-                        fontSize: ScreenUtil().setHeight(10),
-                        fontWeight: FontWeight.w400,
-                        color: primaryColor),
-                  ),
-                  SizedBox(
-                    width: ScreenUtil().setHeight(15),
-                  ),
-                  Expanded(
-                      child: Divider(
-                        color: primaryColor,
-                        height: 0.2,
-                      )),
-                ]),
-              ),
-              SizedBox(
-                height: ScreenUtil().setHeight(15),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      signInWithGoogle();
-                    },
-                    child: Container(
-                      height: ScreenUtil().setHeight(65),
-                      width: ScreenUtil().setWidth(90),
-                      decoration: BoxDecoration(
-                          color: secondaryColor,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "assets/images/google.png",
-                            width: ScreenUtil().setHeight(20),
-                            height: ScreenUtil().setHeight(20),
-                            fit: BoxFit.contain,
-                          ),
-                          SizedBox(
-                            height: ScreenUtil().setHeight(10),
-                          ),
-                          Text(
-                            'Google',
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: ScreenUtil().setWidth(12),
-                              fontFamily: 'work',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: ScreenUtil().setWidth(5)),
-                  GestureDetector(
-                    onTap: () {
-                      _loginWithFacebook();
-                    },
-                    child: Container(
-                      height: ScreenUtil().setHeight(65),
-                      width: ScreenUtil().setWidth(90),
-                      decoration: BoxDecoration(
-                          color: secondaryColor,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "assets/images/facebook.png",
-                            width: ScreenUtil().setHeight(20),
-                            height: ScreenUtil().setHeight(20),
-                            fit: BoxFit.contain,
-                          ),
-                          SizedBox(
-                            height: ScreenUtil().setHeight(10),
-                          ),
-                          Text(
-                            'Facebook',
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: ScreenUtil().setWidth(12),
-                              fontFamily: 'work',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: ScreenUtil().setWidth(5)),
-                  Container(
-                    height: ScreenUtil().setHeight(65),
-                    width: ScreenUtil().setWidth(90),
-                    decoration: BoxDecoration(
-                        color: secondaryColor,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/images/apple.png",
-                          width: ScreenUtil().setHeight(20),
-                          height: ScreenUtil().setHeight(20),
-                          fit: BoxFit.contain,
-                        ),
-                        SizedBox(
-                          height: ScreenUtil().setHeight(10),
-                        ),
-                        Text(
-                          'Apple',
-                          style: TextStyle(
-                            color: primaryColor,
-                            fontSize: ScreenUtil().setWidth(12),
-                            fontFamily: 'work',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: ScreenUtil().setHeight(55)),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return RegistrationPageVendor();
-                      },
-                    ),
-                  );
-                },
-                child: Container(
-                  height: ScreenUtil().setHeight(40),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'You dont have any account?',
-                          style: TextStyle(
-                            color: primaryColor,
-                            fontSize: ScreenUtil().setWidth(12),
-                            fontFamily: 'work',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        Text(
-                          ' Register',
-                          style: TextStyle(
-                            color: appColor,
-                            fontSize: ScreenUtil().setWidth(12),
-                            fontFamily: 'work',
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ],
+                      color: primaryTextColor,
+                      fontSize: ScreenUtil().setWidth(16),
+                      fontFamily: 'work',
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: ScreenUtil().setHeight(15),
-              ),
-            ],
+                SizedBox(
+                  height: ScreenUtil().setHeight(25),
+                ),
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text(
+                          'Email',
+                          style: TextStyle(
+                            color: primaryTextColor,
+                            fontSize: ScreenUtil().setWidth(12),
+                            fontFamily: 'work',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      TextFieldWidget(
+                        controller: _emailController,
+                        title: "Email",
+                        validator: (value) {
+        if (_emailController.text.isEmpty) {
+        return 'This field is required';
+        }
+        return null;
+        },
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text(
+                          'Password',
+                          style: TextStyle(
+                            color: primaryTextColor,
+                            fontSize: ScreenUtil().setWidth(12),
+                            fontFamily: 'work',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      TextFieldWidget(
+                        controller: _passwordController,
+                        title: "Password",
+                        isPassword: true,
+                        validator: (value) {
+                          if (_passwordController.text.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                        obs: true,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: ScreenUtil().setHeight(5),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return ForgotPasswordPage();
+                        },
+                      ),
+                    );
+                  },
+                  child: Container(
+                    alignment: Alignment.centerRight,
+                    height: ScreenUtil().setHeight(40),
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        color: appColor,
+                        fontSize: ScreenUtil().setWidth(12),
+                        fontFamily: 'work',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: ScreenUtil().setHeight(15),
+                ),
+                isloading?CircularProgressIndicator(color: appColor,):GestureDetector(
+                  onTap: () {
+
+                    if (_formKey.currentState!.validate()) {
+                      // Validation passed, navigate to the next page
+                      checkValidation();
+                    } else {
+                      // Validation failed, show an error message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Please fill in the required field.'),
+                        ),
+                      );
+                    }
+
+                   // checkValidation();
+                    /*      Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return CtaegoryInterestPage();
+                        },
+                      ),
+                    );*/
+                  },
+                  child: RoundedButton(
+                    text: 'Login',
+                    press: () {},
+                    color: appColor,
+                  ),
+                ),
+
+
+             /*   Container(
+                  child: Row(children: <Widget>[
+                    Expanded(
+                        child: Divider(
+                          color: primaryColor,
+                          height: 0.2,
+                        )),
+                    SizedBox(
+                      width: ScreenUtil().setHeight(15),
+                    ),
+                    Text(
+                      "OR",
+                      style: TextStyle(
+                          fontFamily: 'work',
+                          fontSize: ScreenUtil().setHeight(10),
+                          fontWeight: FontWeight.w400,
+                          color: primaryColor),
+                    ),
+                    SizedBox(
+                      width: ScreenUtil().setHeight(15),
+                    ),
+                    Expanded(
+                        child: Divider(
+                          color: primaryColor,
+                          height: 0.2,
+                        )),
+                  ]),
+                ),
+                SizedBox(
+                  height: ScreenUtil().setHeight(15),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        signInWithGoogle();
+                      },
+                      child: Container(
+                        height: ScreenUtil().setHeight(65),
+                        width: ScreenUtil().setWidth(90),
+                        decoration: BoxDecoration(
+                            color: secondaryColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/images/google.png",
+                              width: ScreenUtil().setHeight(20),
+                              height: ScreenUtil().setHeight(20),
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(
+                              height: ScreenUtil().setHeight(10),
+                            ),
+                            Text(
+                              'Google',
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontSize: ScreenUtil().setWidth(12),
+                                fontFamily: 'work',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: ScreenUtil().setWidth(5)),
+                    GestureDetector(
+                      onTap: () {
+                        _loginWithFacebook();
+                      },
+                      child: Container(
+                        height: ScreenUtil().setHeight(65),
+                        width: ScreenUtil().setWidth(90),
+                        decoration: BoxDecoration(
+                            color: secondaryColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/images/facebook.png",
+                              width: ScreenUtil().setHeight(20),
+                              height: ScreenUtil().setHeight(20),
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(
+                              height: ScreenUtil().setHeight(10),
+                            ),
+                            Text(
+                              'Facebook',
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontSize: ScreenUtil().setWidth(12),
+                                fontFamily: 'work',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: ScreenUtil().setWidth(5)),
+                    Container(
+                      height: ScreenUtil().setHeight(65),
+                      width: ScreenUtil().setWidth(90),
+                      decoration: BoxDecoration(
+                          color: secondaryColor,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/images/apple.png",
+                            width: ScreenUtil().setHeight(20),
+                            height: ScreenUtil().setHeight(20),
+                            fit: BoxFit.contain,
+                          ),
+                          SizedBox(
+                            height: ScreenUtil().setHeight(10),
+                          ),
+                          Text(
+                            'Apple',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: ScreenUtil().setWidth(12),
+                              fontFamily: 'work',
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),*/
+                SizedBox(height: ScreenUtil().setHeight(20)),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return RegistrationPageVendor();
+                        },
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: ScreenUtil().setHeight(40),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'You dont have any account?',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: ScreenUtil().setWidth(12),
+                              fontFamily: 'work',
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            ' Register Now',
+                            style: TextStyle(
+                              color: appColor,
+                              fontSize: ScreenUtil().setWidth(14),
+                              fontFamily: 'work',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: ScreenUtil().setHeight(15),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -623,8 +677,8 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
             "role", getdata["0"]["original"]["user"]["role@gmail.com"].toString());
         prefs.setString(
             "phone", getdata["0"]["original"]["user"]["mobile_number"].toString());
-        prefs.setString("phone",
-            getdata["0"]["original"]["user"]["mobile_number"].toString());
+        prefs.setString("profileImage",
+            getdata["0"]["original"]["user"]["image"].toString());
         prefs.setBool("isLogging", true);
         Future.delayed(const Duration(milliseconds: 2000), () {
           Navigator.of(context).push(MaterialPageRoute(

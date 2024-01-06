@@ -4,8 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../Constants/Colors.dart';
 import '../Presentation/common_button.dart';
 import 'LoginPageVendor.dart';
-import 'RegistrationPageVendor.dart';
-
 
 class IntroductionScreen extends StatefulWidget {
   const IntroductionScreen({Key? key}) : super(key: key);
@@ -80,7 +78,7 @@ class _SplashScreenTwoState extends State<IntroductionScreen> {
                       height: ScreenUtil().setHeight(40),
                     ),
                     Text(
-                      "Are you looking\nto buy or rent a property?",
+                      "Showcase the walkthrough of your properties on RealPro\nthe Social Platform for real estate",
                       style: TextStyle(
                         color: secondaryColor,
                         fontSize: ScreenUtil().setWidth(20),
@@ -94,7 +92,7 @@ class _SplashScreenTwoState extends State<IntroductionScreen> {
                     SizedBox(
                       height: ScreenUtil().setHeight(10),
                     ),
-                    Text(
+                    /*Text(
                       "In publishing and graphic design, Lorem ipsum is a\nplaceholder text commonly used to ",
                       style: TextStyle(
                         color: secondaryColor,
@@ -103,7 +101,7 @@ class _SplashScreenTwoState extends State<IntroductionScreen> {
                         fontWeight: FontWeight.normal,
                       ),
                       textAlign: TextAlign.center,
-                    ),
+                    ),*/
                   ],
                 ),
               ),
@@ -115,7 +113,7 @@ class _SplashScreenTwoState extends State<IntroductionScreen> {
               margin: EdgeInsets.only(left: ScreenUtil().setHeight(15),right: ScreenUtil().setHeight(15)),
               child: Column(
                 children: [
-                  GestureDetector(
+                 /* GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
@@ -130,7 +128,7 @@ class _SplashScreenTwoState extends State<IntroductionScreen> {
                         text: 'Vendor',
                         press: () {},
                         color: appColor,
-                      )),
+                      )),*/
                   SizedBox(
                     height: ScreenUtil().setHeight(10),
                   ),
@@ -146,10 +144,11 @@ class _SplashScreenTwoState extends State<IntroductionScreen> {
                         );
                       },
                       child: RoundedButton(
-                        text: 'Vendor Login',
+                        text: 'Login',
                         press: () {},
                         color: appColor,
                       )),
+
                   SizedBox(
                     height: ScreenUtil().setHeight(10),
                   ),

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../Constants/Api.dart';
 import '../Constants/Colors.dart';
-import '../Presentation/upload_textfeild.dart';
+import '../Presentation/common_button.dart';
+import '../Presentation/common_textfeild.dart';
 import 'package:http/http.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:convert';
@@ -17,96 +18,14 @@ class RegistrationPageVendor extends StatefulWidget {
 
 class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
 
-  int _activeCurrentStep = 0;
   bool isloading=false;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _postalCodeController = TextEditingController();
-  final TextEditingController _refNumController = TextEditingController();
-  final TextEditingController _ornController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _agencyNameController = TextEditingController();
+  final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _brnController = TextEditingController();
-  final TextEditingController _dldController = TextEditingController();
-
-  List<Step> stepList() => [
-    Step(
-      state: _activeCurrentStep <= 0 ? StepState.editing : StepState.complete,
-      isActive: _activeCurrentStep >= 0,
-      title: const Text('Profile Deetails'),
-      content: Container(
-        child: Column(
-          children: [
-
-            TextFieldUpload(
-              title: 'Email',
-              controller: _emailController,
-            ),
-
-            TextFieldUpload(
-              title: 'Password',
-              controller: _passwordController,
-            ),
-
-
-            TextFieldUpload(
-              title: 'Name',
-              controller: _nameController,
-            ),
-
-
-            TextFieldUpload(
-              title: 'Phone Number',
-              controller: _phoneController,
-            ),
-
-
-            TextFieldUpload(
-              title: 'Address',
-              controller: _addressController,
-            ),
-
-
-            TextFieldUpload(
-              title: 'Postal Code',
-              controller: _postalCodeController,
-            ),
-          ],
-        ),
-      ),
-    ),
-    Step(
-        state: StepState.complete,
-        isActive: _activeCurrentStep >= 1,
-        title: const Text('Property Details'),
-        content: Container(
-          child: Column(
-            children: [
-
-              TextFieldUpload(
-                title: 'Reference Number',
-                controller: _refNumController,
-              ),
-
-              TextFieldUpload(
-                title: 'Broker ORN',
-                controller: _ornController,
-              ),
-
-              TextFieldUpload(
-                title: 'Agent BRN',
-                controller: _brnController,
-              ),
-
-              TextFieldUpload(
-                title: 'DLD Permit Number',
-                controller: _dldController,
-              ),
-            ],
-          ),
-        )),
-  ];
 
   late String token;
 
@@ -122,11 +41,16 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     //print("token $token");
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(color: primaryColor),
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+      ),
+     /* appBar: AppBar(
         backgroundColor: Colors.transparent,
         bottomOpacity: 0,
         elevation: 0,
@@ -140,97 +64,323 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
             fontWeight: FontWeight.w800,
           ),
         ),
-      ),
-      body: Column(
-        children: [
-          Container(
-            height: ScreenUtil().setHeight(90),
-            alignment: Alignment.center,
-            child: Image(
-              image: AssetImage("assets/images/login_bg.png"),
-              fit: BoxFit.fill,
-              height: ScreenUtil().setHeight(90),
-              width: double.infinity,
-            ),
-          ),
-          Expanded(
-            child: Stepper(
-              type: StepperType.horizontal,
-              currentStep: _activeCurrentStep,
-              steps: stepList(),
-              onStepContinue: () {
-                if (_activeCurrentStep < (stepList().length - 1)) {
-                  setState(() {
-                    _activeCurrentStep += 1;
-                  });
-                }
-                else if(_activeCurrentStep == 1){
-                  setState(() {
-                    checkValidation();
-                    /*Navigator.push(
+      ),*/
+      body: SingleChildScrollView(
+        child: Container(
+          margin: EdgeInsets.only(
+              left: ScreenUtil().setWidth(30),
+              right: ScreenUtil().setWidth(30)),
+          child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.always,
+            child: Column(
+              children: [
+                Container(
+                  height: ScreenUtil().setHeight(100),
+                  alignment: Alignment.center,
+                  child: Image(
+                    image: AssetImage("assets/images/login_bg.png"),
+                    fit: BoxFit.fill,
+                    height: ScreenUtil().setHeight(120),
+                    width: double.infinity,
+                  ),
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Sign Up',
+                    style: TextStyle(
+                      color: primaryTextColor,
+                      fontSize: ScreenUtil().setWidth(22),
+                      fontFamily: 'work',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: ScreenUtil().setHeight(8),
+                ),
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text(
+                          'Email',
+                          style: TextStyle(
+                            color: primaryTextColor,
+                            fontSize: ScreenUtil().setWidth(12),
+                            fontFamily: 'work',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      TextFieldWidget(
+                        controller: _emailController,
+                        title: "Email",
+                        validator: (value) {
+                          if (_emailController.text.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 8.0),
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text(
+                          'Password',
+                          style: TextStyle(
+                            color: primaryTextColor,
+                            fontSize: ScreenUtil().setWidth(12),
+                            fontFamily: 'work',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      TextFieldWidget(
+                        title: 'Password',
+                        controller: _passwordController,
+                        isPassword: true,
+                        obs: true,
+                        validator: (value) {
+                          if (_passwordController.text.isEmpty) {
+                            return "This field is required";
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 8.0),
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text(
+                          'Re-enter password',
+                          style: TextStyle(
+                            color: primaryTextColor,
+                            fontSize: ScreenUtil().setWidth(12),
+                            fontFamily: 'work',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      TextFieldWidget(
+                        title: 'Re-enter password',
+                        controller: _confirmPasswordController,
+                        isPassword: true,
+                        obs: true,
+                        validator: (value) {
+                          if (_confirmPasswordController.text.isEmpty) {
+                            return "This field is required";
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text(
+                          'Agent Name',
+                          style: TextStyle(
+                            color: primaryTextColor,
+                            fontSize: ScreenUtil().setWidth(12),
+                            fontFamily: 'work',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      TextFieldWidget(
+                        controller: _nameController,
+                        title: "Agent Name",
+                        validator:(value) {
+                          if (_nameController.text.isEmpty) {
+                            return "This field is required";
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text(
+                          'Agency Name',
+                          style: TextStyle(
+                            color: primaryTextColor,
+                            fontSize: ScreenUtil().setWidth(12),
+                            fontFamily: 'work',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      TextFieldWidget(
+                        controller: _agencyNameController,
+                        title: "Agency Name",
+                        validator:(value) {
+                          if (_agencyNameController.text.isEmpty) {
+                            return "This field is required";
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text(
+                          'BRN',
+                          style: TextStyle(
+                            color: primaryTextColor,
+                            fontSize: ScreenUtil().setWidth(12),
+                            fontFamily: 'work',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      TextFieldWidget(
+                        controller: _brnController,
+                        title: "BRN",
+                        validator: (value) {
+                          if (_brnController.text.isEmpty) {
+                            return "This field is required";
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
+
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text(
+                          'Mobile',
+                          style: TextStyle(
+                            color: primaryTextColor,
+                            fontSize: ScreenUtil().setWidth(12),
+                            fontFamily: 'work',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      TextFieldWidget(
+                        controller: _mobileController,
+                        title: "Mobile",
+                        validator: (value) {
+                          if (_mobileController.text.isEmpty) {
+                            return "This field is required";
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(
+                  height: ScreenUtil().setHeight(20),
+                ),
+
+                isloading?CircularProgressIndicator(color: appColor,):GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      if (_formKey.currentState!.validate()) {
+                        // Validation passed, navigate to the next page
+                        checkValidation();
+                      } else {
+                        // Validation failed, show an error message
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Please fill in the required field.'),
+                          ),
+                        );
+                      }
+                    });
+                //    checkValidation();
+                    /*      Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return BottomNavigationBarVendor();
+                          return CtaegoryInterestPage();
                         },
                       ),
                     );*/
-                  });
-                }
-              },
+                  },
+                  child: RoundedButton(
+                    text: 'Register Now',
+                    press: () {},
+                    color: appColor,
+                  ),
+                ),
 
-              onStepCancel: () {
-                if (_activeCurrentStep == 0) {
-                  return;
-                }
-                setState(() {
-                  _activeCurrentStep -= 1;
-                });
-              },
-
-              onStepTapped: (int index) {
-                setState(() {
-                  _activeCurrentStep = index;
-                });
-              },
-
+                SizedBox(
+                  height: ScreenUtil().setHeight(20),
+                )
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
   void checkValidation() {
     if (_emailController.text.isEmpty) {
-      Message(context, "Enter Email Address");
+  //    print('Entered Text: ${_emailController.text}');
+     // Message(context, "Enter Email Address");
     }
-    else if (_phoneController.text.isEmpty) {
-      Message(context, "Enter Phone");
+    else if (_mobileController.text.isEmpty) {
+      Message(context, "Enter Mobile Number");
     }
     else if (_nameController.text.isEmpty) {
-      Message(context, "Enter Name");
+      Message(context, "Enter Agent Name");
     }
     else if (_passwordController.text.isEmpty) {
       Message(context, "Enter Password");
     }
-    else if (_addressController.text.isEmpty) {
-      Message(context, "Enter Address");
+    else if (_agencyNameController.text.isEmpty) {
+      Message(context, "Enter Agency Name");
     }
-    else if (_postalCodeController.text.isEmpty) {
-      Message(context, "Enter Postal Code");
+    else if (_confirmPasswordController.text.isEmpty) {
+      Message(context, "Re-enter Password");
     }
-    else if(_refNumController.text.isEmpty) {
-      Message(context, "Enter Reference Number");
+    else if (_brnController.text.isEmpty) {
+      Message(context, "Enter BRN");
     }
-    else if(_ornController.text.isEmpty) {
-      Message(context, "Enter Broker ORN");
-    }
-    else if(_brnController.text.isEmpty) {
-      Message(context, "Enter Agent BRN");
-    }
-    else if(_dldController.text.isEmpty) {
-      Message(context, "Enter DLD Permit Number");
+    else if(_passwordController.text!=_confirmPasswordController.text)
+    {
+      Message(context, "Password & Confirm Password not matched");
     }
     else {
       RegisterAPI();
@@ -254,14 +404,27 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       'name': _nameController.text,
       'password': _passwordController.text,
       'email': _emailController.text,
-      'mobile_number': _phoneController.text,
-      'location': _addressController.text,
-      'country_code': "+971",
-      'agent_ref': _refNumController.text,
-      'broker_orn': _ornController.text,
       'agent_brn': _brnController.text,
-      'dld_no': _dldController.text
+      'company_name': _agencyNameController.text,
+      'mobile_number': _mobileController.text,
+      'agency_name': _agencyNameController.text
     };
+
+   /* 'location': _addressController.text,
+    'country_code': "+971",
+    'agent_ref': _refNumController.text,
+    'broker_orn': _ornController.text,
+
+    'dld_no': _dldController.text,
+    'description': _descriptionController.text,
+
+    'company_address': _companyAddressController.text,
+    'about_company': _aboutCompanyController.text,
+    'about_me': "",
+    'language': _languageController.text,
+    'experience': _experienceController.text,
+    'nationality': _nationalityController.text
+*/
     final encoding = Encoding.getByName('utf-8');
 
     Response response = await post(
@@ -270,6 +433,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       body: body,
       encoding: encoding,
     );
+
     var getdata = json.decode(response.body);
 
     int statusCode = response.statusCode;
@@ -280,6 +444,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
         setState(() {
           isloading = false;
         });
+
         Message(context, "Sent OTP Successfully");
         /* prefs.setString("access_token", "Bearer ${getdata["0"]["original"]["access_token"].toString()}");
         prefs.setString("name", getdata["0"]["original"]["user"]["name"].toString());
@@ -294,7 +459,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
             context,
             MaterialPageRoute(
               builder: (context) {
-                return  RegistrationOtpVendor(_passwordController.text,_emailController.text, _nameController.text,_phoneController.text);
+                return  RegistrationOtpVendor(_passwordController.text,_emailController.text, _nameController.text,_mobileController.text);
               },
             ),
           );

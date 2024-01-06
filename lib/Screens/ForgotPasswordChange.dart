@@ -26,6 +26,9 @@ class _ForgotPasswordChangePageState extends State<ForgotPasswordChangePage> {
 
   bool isVisibleV = false;
   bool isloading=false;
+  bool _validate = false;
+
+
 
   void showWidget() {
     setState(() {
@@ -34,7 +37,7 @@ class _ForgotPasswordChangePageState extends State<ForgotPasswordChangePage> {
   }
 
   late String token;
-
+  final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
     getToken();
@@ -63,88 +66,110 @@ class _ForgotPasswordChangePageState extends State<ForgotPasswordChangePage> {
       body: SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.only(left:ScreenUtil().setWidth(30),right:ScreenUtil().setWidth(30)  ),
-          child: Column(
-            children: [
-              Container(
-                height: ScreenUtil().setHeight(100),
-                alignment: Alignment.center,
-                child: Image(
-                  image: AssetImage("assets/images/login_bg.png"),
-                  fit: BoxFit.fill,
-                  height: ScreenUtil().setHeight(120),
-                  width: double.infinity,
-                ),
-              ),
-
-              SizedBox(
-                height: ScreenUtil().setHeight(20),
-              ),
-              Container(
-                alignment: Alignment.center,
-                child: Text(
-                  'Reset Password',
-                  style: TextStyle(
-                    color: primaryTextColor,
-                    fontSize: ScreenUtil().setWidth(22),
-                    fontFamily: 'work',
-                    fontWeight: FontWeight.w600,
+          child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.always,
+            child: Column(
+              children: [
+                Container(
+                  height: ScreenUtil().setHeight(100),
+                  alignment: Alignment.center,
+                  child: Image(
+                    image: AssetImage("assets/images/login_bg.png"),
+                    fit: BoxFit.fill,
+                    height: ScreenUtil().setHeight(120),
+                    width: double.infinity,
                   ),
                 ),
-              ),
-              SizedBox(
-                height: ScreenUtil().setHeight(35),
-              ),
-              Container(
-                height: ScreenUtil().setHeight(195),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Enter registered email address', style: TextStyle(
-                          color: darkTextColor  ,
-                          fontSize: ScreenUtil().setWidth(12),
-                          fontFamily: 'work',
-                          fontWeight: FontWeight.w100,
-                        ),),
-                      ],
-                    ),
-                    SizedBox(
-                      height: ScreenUtil().setHeight(5),
-                    ),
-                    TextFieldWidget(
-                      controller: _otpController,
-                      title: "OTP",
-                    ),
-                    TextFieldWidget(
-                      controller: _passwordController,
-                      title: "Password",
-                      isPassword: true,
-                      obs: true,
-                    ),
-                    TextFieldWidget(
-                      controller: _cPasswordController,
-                      title: "Re Enter Password",
-                      isPassword: true,
-                      obs: true,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: ScreenUtil().setHeight(15),
-              ),
-              isloading?CircularProgressIndicator(color: appColor,): GestureDetector(
-                  onTap: (){
-                    CheckValidation();
-                  },
-                  child: RoundedButton(text: 'Reset Password', press: (){},color: appColor,)),
-              SizedBox(
-                height: ScreenUtil().setHeight(15),
-              ),
 
-            ],
+                SizedBox(
+                  height: ScreenUtil().setHeight(20),
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Reset Password',
+                    style: TextStyle(
+                      color: primaryTextColor,
+                      fontSize: ScreenUtil().setWidth(22),
+                      fontFamily: 'work',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: ScreenUtil().setHeight(35),
+                ),
+                Container(
+                  height: ScreenUtil().setHeight(195),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Enter registered email address', style: TextStyle(
+                            color: darkTextColor  ,
+                            fontSize: ScreenUtil().setWidth(12),
+                            fontFamily: 'work',
+                            fontWeight: FontWeight.w100,
+                          ),),
+                        ],
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(5),
+                      ),
+                      TextFieldWidget(
+                        controller: _otpController,
+                        title: "OTP",
+                        validator: (value) {
+                          if (_otpController.text.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFieldWidget(
+                        controller: _passwordController,
+                        title: "Password",
+                        isPassword: true,
+                        validator: (value) {
+                          if (_passwordController.text.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                        obs: true,
+                      ),
+                      TextFieldWidget(
+                        controller: _cPasswordController,
+                        title: "Re Enter Password",
+                        isPassword: true,
+                        validator: (value) {
+                          if (_cPasswordController.text.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                        obs: true,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: ScreenUtil().setHeight(15),
+                ),
+                isloading?CircularProgressIndicator(color: appColor,): GestureDetector(
+                    onTap: (){
+                      CheckValidation();
+                    },
+                    child: RoundedButton(text: 'Reset Password', press: (){},color: appColor,)),
+                SizedBox(
+                  height: ScreenUtil().setHeight(15),
+                ),
+
+              ],
+            ),
           ),
         ),
       ),

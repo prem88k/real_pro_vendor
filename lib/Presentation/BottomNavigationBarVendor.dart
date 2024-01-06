@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:real_pro_vendor/Screens/UserProfile.dart';
+import 'package:real_pro_vendor/Screens/Chat/ConversationsTab.dart';
 import '../Constants/Colors.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../Screens/HomePage.dart';
+import '../Screens/ProfilePage.dart';
 import '../Screens/UploadPostPage.dart';
 
 class BottomNavigationBarVendor extends StatefulWidget {
@@ -25,7 +26,9 @@ class _BottomNavigationBarVendorState extends State<BottomNavigationBarVendor> {
       case 1:
         return new UploadPostPage();
       case 2:
-        return new UserProfile();
+        return new ConversationsTab();
+      case 3:
+        return new ProfilePage();
       default:
         return HomePage();
     }
@@ -70,6 +73,16 @@ class _BottomNavigationBarVendorState extends State<BottomNavigationBarVendor> {
           SalomonBottomBarItem(
             icon: Icon(Icons.grid_view,color: currentIndex == 1?appColor:borderColor,),
             title: Text("Upload",style:  TextStyle(
+                fontFamily: 'work',
+                fontSize: ScreenUtil().setHeight(13),
+                fontWeight: FontWeight.bold,
+                color:  currentIndex == 1?darkTextColor:borderColor)),
+            selectedColor:primaryColor,
+          ),
+
+          SalomonBottomBarItem(
+            icon: Icon(Icons.message,color: currentIndex == 1?appColor:borderColor,),
+            title: Text("Message",style:  TextStyle(
                 fontFamily: 'work',
                 fontSize: ScreenUtil().setHeight(13),
                 fontWeight: FontWeight.bold,

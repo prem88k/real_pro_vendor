@@ -33,16 +33,16 @@ class _EnquiryDetailsPageState extends State<EnquiryDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: appColor,
         bottomOpacity: 0,
-        iconTheme: IconThemeData(color: primaryColor),
+        iconTheme: IconThemeData(color: secondaryColor),
         elevation: 0,
         centerTitle: true,
         title: Text(
           "Enquiry Details",
           style: TextStyle(
-            color: primaryColor,
-            fontSize: ScreenUtil().setWidth(20),
+            color: secondaryColor,
+            fontSize: ScreenUtil().setWidth(15),
             fontFamily: 'work',
             fontWeight: FontWeight.w600,
           ),

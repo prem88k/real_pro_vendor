@@ -48,6 +48,21 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xffF5F6F8),
+      appBar: AppBar(
+        backgroundColor: appColor,
+        bottomOpacity: 0,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          "Home",
+          style: TextStyle(
+            color: secondaryColor,
+            fontSize: ScreenUtil().setWidth(15),
+            fontFamily: 'work',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
       body: isloading || catloading?Center(child: CircularProgressIndicator(color: appColor,)):Container(
         margin: EdgeInsets.only(
             top: ScreenUtil().setHeight(45),
@@ -408,7 +423,7 @@ class _HomePageState extends State<HomePage> {
                               height: ScreenUtil().setHeight(40),
                             ),
                             Container(
-                              height: ScreenUtil().setHeight(80),
+                              height: ScreenUtil().setHeight(78),
                               child: Padding(
                                 padding: EdgeInsets.only(
                                     left: ScreenUtil().setWidth(12),

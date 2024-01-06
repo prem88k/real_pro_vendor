@@ -358,7 +358,7 @@ class _UserProfileState extends State<UserProfile>
                     keyboardType: TextInputType.text,
                     textAlignVertical: TextAlignVertical.center,
                     style: TextStyle(
-                        fontFamily: 'poppins',
+                        fontFamily: 'work',
                         fontSize: ScreenUtil().setHeight(12),
                         fontWeight: FontWeight.normal,
                         color: primaryColor),
@@ -369,7 +369,7 @@ class _UserProfileState extends State<UserProfile>
                       ),
                       hintText: 'Start Typing',
                       hintStyle: TextStyle(
-                          fontFamily: 'poppins',
+                          fontFamily: 'work',
                           fontSize: ScreenUtil().setHeight(12),
                           fontWeight: FontWeight.normal,
                           color: primaryColor),
@@ -618,7 +618,7 @@ class _UserProfileState extends State<UserProfile>
                       style: TextStyle(
                           fontSize: ScreenUtil().setWidth(12),
                           color: Color(0xff979797),
-                          fontFamily: 'poppins',
+                          fontFamily: 'work',
                           fontWeight: FontWeight.w400),
                       trimLines: 3,
                       colorClickableText: primaryColor,
@@ -628,12 +628,12 @@ class _UserProfileState extends State<UserProfile>
                       lessStyle: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'poppins',
+                        fontFamily: 'work',
                       ),
                       moreStyle: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'poppins',
+                        fontFamily: 'work',
                       ),
                     ),
                     SizedBox(
@@ -727,7 +727,7 @@ class _UserProfileState extends State<UserProfile>
                       style: TextStyle(
                           fontSize: ScreenUtil().setWidth(12),
                           color: Color(0xff979797),
-                          fontFamily: 'poppins',
+                          fontFamily: 'work',
                           fontWeight: FontWeight.w400),
                       trimLines: 3,
                       colorClickableText: primaryColor,
@@ -737,12 +737,12 @@ class _UserProfileState extends State<UserProfile>
                       lessStyle: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'poppins',
+                        fontFamily: 'work',
                       ),
                       moreStyle: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'poppins',
+                        fontFamily: 'work',
                       ),
                     ),
                     SizedBox(
