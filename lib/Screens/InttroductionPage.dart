@@ -42,7 +42,7 @@ class _SplashScreenTwoState extends State<IntroductionScreen> {
               height: ScreenUtil().setHeight(475),
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage('assets/images/into_img.png'),
+                    image: AssetImage('assets/images/intro.jpeg'),
                     fit: BoxFit.fill),
               ),
               alignment: Alignment.center,

@@ -28,7 +28,8 @@ class TextFieldWidget extends StatefulWidget {
 }
 
 class _TextFieldWidgetState extends State<TextFieldWidget> {
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -81,7 +82,6 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
                     });
                   } else {}*/
                 }
-
             },
             validator: widget.validator,
             decoration: !widget.isPassword?InputDecoration(

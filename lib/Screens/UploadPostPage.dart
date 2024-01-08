@@ -138,8 +138,9 @@ class _UploadPostPageState extends State<UploadPostPage> {
       video: _video!.path,
       thumbnailPath: (await getTemporaryDirectory()).path, /// path_provider
       imageFormat: ImageFormat.PNG,
-      maxHeight: 320,
-      quality: 70,
+      maxWidth: 320,
+      maxHeight: 620,
+      quality: 120,
     );
     print(File(_path!));
     _videoPlayerController = VideoPlayerController.file(File(_video!.path))..initialize().then((_) {
@@ -1638,7 +1639,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
                     ),
                     TextFormField(
                       controller: _amountController,
-                      keyboardType: TextInputType.text,
                       textAlignVertical: TextAlignVertical.center,
                       style: TextStyle(
                         fontSize: ScreenUtil().setHeight(13),
@@ -1647,7 +1647,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                         fontFamily: 'work',
                       ),
                       validator: (value) {
-                        if (value == null || _amountController.text.isEmpty) {
+                        if (_amountController.text.isEmpty) {
                           return 'This field is required';
                         }
                         return null;
@@ -1676,11 +1676,37 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 SizedBox(
                   height: ScreenUtil().setHeight(15),
                 ),
+
                 GestureDetector(
                     onTap: () {
-                      if (_formKey.currentState!.validate()) {
+
+                      setState(() {
+                        if (_formKey.currentState!.validate()) {
+                          // Check additional conditions, such as non-empty text fields
+                          if (_houseTitleController.text.isNotEmpty &&
+                              _bedroomController.text.isNotEmpty) {
+                            // Validation passed, initiate the login
+                            setState(() {
+                              isloading = true;
+                            });
+                            // Call the login function
+                            uploadPropertyAPI();
+                          } else {
+                            // Show an error message for empty text fields
+                          }
+                        } else {
+                          // Validation failed, show an error message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Please fill in the required field.'),
+                            ),
+                          );
+                        }
+                      });
+
+                    /*  if (_formKey.currentState!.validate()) {
                         // Validation passed, navigate to the next page
-                        checkValidation();
+                        uploadPropertyAPI();
                       } else {
                         // Validation failed, show an error message
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -1688,10 +1714,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                             content: Text('Please fill in the required field.'),
                           ),
                         );
-                      }
-                      /*setState(() {
-
-                      });*/
+                      }*/
                     },
                     child: RoundedButton(
                       text: 'Submit',
@@ -1699,6 +1722,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                       color: appColor,
                     )
                 ),
+
                 SizedBox(
                   height: ScreenUtil().setHeight(20),
                 ),
@@ -2588,11 +2612,11 @@ class _UploadPostPageState extends State<UploadPostPage> {
       Message(context, "Enter Amount");
     }
     else {
-      RegisterAPI();
+      uploadPropertyAPI();
     }
   }
 
-  Future<void> RegisterAPI() async {
+  Future<void> uploadPropertyAPI() async {
     List<String> textController = [];
     for(int i = 0; i<_controllers.length; i++)
     {
@@ -2639,8 +2663,12 @@ class _UploadPostPageState extends State<UploadPostPage> {
     request.fields['location'] = _locationController.text;
     request.fields['lat'] = pickUpLat.toString();
     request.fields['lang'] = pickUpLong.toString();
-
-    if(thumbnailType == "Upload manually")
+    request.files.add(
+        await MultipartFile.fromPath(
+            'thamblain',
+            thumbnailImage!.path
+        ));
+   /* if(thumbnailType == "Upload manually")
     {
       request.files.add(
           await MultipartFile.fromPath(
@@ -2654,7 +2682,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
               'thamblain',
               _path!
           ));
-    }
+    }*/
 
     if(_video == null)
      {

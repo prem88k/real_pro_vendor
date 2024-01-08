@@ -18,7 +18,6 @@ import '../Presentation/common_textfeild.dart';
 import 'ForgotPassword.dart';
 import 'RegistrationPageVendor.dart';
 
-
 FirebaseAuth _auth = FirebaseAuth.instance;
 
 class LoginPageVendor extends StatefulWidget {
@@ -54,7 +53,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
   @override
   void initState() {
     getToken();
-  /*  _emailController.text = "fk@gmail.com";
+    /*  _emailController.text = "fk@gmail.com";
     _passwordController.text = "123456";*/
     // TODO: implement initState
     super.initState();
@@ -64,7 +63,9 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
     //token = (await FirebaseMessaging.instance.getToken())!;
     //print("token $token");
   }
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
@@ -143,11 +144,11 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                         controller: _emailController,
                         title: "Email",
                         validator: (value) {
-        if (_emailController.text.isEmpty) {
-        return 'This field is required';
-        }
-        return null;
-        },
+                          if (_emailController.text.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
                       ),
                     ],
                   ),
@@ -183,8 +184,76 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                   ),
                 ),
                 SizedBox(
-                  height: ScreenUtil().setHeight(5),
+                  height: ScreenUtil().setHeight(15),
                 ),
+                isloading
+                    ? CircularProgressIndicator(
+                        color: appColor,
+                      )
+                    : GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (_formKey.currentState!.validate()) {
+                              // Check additional conditions, such as non-empty text fields
+                              if (_emailController.text.isNotEmpty &&
+                                  _passwordController.text.isNotEmpty) {
+                                // Validation passed, initiate the login
+                                setState(() {
+                                  isloading = true;
+                                });
+
+                                // Call the login function
+                                Login();
+                              } else {
+                                // Show an error message for empty text fields
+                              }
+                            } else {
+                              // Validation failed, show an error message
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content:
+                                  Text('Please fill in the required field.'),
+                                ),
+                              );
+                            }
+                          });
+
+                          /*setState(() {
+                            if (_formKey.currentState!.validate()) {
+                              setState(() {
+                                // Set loading state if needed
+                                isloading = true;
+                              });
+
+                              // Call the login function
+                              Login();
+                              // Validation passed, navigate to the next page
+                            } else {
+                              // Validation failed, show an error message
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Please fill in the required field.'),
+                                ),
+                              );
+                            }
+                          });*/
+                          // checkValidation();
+                          /*      Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return CtaegoryInterestPage();
+                        },
+                      ),
+                    );*/
+                        },
+                        child: RoundedButton(
+                          text: 'Login',
+                          press: () {},
+                          color: appColor,
+                        ),
+                      ),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -213,40 +282,150 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                 SizedBox(
                   height: ScreenUtil().setHeight(15),
                 ),
-                isloading?CircularProgressIndicator(color: appColor,):GestureDetector(
-                  onTap: () {
-
-                    if (_formKey.currentState!.validate()) {
-                      // Validation passed, navigate to the next page
-                      checkValidation();
-                    } else {
-                      // Validation failed, show an error message
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Please fill in the required field.'),
-                        ),
-                      );
-                    }
-
-                   // checkValidation();
-                    /*      Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return CtaegoryInterestPage();
-                        },
-                      ),
-                    );*/
-                  },
-                  child: RoundedButton(
-                    text: 'Login',
-                    press: () {},
-                    color: appColor,
-                  ),
+                SizedBox(
+                  height: ScreenUtil().setHeight(15),
                 ),
+                Container(
+                  child: Row(children: <Widget>[
+                    Expanded(
+                        child: Divider(
+                      color: primaryColor,
+                      height: 0.2,
+                    )),
+                    SizedBox(
+                      width: ScreenUtil().setHeight(15),
+                    ),
+                    Text(
+                      "OR",
+                      style: TextStyle(
+                          fontFamily: 'work',
+                          fontSize: ScreenUtil().setHeight(10),
+                          fontWeight: FontWeight.w400,
+                          color: primaryColor),
+                    ),
+                    SizedBox(
+                      width: ScreenUtil().setHeight(15),
+                    ),
+                    Expanded(
+                        child: Divider(
+                      color: primaryColor,
+                      height: 0.2,
+                    )),
+                  ]),
+                ),
+                SizedBox(
+                  height: ScreenUtil().setHeight(15),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        signInWithGoogle();
+                      },
+                      child: Container(
+                        height: ScreenUtil().setHeight(65),
+                        width: ScreenUtil().setHeight(90),
+                        decoration: BoxDecoration(
+                            color: secondaryColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/images/google.png",
+                              width: ScreenUtil().setHeight(20),
+                              height: ScreenUtil().setHeight(20),
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(
+                              height: ScreenUtil().setHeight(10),
+                            ),
+                            Text(
+                              'Google',
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontSize: ScreenUtil().setWidth(12),
+                                fontFamily: 'work',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: ScreenUtil().setWidth(5)),
+                    GestureDetector(
+                      onTap: () {
+                        _loginWithFacebook();
+                      },
+                      child: Container(
+                        height: ScreenUtil().setHeight(65),
+                        width: ScreenUtil().setHeight(90),
+                        decoration: BoxDecoration(
+                            color: secondaryColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/images/facebook.png",
+                              width: ScreenUtil().setHeight(20),
+                              height: ScreenUtil().setHeight(20),
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(
+                              height: ScreenUtil().setHeight(10),
+                            ),
+                            Text(
+                              'Facebook',
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontSize: ScreenUtil().setWidth(12),
+                                fontFamily: 'work',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: ScreenUtil().setWidth(5)),
+                    Container(
+                      height: ScreenUtil().setHeight(65),
+                      width: ScreenUtil().setHeight(90),
+                      decoration: BoxDecoration(
+                          color: secondaryColor,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/images/apple.png",
+                            width: ScreenUtil().setHeight(20),
+                            height: ScreenUtil().setHeight(20),
+                            fit: BoxFit.contain,
+                          ),
+                          SizedBox(
+                            height: ScreenUtil().setHeight(10),
+                          ),
+                          Text(
+                            'Apple',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: ScreenUtil().setWidth(12),
+                              fontFamily: 'work',
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: ScreenUtil().setHeight(25)),
 
-
-             /*   Container(
+                /*   Container(
                   child: Row(children: <Widget>[
                     Expanded(
                         child: Divider(
@@ -534,13 +713,13 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
     // Check result status
     switch (res.status) {
       case FacebookLoginStatus.success:
-      // The user is suceessfully logged in
-      // Send access token to server for validation and auth
+        // The user is suceessfully logged in
+        // Send access token to server for validation and auth
         final FacebookAccessToken? accessToken = res.accessToken;
         final AuthCredential authCredential =
-        FacebookAuthProvider.credential(accessToken!.token);
+            FacebookAuthProvider.credential(accessToken!.token);
         final result =
-        await FirebaseAuth.instance.signInWithCredential(authCredential);
+            await FirebaseAuth.instance.signInWithCredential(authCredential);
         // Get profile data from facebook for use in the app
         final profile = await fb.getUserProfile();
         print('Hello, ${profile!.name}! You ID: ${profile.userId}');
@@ -554,10 +733,10 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
         postRegisterGoogleData(profile.userId, profile.name!, email!);
         break;
       case FacebookLoginStatus.cancel:
-      // In case the user cancels the login process
+        // In case the user cancels the login process
         break;
       case FacebookLoginStatus.error:
-      // Login procedure failed
+        // Login procedure failed
         print('Error while log in: ${res.error}');
         break;
     }
@@ -565,9 +744,9 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
 
   Future<String?> signInWithGoogle() async {
     final GoogleSignInAccount? googleUser =
-    await GoogleSignIn(scopes: <String>["email"]).signIn();
+        await GoogleSignIn(scopes: <String>["email"]).signIn();
     final GoogleSignInAuthentication googleAuth =
-    await googleUser!.authentication;
+        await googleUser!.authentication;
 
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
@@ -575,7 +754,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
     );
 
     final UserCredential authResult =
-    await _auth.signInWithCredential(credential);
+        await _auth.signInWithCredential(credential);
     final User? user = authResult.user;
 
     if (user != null) {
@@ -663,7 +842,6 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
         setState(() {
           isloading = false;
         });
-
         Message(context, "Login Successfully");
         prefs.setString("access_token",
             "Bearer ${getdata["0"]["original"]["access_token"].toString()}");
@@ -673,18 +851,17 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
             "UserId", "${getdata["0"]["original"]["user"]["id"].toString()}");
         prefs.setString(
             "email", getdata["0"]["original"]["user"]["email"].toString());
-        prefs.setString(
-            "role", getdata["0"]["original"]["user"]["role@gmail.com"].toString());
-        prefs.setString(
-            "phone", getdata["0"]["original"]["user"]["mobile_number"].toString());
+        prefs.setString("role",
+            getdata["0"]["original"]["user"]["role@gmail.com"].toString());
+        prefs.setString("phone",
+            getdata["0"]["original"]["user"]["mobile_number"].toString());
         prefs.setString("profileImage",
             getdata["0"]["original"]["user"]["image"].toString());
         prefs.setBool("isLogging", true);
         Future.delayed(const Duration(milliseconds: 2000), () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => BottomNavigationBarVendor()));
+              builder: (context) => RegistrationPageVendor()));
         });
-
 
         /*bookTable();*/
       } else {

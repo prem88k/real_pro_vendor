@@ -38,18 +38,18 @@ class _BottomNavigationBarVendorState extends State<BottomNavigationBarVendor> {
     // TODO: implement initState
     super.initState();
   }
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   /// Build BottomNavigationBar Widget
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
     return  isloading
         ? Center(
         child: CircularProgressIndicator(
           color: appColor,
         ))
         : Scaffold(
-      key: _scaffoldKey,
+      key: _formKey,
       body: callPage(currentIndex),
       bottomNavigationBar: SalomonBottomBar(
         backgroundColor: secondaryColor,

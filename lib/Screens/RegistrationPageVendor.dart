@@ -40,10 +40,9 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     //token = (await FirebaseMessaging.instance.getToken())!;
     //print("token $token");
   }
-
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: primaryColor),
