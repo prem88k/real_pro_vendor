@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: isloading || catloading?Center(child: CircularProgressIndicator(color: appColor,)):Container(
         margin: EdgeInsets.only(
-            top: ScreenUtil().setHeight(45),
+            top: ScreenUtil().setHeight(25),
             left: ScreenUtil().setWidth(15),
             right: ScreenUtil().setWidth(15)),
         child: Column(

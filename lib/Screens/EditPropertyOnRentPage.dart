@@ -15,13 +15,21 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dotted_decoration/dotted_decoration.dart';
 import '../Models/GetAmenitiesData.dart';
+import '../Models/GetAmountTypeData.dart';
+import '../Models/GetAreaData.dart';
 import '../Models/GetCaategoryData.dart';
+import '../Models/GetCityData.dart';
 import '../Models/GetPropertyDetailsData.dart';
+import '../Models/GetPropertyTypeData.dart';
+import '../Models/GetTowerData.dart';
 import '../Presentation/common_button.dart';
 import '../Presentation/upload_textfeild.dart';
 import 'package:http/http.dart' as http;
 import 'LoginPageVendor.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:path_provider/path_provider.dart';
 
 class EditPropertyOnRentPage extends StatefulWidget {
   String property_id;
@@ -35,16 +43,24 @@ class EditPropertyOnRentPage extends StatefulWidget {
 class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
 
   int? selectedOption;
+  String? thumbnailType;
+  String? propertyType;
+  String? categoryType;
+  String? categoryName;
+  String? commercialType;
+  String? amountType;
+  String? amountName;
+  String? furnishType;
+
+  bool isloading = false;
+  bool catloading = false;
+
   final TextEditingController _houseTitleController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _floorController = TextEditingController();
   final TextEditingController _bedroomController = TextEditingController();
   final TextEditingController _toiletController = TextEditingController();
   final TextEditingController _sqftController = TextEditingController();
   final TextEditingController _feature1Controller = TextEditingController();
-  final TextEditingController _typeController = TextEditingController();
-  final TextEditingController _purposeController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _realProController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
 
@@ -53,6 +69,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
   GoogleMapController? mapController; //contrller for Google map
   LatLng? showLocation;
   String location = "Select Leaving from Location..";
+  var newlatlang;
   double? pickUpLat;
   double? pickUpLong;
 
@@ -73,18 +90,19 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     setState((){});
   }
 
-  late GecategoryData gecategoryData;
-  List<CategoryList>? catList = [];
-  String selectedCategory = "";
-  var dropdownCategoryValue;
-
 
   List<AmenitiesList> _selectedAmenities = [];
 
+
+
   void _onJobLanguage(AmenitiesList amenitiesList, int? id) {
     print(_selectedAmenities.map((e) => e.name));
+
     print(_selectedAmenities.contains(amenitiesList));
+    final List<int?> selectedIds = getPropertyDetails.data![0].amenities!.map((amenity) => amenity.id).toList();
+
     setState(() {
+      print("IDS:: ${selectedIds}");
       if (_selectedAmenities.contains(amenitiesList)) {
         _selectedAmenities.remove(amenitiesList);
       } else {
@@ -95,10 +113,43 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     print(_selectedAmenities.contains(amenitiesList));
   }
 
+  late GecategoryData gecategoryData;
+  List<CategoryList>? catList = [];
+  String selectedCategory = "";
+  var dropdownCategoryValue;
+
+  var items = [
+    'Sale',
+    'Rent',
+  ];
+
+  var furnishItem = [
+    'Furnished',
+    'Un-furnished',
+    'Partially furnished'
+  ];
   late GetAmenitiesData getAmenitiesData;
   List<AmenitiesList>? amenitiesList = [];
-  bool isloading = false;
-  bool catloading = false;
+
+  late GetPropertyTypeData getPropertyTypeData;
+  List<PropertyTypeList>? propertyTypeList = [];
+  String selectedProperty = "";
+  var dropdownPropertyValue;
+
+  late GetCityData getCityData;
+  List<CityList>? cityList = [];
+  String selectedCity = "";
+  var dropdownCityValue;
+
+  late GetAreaData getAreaData;
+  List<AreaList>? areaList = [];
+  String selectedArea = "";
+  var dropdownAreaValue;
+
+  late GetTowerData getTowerData;
+  List<TowerList>? towerList = [];
+  String selectedTower = "";
+  var dropdownTowerValue;
 
   late GetPropertyDetails getPropertyDetails;
   List<PropertyDetails>? details = [];
@@ -106,69 +157,6 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
   static List<TextEditingController> _controllers = [];
   List<Widget> _fields = [];
 
-  bool isVisible = true;
-  bool isVisibleB = true;
-  bool isVisibleT = true;
-  bool isVisibleS = true;
-  bool isVisibleTy = true;
-  bool isVisibleP = true;
-  bool isVisibleRef = true;
-  bool isVisibleAdd = true;
-  bool isVisibleAm = true;
-
-  void showFeature(){
-    setState(() {
-      isVisible = !isVisible;
-    });
-  }
-
-  void showBedroom(){
-    setState(() {
-      isVisibleB = !isVisibleB;
-    });
-  }
-
-  void showToilet(){
-    setState(() {
-      isVisibleT = !isVisibleT;
-    });
-  }
-
-  void showSqft(){
-    setState(() {
-      isVisibleS = !isVisibleS;
-    });
-  }
-
-  void showType(){
-    setState(() {
-      isVisibleTy = !isVisibleTy;
-    });
-  }
-
-  void showPurpose(){
-    setState(() {
-      isVisibleP = !isVisibleP;
-    });
-  }
-
-  void showRef(){
-    setState(() {
-      isVisibleRef = !isVisibleRef;
-    });
-  }
-
-  void showAddOn(){
-    setState(() {
-      isVisibleAdd = !isVisibleAdd;
-    });
-  }
-
-  void showAmount(){
-    setState(() {
-      isVisibleAm = !isVisibleAm;
-    });
-  }
 
   void getTextFormField() {
     final field = Row(
@@ -248,16 +236,66 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
   @override
   void initState() {
     super.initState();
-    getCategory();
-    getAmenities();
-    getTextFormField();
     getPropertyDetailsAPI();
+    getPropertyDetails = GetPropertyDetails();
+    getCity();
+    getAmenities();
+    getProperty();
+    getTextFormField();
+
     _locationController.addListener(() {
       /*_onChanged();*/
     });
 
-
     // TODO: implement initState
+  }
+
+  void getPostData() {
+
+    getPropertyDetails.data![0].location == null ?
+    _locationController.text :
+    _locationController.text = getPropertyDetails.data![0].location.toString();
+
+    getPropertyDetails.data?[0].floor == null ?
+    " " : _floorController.text = getPropertyDetails.data![0].floor.toString();
+
+    getPropertyDetails.data?[0].bedroomCount == null ?
+     " " : _bedroomController.text = getPropertyDetails.data![0].bedroomCount.toString();
+
+    getPropertyDetails.data?[0].propertySize == null ?
+    " " : _sqftController.text = getPropertyDetails.data![0].propertySize.toString();
+
+    getPropertyDetails.data?[0].bathroomCount == null ?
+    " " : _toiletController.text = getPropertyDetails.data![0].bathroomCount.toString();
+
+    getPropertyDetails.data?[0].propertyName  == null ?
+    " " : _houseTitleController.text =  getPropertyDetails.data![0].propertyName.toString() ;
+
+    getPropertyDetails.data?[0].price == null ?
+    " " : _amountController.text = getPropertyDetails.data![0].price.toString();
+
+    getPropertyDetails.data![0].categoryId == null ?
+     propertyType : propertyType = getPropertyDetails.data![0].categoryId.toString();
+
+    getPropertyDetails.data![0].category!.id == null ?
+     categoryType : categoryType = getPropertyDetails.data![0].category!.id.toString();
+
+    commercialType = getPropertyDetails.data![0].purpose.toString();
+
+    getPropertyDetails.data![0].cityId == null ?
+    "City" :
+    dropdownCityValue = getPropertyDetails.data![0].cityId.toString();
+
+    getPropertyDetails.data![0].areaId == null ?
+     "Area" :
+    dropdownAreaValue = getPropertyDetails.data![0].areaId.toString();
+
+    getPropertyDetails.data![0].towerId == null ?
+    "Tower" :
+    dropdownTowerValue = getPropertyDetails.data![0].towerId.toString();
+
+  /*  _controllers = _fields.map((item) => TextEditingController(text: )).toList();*/
+
   }
 
   @override
@@ -293,990 +331,395 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                   bottom: ScreenUtil().setHeight(5)),
               child: Column(
                 children: [
+
                   SizedBox(
                     height: ScreenUtil().setHeight(7),
                   ),
-                  Container(
-                    height: ScreenUtil().setHeight(280),
-                    width: ScreenUtil().screenWidth,
-                    child: Column(
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Property type",
+                          style: TextStyle(
+                              color: primaryColor,
+                              fontFamily: 'work',
+                              fontSize: ScreenUtil().setHeight(14),
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(10),
+                      ),
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Category*",
+                          style: TextStyle(
+                              color: primaryColor,
+                              fontFamily: 'work',
+                              fontSize: ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(5),
+                      ),
+                      _propertyListWidget(),
+                    ],
+                  ),
 
-                              },
-                              child: Container(
-                                height: ScreenUtil().setHeight(83),
-                                width: ScreenUtil().setWidth(83),
-                                decoration: DottedDecoration(
-                                    color: appColor,
-                                    shape: Shape.box,
-                                    borderRadius: BorderRadius.circular(10)
-                                ),// color of grid items
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.add_to_queue,
-                                      size: 34,
-                                      color: appColor,),
-                                    SizedBox(
-                                      height: ScreenUtil().setHeight(10),
-                                    ),
-                                    Text(
-                                      "Upload Video",
-                                      style: TextStyle(
-                                          fontSize: ScreenUtil().setHeight(8),
-                                          color: appColor),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: ScreenUtil().setWidth(10),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                selectImages();
-                              },
-                              child: Container(
-                                height: ScreenUtil().setHeight(83),
-                                width: ScreenUtil().setWidth(83),
-                                decoration: DottedDecoration(
-                                    color: appColor,
-                                    shape: Shape.box,
-                                    borderRadius: BorderRadius.circular(10)
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.add_a_photo_outlined,
-                                      size: 34,
-                                      color: appColor,),
-                                    SizedBox(
-                                      height: ScreenUtil().setHeight(10),
-                                    ),
-                                    Text(
-                                      "Upload Image",
-                                      style: TextStyle(
-                                          fontSize: ScreenUtil().setHeight(8),
-                                          color: appColor),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                           /* SizedBox(
-                              width: ScreenUtil().setWidth(10),
-                            ),*/
-                          ],
+                  propertyType == null ?
+                  Container() :
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: ScreenUtil().setHeight(10),
+                      ),
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Property type*",
+                          style: TextStyle(
+                              color: primaryColor,
+                              fontFamily: 'work',
+                              fontSize: ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w400),
                         ),
-                        SizedBox(
-                          height: ScreenUtil().setHeight(10),
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(5),
+                      ),
+                      _catListWidget(),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(10),
+                      ),
+                    ],
+                  ),
+
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Property available for*",
+                          style: TextStyle(
+                              color: primaryColor,
+                              fontFamily: 'work',
+                              fontSize: ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w400),
                         ),
-                        Expanded(
-                          child: GridView.builder(
-                              padding: EdgeInsets.all(0),
-                              itemCount: getPropertyDetails.data![0].images!.length,
-                              scrollDirection: Axis.horizontal,
-                              gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  mainAxisSpacing: 0,
-                                  crossAxisSpacing: 0,
-                                  crossAxisCount: 2),
-                              itemBuilder: (BuildContext context, int index) {
-                                return Stack(
-                                  alignment: Alignment.topLeft,
-                                  children:  <Widget>[
-                                    ClipRRect(
-                                       borderRadius: BorderRadius.circular(ScreenUtil().setWidth(10)),
-                                      child: Image.network( getPropertyDetails.data![0].images![0].image.toString(),
-                                        fit: BoxFit.cover,
-                                        height: ScreenUtil().setHeight(84.4),
-                                        width: ScreenUtil().setWidth(83),
-                                    ),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            deleteImage(getPropertyDetails.data![0].images![0].id.toString(), getPropertyDetails.data![0].images![0].productId.toString());
-                                          },
-                                          child: Padding(
-                                            padding: EdgeInsets.only(right: ScreenUtil().setWidth(10)),
-                                            child: Container(
-                                              alignment: Alignment.center,
-                                              child: Icon(Icons.delete_outline,
-                                                size: ScreenUtil().setHeight(19.7),
-                                                color: secondaryColor,),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                );
-                              }),
-                        ),
-                      ],
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(5),
+                      ),
+                      _commercialListWidget(),
+                    ],
+                  ),
+
+                  SizedBox(
+                    height: ScreenUtil().setHeight(10),
+                  ),
+
+                  Divider(
+                    thickness: 0.5,
+                    color: lightTextColor,
+                  ),
+
+                  SizedBox(
+                    height: ScreenUtil().setHeight(6),
+                  ),
+
+                  Container(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Property Location",
+                      style: TextStyle(
+                          color: primaryColor,
+                          fontFamily: 'work',
+                          fontSize: ScreenUtil().setHeight(14),
+                          fontWeight: FontWeight.w500),
                     ),
                   ),
 
                   SizedBox(
-                    height: ScreenUtil().setHeight(5),
+                    height: ScreenUtil().setHeight(12),
                   ),
-
-                  Row(
+                  //city
+                  Column(
                     mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        "City",
+                        style: TextStyle(
+                            color: primaryColor,
+                            fontFamily: 'work',
+                            fontSize: ScreenUtil().setHeight(12.5),
+                            fontWeight: FontWeight.w400),
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(5),
+                      ),
                       Container(
-                        /* padding: EdgeInsets.only(
-                          left: size.width * 0.025,
-                          right: size.width * 0.05,
-                        ),*/
-                        //  margin: EdgeInsets.only(left: ScreenUtil().setWidth(5)),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: secondaryColor
-                        ),
-                        height: ScreenUtil().setHeight(50),
+                        //  height: ScreenUtil().setHeight(45),
                         width: ScreenUtil().setWidth(340),
-                        child: DropdownButtonHideUnderline(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.only(
-                                left: ScreenUtil().setWidth(20),
-                                right: ScreenUtil().setWidth(10)
+                        child: DropdownButtonFormField<String>(
+                          iconDisabledColor: Colors.transparent,
+                          iconEnabledColor: Colors.transparent,
+                          iconSize: 34,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            // Set height and width constraints
+                            isDense: true,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: textFieldBorderColor)
                             ),
-                            child: DropdownButton<String>(
-                              iconSize: 30,
-                              style: TextStyle(
-                                color: primaryColor,
+                            suffixIcon: Icon(
+                              Icons.keyboard_arrow_down_sharp,
+                              color: appColor,
+                              size: ScreenUtil().setHeight(22),
+                            ),// You can add a border here if needed
+                          ),
+                          style: TextStyle(
+                            color: primaryColor,
+                          ),
+                          dropdownColor: secondaryColor,
+                          isExpanded: true,
+                          value: dropdownCityValue,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownCityValue = newValue;
+                              print("City Id::$newValue");
+                              selectedCity = newValue!;
+                              getArea(selectedCity);
+                            });
+                          },
+                          hint: Row(
+                            children: [
+                              Text(
+                                "City",
+                                style: TextStyle(
+                                    color: primaryColor,
+                                    fontFamily: 'work',
+                                    fontSize: ScreenUtil().setHeight(12.5),
+                                    fontWeight: FontWeight.normal),
                               ),
-                              dropdownColor: secondaryColor,
-                              isExpanded: true,
-                              value: dropdownCategoryValue,
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  dropdownCategoryValue = newValue;
-                                  print("Cart Id::$newValue");
-                                  selectedCategory = newValue!;
-                                });
-                              },
-                              hint: Row(
+                            ],
+                          ),
+                          items: cityList!.map((CityList value) {
+                            return DropdownMenuItem<String>(
+                              value: value.id.toString(),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "House Category",
+                                    value.cityName!,
                                     style: TextStyle(
-                                        color: primaryColor,
                                         fontFamily: 'work',
+                                        color: primaryColor,
                                         fontSize: ScreenUtil().setHeight(12.5),
                                         fontWeight: FontWeight.normal),
                                   ),
                                 ],
                               ),
-                              icon: Icon(
-                                // Add this
-                                Icons.arrow_drop_down, // Add this
-                                color: primaryColor, // Add this
-                              ),
-                              items: catList!.map((CategoryList value) {
-                                return DropdownMenuItem<String>(
-                                  value: value.id.toString(),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        value.name!,
-                                        style: TextStyle(
-                                            fontFamily: 'work',
-                                            color: primaryColor,
-                                            fontSize: ScreenUtil().setHeight(12.5),
-                                            fontWeight: FontWeight.normal),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
+                            );
+                          }).toList(),
                         ),
                       ),
                     ],
                   ),
 
                   SizedBox(
-                    height: ScreenUtil().setHeight(5),
-                  ),
-                  TextFieldUpload(
-                    title:
-                    getPropertyDetails.data![0].propertyAddress != null ?
-                    getPropertyDetails.data![0].propertyAddress.toString() : "Address",
-                    controller: _addressController,
-                  ),
-                  SizedBox(
                     height: ScreenUtil().setHeight(10),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Image.asset("assets/images/bed.png",
-                                  height: ScreenUtil().setHeight(15),
-                                  width: ScreenUtil().setWidth(18)),
-                              SizedBox(
-                                width: ScreenUtil().setWidth(5),
-                              ),
-                              Text(
-                               "Bedroom",
-                                style: TextStyle(
-                                  color: darkTextColor,
-                                  fontSize: ScreenUtil().setWidth(12),
-                                  fontFamily: 'work',
-                                  height: ScreenUtil().setWidth(1),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: ScreenUtil().setHeight(7),
-                          ),
-                          isVisibleB ?
-                          Container(
-                            height: ScreenUtil().setHeight(50),
-                            width: ScreenUtil().setWidth(113),
-                            decoration: BoxDecoration(
-                              color: secondaryColor,
-                                borderRadius: BorderRadius.circular(10)
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                left: 20,
-                                right: 5
-                            ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                      getPropertyDetails.data![0].bedroomCount != null ?
-                                      getPropertyDetails.data![0].bedroomCount.toString() : " ",
-                                    style: TextStyle(
-                                      fontSize: ScreenUtil().setHeight(14),
-                                      color: primaryColor,
-                                      fontWeight: FontWeight.w400,
-                                      fontFamily: 'work',
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      showBedroom();
-                                    },
-                                      child: Icon(Icons.mode_edit_outline_outlined,
-                                        color: appColor, size: ScreenUtil().setHeight(18.3),))
-                                ],
-                              ),
-                            ),
-                          )
-                         : Container(
-                            height: ScreenUtil().setHeight(50),
-                            width: ScreenUtil().setWidth(113),
-                            child: TextFormField(
-                              controller: _bedroomController,
-                              keyboardType: TextInputType.text,
-                              textAlignVertical: TextAlignVertical.center,
-                              style: TextStyle(
-                                fontSize: ScreenUtil().setHeight(14),
-                                color: primaryColor,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: 'work',
-                              ),
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: secondaryColor,
-                                hintText: "Bedroom",
-                                hintStyle: TextStyle(
-                                    fontFamily: 'work',
-                                    fontSize: ScreenUtil().setHeight(14),
-                                    fontWeight: FontWeight.w400,
-                                    color: primaryColor),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide.none,
-                                    borderRadius: BorderRadius.circular(10)),
-                                contentPadding: EdgeInsets.only(left: 20),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Image.asset("assets/images/bath.png",
-                                  height: ScreenUtil().setHeight(15),
-                                  width: ScreenUtil().setWidth(18)),
-                              SizedBox(
-                                width: ScreenUtil().setWidth(5),
-                              ),
-                              Text(
-                                "Toilet",
-                                style: TextStyle(
-                                  color: darkTextColor,
-                                  fontSize: ScreenUtil().setWidth(12),
-                                  fontFamily: 'work',
-                                  height: ScreenUtil().setWidth(1),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: ScreenUtil().setHeight(7),
-                          ),
-                              isVisibleT ?
-                               Container(
-                            height: ScreenUtil().setHeight(50),
-                            width: ScreenUtil().setWidth(113),
-                            decoration: BoxDecoration(
-                                color: secondaryColor,
-                                borderRadius: BorderRadius.circular(10)
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  left: 20,
-                                  right: 5
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    getPropertyDetails.data![0].bathroomCount != null ?
-                                    getPropertyDetails.data![0].bathroomCount.toString() : "0",
-                                    style: TextStyle(
-                                      fontSize: ScreenUtil().setHeight(14),
-                                      color: primaryColor,
-                                      fontWeight: FontWeight.w400,
-                                      fontFamily: 'work',
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                      onTap: () {
-                                        showToilet();
-                                      },
-                                      child: Icon(Icons.mode_edit_outline_outlined,
-                                        color: appColor, size: ScreenUtil().setHeight(18.3),))
-                                ],
-                              ),
-                            ),
-                          )
-                              :Container(
-                            height: ScreenUtil().setHeight(50),
-                            width: ScreenUtil().setWidth(113),
-                            child: TextFormField(
-                              controller: _toiletController,
-                              keyboardType: TextInputType.text,
-                              textAlignVertical: TextAlignVertical.center,
-                              style: TextStyle(
-                                fontSize: ScreenUtil().setHeight(14),
-                                color: primaryColor,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: 'work',
-                              ),
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: secondaryColor,
-                                hintText: "Toilet",
-                                hintStyle: TextStyle(
-                                    fontFamily: 'work',
-                                    fontSize: ScreenUtil().setHeight(14),
-                                    fontWeight: FontWeight.w400,
-                                    color: primaryColor),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide.none,
-                                    borderRadius: BorderRadius.circular(10)),
-                                contentPadding: EdgeInsets.only(left: 20),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Image.asset("assets/images/crop.png",
-                                  height: ScreenUtil().setHeight(15),
-                                  width: ScreenUtil().setWidth(18)),
-                              SizedBox(
-                                width: ScreenUtil().setWidth(5),
-                              ),
-                              Text(
-                                "Sqft",
-                                style: TextStyle(
-                                  color: darkTextColor,
-                                  fontSize: ScreenUtil().setWidth(12),
-                                  fontFamily: 'work',
-                                  height: ScreenUtil().setWidth(1),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: ScreenUtil().setHeight(7),
-                          ),
-                          isVisibleS ?
-                                Container(
-                            height: ScreenUtil().setHeight(50),
-                            width: ScreenUtil().setWidth(113),
-                            decoration: BoxDecoration(
-                                color: secondaryColor,
-                                borderRadius: BorderRadius.circular(10)
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  left: 20,
-                                  right: 5
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    getPropertyDetails.data![0].propertySize != null ?
-                                    getPropertyDetails.data![0].propertySize.toString() : "0",
-                                    style: TextStyle(
-                                      fontSize: ScreenUtil().setHeight(14),
-                                      color: primaryColor,
-                                      fontWeight: FontWeight.w400,
-                                      fontFamily: 'work',
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                      onTap: () {
-                                        showSqft();
-                                      },
-                                      child: Icon(Icons.mode_edit_outline_outlined,
-                                        color: appColor, size: ScreenUtil().setHeight(18.3),))
-                                ],
-                              ),
-                            ),
-                          )
-                              : Container(
-                            height: ScreenUtil().setHeight(50),
-                            width: ScreenUtil().setWidth(113),
-                            child: TextFormField(
-                              controller: _sqftController,
-                              keyboardType: TextInputType.text,
-                              textAlignVertical: TextAlignVertical.center,
-                              style: TextStyle(
-                                fontSize: ScreenUtil().setHeight(14),
-                                color: primaryColor,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: 'work',
-                              ),
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: secondaryColor,
-                                hintText: "Sqft",
-                                hintStyle: TextStyle(
-                                    fontFamily: 'work',
-                                    fontSize: ScreenUtil().setHeight(14),
-                                    fontWeight: FontWeight.w400,
-                                    color: primaryColor),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide.none,
-                                    borderRadius: BorderRadius.circular(10)),
-                                contentPadding: EdgeInsets.only(left: 20),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: ScreenUtil().setHeight(10),
-                  ),
-                  // villa feature
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        child: Text("Villa Feature",
-                            style: TextStyle(
-                                fontSize: ScreenUtil()
-                                    .setHeight(14),
-                                color: primaryColor,
-                                fontFamily: 'work',
-                                fontWeight:
-                                FontWeight.w600)),
-                      ),
-                      SizedBox(
-                        height: ScreenUtil().setHeight(10),
-                      ),
-                      _featureListView(),
 
-                      SizedBox(
-                        height: ScreenUtil().setHeight(10),
-                      ),
-                       _listView(),
-                    ],
-                  ),
-                  SizedBox(
-                    height: ScreenUtil().setHeight(10),
-                  ),
-                  // property info
-                  Row(
+                  //area
+                  Column(
                     mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        "Area*",
+                        style: TextStyle(
+                            color: primaryColor,
+                            fontFamily: 'work',
+                            fontSize: ScreenUtil().setHeight(12.5),
+                            fontWeight: FontWeight.w400),
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(5),
+                      ),
                       Container(
-                        child: Text("Property Information",
-                            style: TextStyle(
-                                fontSize: ScreenUtil()
-                                    .setHeight(14),
-                                color: primaryColor,
-                                fontFamily: 'work',
-                                fontWeight:
-                                FontWeight.w600)),
+                        // height: ScreenUtil().setHeight(35),
+                        width: ScreenUtil().setWidth(340),
+                        child: DropdownButtonFormField<String>(
+                          iconDisabledColor: Colors.transparent,
+                          iconEnabledColor: Colors.transparent,
+                          iconSize: 34,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            // Set height and width constraints
+                            isDense: true,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: textFieldBorderColor)
+                            ),
+                            suffixIcon: Icon(
+                              Icons.keyboard_arrow_down_sharp,
+                              color: appColor,
+                              size: ScreenUtil().setHeight(22),
+                            ),// You can add a border here if needed
+                          ),
+                          style: TextStyle(
+                            color: primaryColor,
+                          ),
+                          dropdownColor: secondaryColor,
+                          isExpanded: true,
+                          value: dropdownAreaValue,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownAreaValue = newValue;
+                              print("Area Id::$newValue");
+                              selectedArea = newValue!;
+                              getTower(selectedArea);
+                            });
+                          },
+                          hint: Row(
+                            children: [
+                              Text(
+                                "Area",
+                                style: TextStyle(
+                                    color: primaryColor,
+                                    fontFamily: 'work',
+                                    fontSize: ScreenUtil().setHeight(12.5),
+                                    fontWeight: FontWeight.normal),
+                              ),
+                            ],
+                          ),
+                          items: areaList!.map((AreaList value) {
+                            return DropdownMenuItem<String>(
+                              value: value.id.toString(),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    value.area!,
+                                    style: TextStyle(
+                                        fontFamily: 'work',
+                                        color: primaryColor,
+                                        fontSize: ScreenUtil().setHeight(12.5),
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: ScreenUtil().setHeight(7),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: ScreenUtil().setWidth(95),
-                                child: Text("Type",
-                                    style: TextStyle(
-                                        fontSize: ScreenUtil()
-                                            .setHeight(12),
-                                        color: primaryColor,
-                                        fontFamily: 'work',
-                                        fontWeight:
-                                        FontWeight.w400)),
-                              ),
-                              SizedBox(
-                                width: ScreenUtil().setWidth(7),
-                              ),
-                              isVisibleTy ?
-                              Container(
-                                width: ScreenUtil().setWidth(120),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                getPropertyDetails.data![0].type != null ?
-                                      getPropertyDetails.data![0].type.toString() : "Type",
-                                      style: TextStyle(
-                                        fontSize: ScreenUtil().setHeight(12),
-                                        color: primaryColor,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: 'work',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                              : Container(
-                                height: ScreenUtil().setHeight(50),
-                                width: ScreenUtil().setWidth(120),
-                                child: TextFormField(
-                                  controller: _typeController,
-                                  keyboardType: TextInputType.text,
-                                  textAlignVertical: TextAlignVertical.center,
-                                  style: TextStyle(
-                                    fontSize: ScreenUtil().setHeight(14),
-                                    color: primaryColor,
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: 'work',
-                                  ),
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: secondaryColor,
-                                    hintText: "Type",
-                                    hintStyle: TextStyle(
-                                        fontFamily: 'work',
-                                        fontSize: ScreenUtil().setHeight(14),
-                                        fontWeight: FontWeight.w400,
-                                        color: primaryColor),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                        borderRadius: BorderRadius.circular(10)),
-                                    contentPadding: EdgeInsets.only(left: 20),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          GestureDetector(
-                              onTap: () {
-                                showType();
-                              },
-                              child: Icon(Icons.mode_edit_outline_outlined,
-                                color: appColor, size: ScreenUtil().setHeight(18.3),))
-                        ],
-                      ),
-                      SizedBox(
-                        height: ScreenUtil().setHeight(7),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: ScreenUtil().setWidth(95),
-                                child: Text("Purpose",
-                                    style: TextStyle(
-                                        fontSize: ScreenUtil()
-                                            .setHeight(12),
-                                        color: primaryColor,
-                                        fontFamily: 'work',
-                                        fontWeight:
-                                        FontWeight.w400)),
-                              ),
-                              SizedBox(
-                                width: ScreenUtil().setWidth(7),
-                              ),
-                              isVisibleP ?
-                              Container(
-                                width: ScreenUtil().setWidth(120),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      getPropertyDetails.data![0].purpose != null ?
-                                      getPropertyDetails.data![0].purpose.toString() : "Purpose",
-                                      style: TextStyle(
-                                        fontSize: ScreenUtil().setHeight(12),
-                                        color: primaryColor,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: 'work',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                                  : Container(
-                                height: ScreenUtil().setHeight(50),
-                                width: ScreenUtil().setWidth(120),
-                                child: TextFormField(
-                                  controller: _purposeController,
-                                  keyboardType: TextInputType.text,
-                                  textAlignVertical: TextAlignVertical.center,
-                                  style: TextStyle(
-                                    fontSize: ScreenUtil().setHeight(14),
-                                    color: primaryColor,
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: 'work',
-                                  ),
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: secondaryColor,
-                                    hintText: "Purpose",
-                                    hintStyle: TextStyle(
-                                        fontFamily: 'work',
-                                        fontSize: ScreenUtil().setHeight(14),
-                                        fontWeight: FontWeight.w400,
-                                        color: primaryColor),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                        borderRadius: BorderRadius.circular(10)),
-                                    contentPadding: EdgeInsets.only(left: 20),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          GestureDetector(
-                              onTap: () {
-                                showPurpose();
-                              },
-                              child: Icon(Icons.mode_edit_outline_outlined,
-                                color: appColor, size: ScreenUtil().setHeight(18.3),))
-                        ],
-                      ),
-                      SizedBox(
-                        height: ScreenUtil().setHeight(7),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: ScreenUtil().setWidth(95),
-                                child: Text("Reference No.",
-                                    style: TextStyle(
-                                        fontSize: ScreenUtil()
-                                            .setHeight(12),
-                                        color: primaryColor,
-                                        fontFamily: 'work',
-                                        fontWeight:
-                                        FontWeight.w400)),
-                              ),
-                              SizedBox(
-                                width: ScreenUtil().setWidth(7),
-                              ),
-                              isVisibleRef ?
-                              Container(
-                                width: ScreenUtil().setWidth(120),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      getPropertyDetails.data![0].refNum != null ?
-                                      getPropertyDetails.data![0].refNum.toString() : "Ref Num",
-                                      style: TextStyle(
-                                        fontSize: ScreenUtil().setHeight(12),
-                                        color: primaryColor,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: 'work',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                                  : Container(
-                                height: ScreenUtil().setHeight(50),
-                                width: ScreenUtil().setWidth(120),
-                                child: TextFormField(
-                                  controller: _realProController,
-                                  keyboardType: TextInputType.text,
-                                  textAlignVertical: TextAlignVertical.center,
-                                  style: TextStyle(
-                                    fontSize: ScreenUtil().setHeight(14),
-                                    color: primaryColor,
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: 'work',
-                                  ),
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: secondaryColor,
-                                    hintText: "Ref No",
-                                    hintStyle: TextStyle(
-                                        fontFamily: 'work',
-                                        fontSize: ScreenUtil().setHeight(14),
-                                        fontWeight: FontWeight.w400,
-                                        color: primaryColor),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                        borderRadius: BorderRadius.circular(10)),
-                                    contentPadding: EdgeInsets.only(left: 20),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          GestureDetector(
-                              onTap: () {
-                                showRef();
-                              },
-                              child: Icon(Icons.mode_edit_outline_outlined,
-                                color: appColor, size: ScreenUtil().setHeight(18.3),))
-                        ],
-                      ),
-                      SizedBox(
-                        height: ScreenUtil().setHeight(7),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: ScreenUtil().setWidth(95),
-                                child: Text("Added on",
-                                    style: TextStyle(
-                                        fontSize: ScreenUtil()
-                                            .setHeight(12),
-                                        color: primaryColor,
-                                        fontFamily: 'work',
-                                        fontWeight:
-                                        FontWeight.w400)),
-                              ),
-                              SizedBox(
-                                width: ScreenUtil().setWidth(7),
-                              ),
-                              isVisibleAdd ?
-                              Container(
-                                width: ScreenUtil().setWidth(120),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      getPropertyDetails.data![0].addon != null ?
-                                      getPropertyDetails.data![0].addon.toString() : "Date",
-                                      style: TextStyle(
-                                        fontSize: ScreenUtil().setHeight(12),
-                                        color: primaryColor,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: 'work',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                                  : Container(
-                                height: ScreenUtil().setHeight(50),
-                                width: ScreenUtil().setWidth(120),
-                                child: TextFormField(
-                                  controller: _dateController,
-                                  keyboardType: TextInputType.text,
-                                  textAlignVertical: TextAlignVertical.center,
-                                  style: TextStyle(
-                                    fontSize: ScreenUtil().setHeight(14),
-                                    color: primaryColor,
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: 'work',
-                                  ),
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: secondaryColor,
-                                    hintText: "Add On",
-                                    hintStyle: TextStyle(
-                                        fontFamily: 'work',
-                                        fontSize: ScreenUtil().setHeight(14),
-                                        fontWeight: FontWeight.w400,
-                                        color: primaryColor),
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                        borderRadius: BorderRadius.circular(10)),
-                                    contentPadding: EdgeInsets.only(left: 20),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          GestureDetector(
-                              onTap: () {
-                                showAddOn();
-                              },
-                              child: Icon(Icons.mode_edit_outline_outlined,
-                                color: appColor, size: ScreenUtil().setHeight(18.3),))
-                        ],
-                      ),
-                      SizedBox(
-                        height: ScreenUtil().setHeight(7),
-                      ),
-                    ],
-                  ),
+
                   SizedBox(
                     height: ScreenUtil().setHeight(10),
                   ),
-                  // amenities
+
+                  //tower
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            child: Text("Amenities",
+                      Text(
+                        "Tower",
+                        style: TextStyle(
+                            color: primaryColor,
+                            fontFamily: 'work',
+                            fontSize: ScreenUtil().setHeight(12.5),
+                            fontWeight: FontWeight.w400),
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(5),
+                      ),
+                      Container(
+                        // height: ScreenUtil().setHeight(35),
+                        width: ScreenUtil().setWidth(340),
+                        child: DropdownButtonFormField<String>(
+                          iconDisabledColor: Colors.transparent,
+                          iconEnabledColor: Colors.transparent,
+                          iconSize: 34,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            // Set height and width constraints
+                            isDense: true,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: textFieldBorderColor)
+                            ),
+                            suffixIcon: Icon(
+                              Icons.keyboard_arrow_down_sharp,
+                              color: appColor,
+                              size: ScreenUtil().setHeight(22),
+                            ),// You can add a border here if needed
+                          ),
+                          style: TextStyle(
+                            color: primaryColor,
+                          ),
+                          dropdownColor: secondaryColor,
+                          isExpanded: true,
+                          value: dropdownTowerValue,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownTowerValue = newValue;
+                              print("Tower Id::$newValue");
+                              selectedTower = newValue!;
+                            });
+                          },
+                          hint: Row(
+                            children: [
+                              Text(
+                                "Tower",
                                 style: TextStyle(
-                                    fontSize: ScreenUtil()
-                                        .setHeight(14),
                                     color: primaryColor,
                                     fontFamily: 'work',
-                                    fontWeight:
-                                    FontWeight.w600)),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: ScreenUtil().setHeight(7),
-                      ),
-                      // choice chips
-                      Wrap(
-                        spacing: 12.0,
-                        children: amenitiesList!.map((AmenitiesList value) =>
-                            Container(
-                              child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    _onJobLanguage(value, value.id);
-                                  },
-                                  child: Chip(
-                                    padding: EdgeInsets.all(8.0),
-                                    label: Text(
-                                      value.name.toString(),
-                                      style: TextStyle(
-                                          fontFamily: 'work',
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: ScreenUtil().setHeight(14),
-                                          color: _selectedAmenities.contains(value)
-                                              ? secondaryColor
-                                              : primaryColor ),
-                                    ),
-                                    avatar: CircleAvatar(
-                                      backgroundColor: Colors.transparent,
-                                      child: Icon(
-                                        _selectedAmenities.contains(value)
-                                            ? Icons.check_circle
-                                            : Icons.add_circle,
-                                        size: 20,
-                                        color: _selectedAmenities.contains(value)
-                                            ? secondaryColor
-                                            : appColor ,
-                                      ),
-                                    ),
-                                    /* side: BorderSide(color: _selectedLanguage.contains(category)
-                                ? appColor
-                                : primaryColor, ),*/
-                                    backgroundColor:
-                                    _selectedAmenities.contains(value)
-                                        ? appColor
-                                        : Color(0xffb8c8e3),
-
-                                  ),
-                                ),
+                                    fontSize: ScreenUtil().setHeight(12.5),
+                                    fontWeight: FontWeight.normal),
                               ),
-                            ))
-                            .toList(),
-                      ),
-                      SizedBox(
-                        height: ScreenUtil().setHeight(7),
+                            ],
+                          ),
+                          items: towerList!.map((TowerList value) {
+                            return DropdownMenuItem<String>(
+                              value: value.id.toString(),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    value.towerName!,
+                                    style: TextStyle(
+                                        fontFamily: 'work',
+                                        color: primaryColor,
+                                        fontSize: ScreenUtil().setHeight(12.5),
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ],
                   ),
+
                   SizedBox(
                     height: ScreenUtil().setHeight(10),
                   ),
-                  // location
+
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1288,7 +731,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                 color: primaryColor,
                                 fontFamily: 'work',
                                 fontWeight:
-                                FontWeight.w600)),
+                                FontWeight.w400)),
                       ),
                       SizedBox(
                         height: ScreenUtil().setHeight(7),
@@ -1297,8 +740,8 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 7),
                         height: ScreenUtil().setHeight(50),
                         decoration: BoxDecoration(
+                            border: Border.all(color: textFieldBorderColor),
                             borderRadius: BorderRadius.circular(10.0),
-                            color: secondaryColor
                         ),
                         child: Center(
                           child: InkWell(
@@ -1346,9 +789,10 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(_locationController.text.isEmpty ?
-                                      getPropertyDetails.data![0].location.toString():
-                                      _locationController.text,
+                                      Text(
+                                        /*_locationController.text.isEmpty != null ?
+                                        getPropertyDetails.data![0].location.toString():*/
+                                        _locationController.text,
                                         style: TextStyle(
                                             fontFamily: 'work',
                                             fontSize: ScreenUtil().setHeight(14),
@@ -1372,6 +816,486 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                   SizedBox(
                     height: ScreenUtil().setHeight(10),
                   ),
+
+                  Divider(
+                    thickness: 0.5,
+                    color: lightTextColor,
+                  ),
+
+                  SizedBox(
+                    height: ScreenUtil().setHeight(10),
+                  ),
+
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: Text("Property Details",
+                            style: TextStyle(
+                                fontSize: ScreenUtil()
+                                    .setHeight(14),
+                                color: primaryColor,
+                                fontFamily: 'work',
+                                fontWeight:
+                                FontWeight.w400)),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(
+                    height: ScreenUtil().setHeight(10),
+                  ),
+
+                  Container(
+                    decoration: BoxDecoration(
+                        color: boxBackgroundColor,
+                        borderRadius: BorderRadius.circular(5)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Image.asset("assets/images/bed.png",
+                                      height: ScreenUtil().setHeight(15),
+                                      width: ScreenUtil().setWidth(18)),
+                                  SizedBox(
+                                    width: ScreenUtil().setWidth(5),
+                                  ),
+                                  Text(
+                                   "Bedroom",
+                                    style: TextStyle(
+                                      color: darkTextColor,
+                                      fontSize: ScreenUtil().setWidth(12),
+                                      fontFamily: 'work',
+                                      height: ScreenUtil().setWidth(1),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: ScreenUtil().setHeight(7),
+                              ),
+                             /* isVisibleB ?
+                              Container(
+                                height: ScreenUtil().setHeight(42),
+                                width: ScreenUtil().setWidth(100),
+                                decoration: BoxDecoration(
+                                  color: secondaryColor,
+
+                                    borderRadius: BorderRadius.circular(10)
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    left: 20,
+                                    right: 5
+                                ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                          getPropertyDetails.data?[0].bedroomCount != null ?
+                                          getPropertyDetails.data![0].bedroomCount.toString() : " ",
+                                        style: TextStyle(
+                                          fontSize: ScreenUtil().setHeight(14),
+                                          color: primaryColor,
+                                          fontWeight: FontWeight.w400,
+                                          fontFamily: 'work',
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          showBedroom();
+                                        },
+                                          child: Icon(Icons.mode_edit_outline_outlined,
+                                            color: appColor, size: ScreenUtil().setHeight(18.3),))
+                                    ],
+                                  ),
+                                ),
+                              )
+                             :*/ Container(
+                                height: ScreenUtil().setHeight(50),
+                                width: ScreenUtil().setWidth(100),
+                                child: TextFormField(
+                                  controller: _bedroomController,
+                                  keyboardType: TextInputType.text,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  style: TextStyle(
+                                    fontSize: ScreenUtil().setHeight(14),
+                                    color: primaryColor,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: 'work',
+                                  ),
+                                  decoration: InputDecoration(
+                                    filled: false,
+                                    fillColor: secondaryColor,
+                                    hintText: "",
+                                    hintStyle: TextStyle(
+                                        fontFamily: 'work',
+                                        fontSize: ScreenUtil().setHeight(14),
+                                        fontWeight: FontWeight.w400,
+                                        color: primaryColor),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide(color: textFieldBorderColor),
+                                        borderRadius: BorderRadius.circular(10)),
+                                    contentPadding: EdgeInsets.only(left: 20),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Image.asset("assets/images/bath.png",
+                                      height: ScreenUtil().setHeight(15),
+                                      width: ScreenUtil().setWidth(18)),
+                                  SizedBox(
+                                    width: ScreenUtil().setWidth(5),
+                                  ),
+                                  Text(
+                                    "Toilet",
+                                    style: TextStyle(
+                                      color: darkTextColor,
+                                      fontSize: ScreenUtil().setWidth(12),
+                                      fontFamily: 'work',
+                                      height: ScreenUtil().setWidth(1),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: ScreenUtil().setHeight(7),
+                              ),
+                                  /*isVisibleT ?
+                                   Container(
+                                height: ScreenUtil().setHeight(42),
+                                width: ScreenUtil().setWidth(100),
+                                decoration: BoxDecoration(
+                                    color: secondaryColor,
+                                    borderRadius: BorderRadius.circular(10)
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      left: 20,
+                                      right: 5
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        getPropertyDetails.data?[0].bathroomCount != null ?
+                                        getPropertyDetails.data![0].bathroomCount.toString() : "0",
+                                        style: TextStyle(
+                                          fontSize: ScreenUtil().setHeight(14),
+                                          color: primaryColor,
+                                          fontWeight: FontWeight.w400,
+                                          fontFamily: 'work',
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                          onTap: () {
+                                            showToilet();
+                                          },
+                                          child: Icon(Icons.mode_edit_outline_outlined,
+                                            color: appColor, size: ScreenUtil().setHeight(18.3),))
+                                    ],
+                                  ),
+                                ),
+                              )
+                                  :*/Container(
+                                height: ScreenUtil().setHeight(50),
+                                width: ScreenUtil().setWidth(100),
+                                child: TextFormField(
+                                  controller: _toiletController,
+                                  keyboardType: TextInputType.text,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  style: TextStyle(
+                                    fontSize: ScreenUtil().setHeight(14),
+                                    color: primaryColor,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: 'work',
+                                  ),
+                                  decoration: InputDecoration(
+                                    filled: false,
+                                    fillColor: secondaryColor,
+                                    hintText:  " ",
+                                    hintStyle: TextStyle(
+                                        fontFamily: 'work',
+                                        fontSize: ScreenUtil().setHeight(14),
+                                        fontWeight: FontWeight.w400,
+                                        color: primaryColor),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide(color: textFieldBorderColor),
+                                        borderRadius: BorderRadius.circular(10)),
+                                    contentPadding: EdgeInsets.only(left: 20),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Image.asset("assets/images/crop.png",
+                                      height: ScreenUtil().setHeight(15),
+                                      width: ScreenUtil().setWidth(18)),
+                                  SizedBox(
+                                    width: ScreenUtil().setWidth(5),
+                                  ),
+                                  Text(
+                                    "Sqft",
+                                    style: TextStyle(
+                                      color: darkTextColor,
+                                      fontSize: ScreenUtil().setWidth(12),
+                                      fontFamily: 'work',
+                                      height: ScreenUtil().setWidth(1),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: ScreenUtil().setHeight(7),
+                              ),
+                              /*isVisibleS ?
+                                    Container(
+                                height: ScreenUtil().setHeight(42),
+                                width: ScreenUtil().setWidth(100),
+                                decoration: BoxDecoration(
+                                    color: secondaryColor,
+                                    borderRadius: BorderRadius.circular(10)
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      left: 20,
+                                      right: 5
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        getPropertyDetails.data?[0].propertySize != null ?
+                                        getPropertyDetails.data![0].propertySize.toString() : " ",
+                                        style: TextStyle(
+                                          fontSize: ScreenUtil().setHeight(14),
+                                          color: primaryColor,
+                                          fontWeight: FontWeight.w400,
+                                          fontFamily: 'work',
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                          onTap: () {
+                                            showSqft();
+                                          },
+                                          child: Icon(Icons.mode_edit_outline_outlined,
+                                            color: appColor, size: ScreenUtil().setHeight(18.3),))
+                                    ],
+                                  ),
+                                ),
+                              )
+                                  :*/ Container(
+                                height: ScreenUtil().setHeight(50),
+                                width: ScreenUtil().setWidth(100),
+                                child: TextFormField(
+                                  controller: _sqftController,
+                                  keyboardType: TextInputType.text,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  style: TextStyle(
+                                    fontSize: ScreenUtil().setHeight(14),
+                                    color: primaryColor,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: 'work',
+                                  ),
+                                  decoration: InputDecoration(
+                                    filled: false,
+                                    fillColor: secondaryColor,
+                                    hintText: " ",
+                                    hintStyle: TextStyle(
+                                        fontFamily: 'work',
+                                        fontSize: ScreenUtil().setHeight(14),
+                                        fontWeight: FontWeight.w400,
+                                        color: primaryColor),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide(color: textFieldBorderColor),
+                                        borderRadius: BorderRadius.circular(10)),
+                                    contentPadding: EdgeInsets.only(left: 20),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: ScreenUtil().setHeight(10),
+                  ),
+
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Title",
+                        style: TextStyle(
+                            color: primaryColor,
+                            fontFamily: 'work',
+                            fontSize: ScreenUtil().setHeight(12.5),
+                            fontWeight: FontWeight.w400),
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(5),
+                      ),
+                      TextFormField(
+                        controller: _houseTitleController,
+                        keyboardType: TextInputType.text,
+                        textAlignVertical: TextAlignVertical.center,
+                        maxLines: 3,
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setHeight(13),
+                          color: primaryColor,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'work',
+                        ),
+                        decoration: InputDecoration(
+                          filled: false,
+                          hintText: " ",
+                          hintStyle: TextStyle(
+                              fontFamily: 'work',
+                              fontSize: ScreenUtil().setHeight(13),
+                              fontWeight: FontWeight.w400,
+                              color: lightTextColor),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: textFieldBorderColor),
+                              borderRadius: BorderRadius.circular(10)),
+                          contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(20), top: ScreenUtil().setHeight(10)),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(
+                    height: ScreenUtil().setHeight(10),
+                  ),
+
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text("Floor",
+                            style: TextStyle(
+                                fontSize: ScreenUtil()
+                                    .setHeight(12),
+                                color: primaryColor,
+                                fontFamily: 'work',
+                                fontWeight:
+                                FontWeight.w400)),
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(5),
+                      ),
+                      TextFormField(
+                        controller: _floorController,
+                        keyboardType: TextInputType.text,
+                        textAlignVertical: TextAlignVertical.center,
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setHeight(13),
+                          color: primaryColor,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'work',
+                        ),
+                        decoration: InputDecoration(
+                          filled: false,
+                          hintText: "",
+                          hintStyle: TextStyle(
+                              fontFamily: 'work',
+                              fontSize: ScreenUtil().setHeight(13),
+                              fontWeight: FontWeight.w400,
+                              color: lightTextColor),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: textFieldBorderColor),
+                              borderRadius: BorderRadius.circular(10)),
+                          contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(20), top: ScreenUtil().setHeight(10)),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(
+                    height: ScreenUtil().setHeight(10),
+                  ),
+
+                  // villa feature
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text("Villa Feature",
+                            style: TextStyle(
+                                fontSize: ScreenUtil()
+                                    .setHeight(14),
+                                color: primaryColor,
+                                fontFamily: 'work',
+                                fontWeight:
+                                FontWeight.w400)),
+                      ),
+                      _listView(),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(10),
+                      ),
+                      _featureListView()
+                    ],
+                  ),
+
+                  SizedBox(
+                    height: ScreenUtil().setHeight(10),
+                  ),
+
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Furnishings",
+                          style: TextStyle(
+                              color: darkTextColor,
+                              fontFamily: 'work',
+                              fontSize: ScreenUtil().setHeight(12),
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(5),
+                      ),
+                      _furnishListWidget(),
+                    ],
+                  ),
+
+                  SizedBox(
+                    height: ScreenUtil().setHeight(10),
+                  ),
+
+                  // amenities
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1380,14 +1304,162 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Container(
-                            child: Text("Amount",
+                            child: Text("Amenities",
                                 style: TextStyle(
                                     fontSize: ScreenUtil()
                                         .setHeight(14),
                                     color: primaryColor,
                                     fontFamily: 'work',
                                     fontWeight:
-                                    FontWeight.w600)),
+                                    FontWeight.w400)),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(7),
+                      ),
+                      // choice chips
+                      Wrap(
+                        spacing: 12.0,
+                        children: amenitiesList!.map((AmenitiesList value) =>
+                            Container(
+                              child: Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _onJobLanguage(value, value.id);
+                                  },
+                                  child: Chip(
+                                    padding: EdgeInsets.all(5.0),
+                                    label: Text(
+                                      value.name.toString(),
+                                      style: TextStyle(
+                                          fontFamily: 'work',
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: ScreenUtil().setHeight(14),
+                                          color: _selectedAmenities.contains(value)
+                                              ? secondaryColor
+                                              : primaryColor ),
+                                    ),
+                                    avatar: CircleAvatar(
+                                      backgroundColor: Colors.transparent,
+                                      child: Icon(
+                                        _selectedAmenities.contains(value)
+                                            ? Icons.check_circle
+                                            : Icons.add_circle,
+                                        size: 20,
+                                        color: _selectedAmenities.contains(value)
+                                            ? secondaryColor
+                                            : appColor ,
+                                      ),
+                                    ),
+                                    side: BorderSide(color: _selectedAmenities.contains(value)
+                                        ? appColor
+                                        : appColor, ),
+                                    backgroundColor: _selectedAmenities.contains(value)
+                                        ? appColor
+                                        : secondaryColor,
+                                  ),
+                                ),
+                              ),
+                            ))
+                            .toList(),
+                      ),
+
+                      SizedBox(
+                        height: ScreenUtil().setHeight(7),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(
+                    height: ScreenUtil().setHeight(10),
+                  ),
+
+                  Divider(
+                    thickness: 0.5,
+                    color: lightTextColor,
+                  ),
+
+                  SizedBox(
+                    height: ScreenUtil().setHeight(10),
+                  ),
+
+                  commercialType == "Rent" ?
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text("Commercials",
+                            style: TextStyle(
+                                fontSize: ScreenUtil()
+                                    .setHeight(14),
+                                color: primaryColor,
+                                fontFamily: 'work',
+                                fontWeight:
+                                FontWeight.w500)),
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(7),
+                      ),
+                      Container(
+                        child: Text("Rent",
+                            style: TextStyle(
+                                fontSize: ScreenUtil()
+                                    .setHeight(12),
+                                color: primaryColor,
+                                fontFamily: 'work',
+                                fontWeight:
+                                FontWeight.w400)),
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(7),
+                      ),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            child: Text("Monthly",
+                                style: TextStyle(
+                                    fontSize: ScreenUtil()
+                                        .setHeight(12),
+                                    color: appColor,
+                                    fontFamily: 'work',
+                                    fontWeight:
+                                    FontWeight.w400)),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(
+                        height: ScreenUtil().setHeight(10),
+                      ),
+                    ],
+                  )
+                      :Container(),
+
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+
+                          Container(
+                            child: Text( commercialType == "Rent" ?
+                  "Rent Amount (in AED)"
+                      : "Price (in AED)",
+                                style: TextStyle(
+                                    fontSize: ScreenUtil()
+                                        .setHeight(14),
+                                    color: primaryColor,
+                                    fontFamily: 'work',
+                                    fontWeight:
+                                    FontWeight.w400)),
                           ),
                         ],
                       ),
@@ -1395,7 +1467,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                         height: ScreenUtil().setHeight(7),
                       ),
 
-                      isVisibleAm ?
+                    /*  isVisibleAm ?
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -1406,7 +1478,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                             children: [
                               Container(
                                 child: Text(
-                                    getPropertyDetails.data![0].price != null ?
+                                    getPropertyDetails.data?[0].price != null ?
                                     getPropertyDetails.data![0].price.toString() : "0",
                                     style: TextStyle(
                                         fontSize: ScreenUtil()
@@ -1439,7 +1511,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                 color: appColor, size: ScreenUtil().setHeight(18.3),))
                         ],
                       )
-                      : TextFieldUpload(
+                      :*/ TextFieldUpload(
                           title: "Amount",
                           controller: _amountController),
 
@@ -1477,43 +1549,57 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     return ListView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      itemCount: _fields.length,
+      itemCount: getPropertyDetails.data?[0].vilaFeature?.length ?? 0,
       itemBuilder: (context, index) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
-              height: ScreenUtil().setHeight(50),
-              width: ScreenUtil().setWidth(290),
-              child: TextFormField(
-                controller: _controllers[index],
-                keyboardType: TextInputType.text,
-                textAlignVertical: TextAlignVertical.center,
-                style: TextStyle(
-                  fontSize: ScreenUtil().setHeight(14),
-                  color: primaryColor,
-                  fontWeight: FontWeight.w400,
-                  fontFamily: 'work',
+            Padding(
+              padding: EdgeInsets.only(
+                  top: ScreenUtil().setHeight(5),
+                  bottom: ScreenUtil().setHeight(5)
+              ),
+              child: Container(
+                height: ScreenUtil().setHeight(34),
+                width: ScreenUtil().setWidth(250),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: textFieldBorderColor)
                 ),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: secondaryColor,
-                  hintText: "Feature",
-                  hintStyle: TextStyle(
-                      fontFamily: 'work',
-                      fontSize: ScreenUtil().setHeight(14),
-                      fontWeight: FontWeight.w400,
-                      color: primaryColor),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.circular(10)),
-                  contentPadding: EdgeInsets.only(left: 20),
+                child: TextFormField(
+                  controller: TextEditingController(
+                    text: getPropertyDetails.data![0].vilaFeature![index].toString() ?? '',
+                  ),
+                  keyboardType: TextInputType.text,
+                  textAlignVertical: TextAlignVertical.center,
+                  style: TextStyle(
+                    fontSize: ScreenUtil().setHeight(14),
+                    color: primaryColor,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'work',
+                  ),
+                  decoration: InputDecoration(
+                    filled: false,
+                    fillColor: secondaryColor,
+                    hintText: getPropertyDetails.data![0].vilaFeature![index].toString() ?? '',
+                    hintStyle: TextStyle(
+                        fontFamily: 'work',
+                        fontSize: ScreenUtil().setHeight(14),
+                        fontWeight: FontWeight.w400,
+                        color: primaryColor),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(10)),
+                    contentPadding: EdgeInsets.only(left: 20),
+                  ),
                 ),
               ),
             ),
+
+            /*index == 0 ?
             IconButton(
-              icon: Icon( index == 0 ? Icons.add_circle_outline  : Icons.remove_circle_outline),
+              icon: Icon(Icons.add_circle_outline),
               color: appColor,
               onPressed: () async {
                 final controller = TextEditingController();
@@ -1543,33 +1629,349 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                   ),
                 );
                 setState(() {
-                  if(index == 0) {
-                    _controllers.add(controller);
-                    _fields.add(field);
-                  }
-                  else{
-                    _controllers.removeAt(index);
-                    _fields.removeAt(index);
-                  }
-
+                  _controllers.add(controller);
+                  _fields.add(field);
                 });
               },)
+                : Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.add_circle_outline),
+                  color: appColor,
+                  onPressed: () async {
+                    final controller = TextEditingController();
+                    final field = TextFormField(
+                      controller: _controllers[index],
+                      keyboardType: TextInputType.text,
+                      textAlignVertical: TextAlignVertical.center,
+                      style: TextStyle(
+                        fontSize: ScreenUtil().setHeight(14),
+                        color: primaryColor,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'work',
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: secondaryColor,
+                        hintText: "Feature ${_controllers.length + 1}",
+                        hintStyle: TextStyle(
+                            fontFamily: 'work',
+                            fontSize: ScreenUtil().setHeight(14),
+                            fontWeight: FontWeight.w400,
+                            color: primaryColor),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(10)),
+                        contentPadding: EdgeInsets.only(left: 20),
+                      ),
+                    );
+                    setState(() {
+                      _controllers.add(controller);
+                      _fields.add(field);
+                    });
+                  },),
+                IconButton(
+                  icon: Icon(Icons.remove_circle_outline),
+                  color: appColor,
+                  onPressed: () async {
+                    final controller = TextEditingController();
+                    final field = TextFormField(
+                      controller: _controllers[index],
+                      keyboardType: TextInputType.text,
+                      textAlignVertical: TextAlignVertical.center,
+                      style: TextStyle(
+                        fontSize: ScreenUtil().setHeight(14),
+                        color: primaryColor,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'work',
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: secondaryColor,
+                        hintText: "Feature ${_controllers.length + 1}",
+                        hintStyle: TextStyle(
+                            fontFamily: 'work',
+                            fontSize: ScreenUtil().setHeight(14),
+                            fontWeight: FontWeight.w400,
+                            color: primaryColor),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(10)),
+                        contentPadding: EdgeInsets.only(left: 20),
+                      ),
+                    );
+                    setState(() {
+                      _controllers.removeAt(index);
+                      _fields.removeAt(index);
+                    });
+                  },),
+              ],
+            ),*/
+
           ],
         );
       },
     );
   }
 
-  Future<void> getCategory() async {
+  _propertyListWidget() {
+    return  ListView.builder(
+      itemCount: propertyTypeList!.length,
+      shrinkWrap: true,
+      primary: false,
+      padding: EdgeInsets.all(0.0),
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (context, i) {
+        return _buildPropertyList(i);
+      },
+    );
+  }
+
+  _catListWidget() {
+    return   ListView.builder(
+      itemCount: catList!.length,
+      shrinkWrap: true,
+      padding: EdgeInsets.all(0),
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (context, i) {
+        return _buildCategoryList(i);
+      },
+    );
+  }
+
+  _commercialListWidget() {
+    return  ListView.builder(
+      itemCount: items.length,
+      shrinkWrap: true,
+      primary: false,
+      padding: EdgeInsets.all(0),
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (context, i) {
+        return _buildCommercialList(i);
+      },
+    );
+  }
+
+  _furnishListWidget() {
+    return   ListView.builder(
+      itemCount: furnishItem.length,
+      shrinkWrap: true,
+      padding: EdgeInsets.all(0),
+      physics: NeverScrollableScrollPhysics(),
+      itemBuilder: (context, i) {
+        return _buildFurnishList(i);
+      },
+    );
+  }
+
+
+
+  Widget _buildPropertyList(int i) {
+    return  Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          flex: 0,
+          child: Theme(
+            data: ThemeData(
+              unselectedWidgetColor: appColor,
+            ),
+            child: SizedBox(
+              width: ScreenUtil().setWidth(250),
+              child: ListTileTheme(
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                child: RadioListTile(
+                  dense: true,
+                  visualDensity: const VisualDensity(
+                      horizontal: VisualDensity.minimumDensity,
+                      vertical: VisualDensity.minimumDensity),
+                  contentPadding: EdgeInsets.zero,
+                  value:  propertyTypeList![i].id.toString(),
+                  groupValue: propertyType,
+                  title: Transform(
+                    transform:
+                    Matrix4.translationValues(-12.0, 0.0, 0.0),
+                    child: Text(propertyTypeList![i].propertyName!,
+                        style: TextStyle(
+                          color: darkTextColor,
+                          fontSize: ScreenUtil().setHeight(12),
+                          fontFamily: 'work',
+                          fontWeight: FontWeight.w400,
+                        )),
+                  ),
+                  onChanged: (newValue) {
+                    setState(() {
+                      propertyType = newValue.toString();
+                      print(propertyType);
+                      getCategory(propertyType!);
+                    });
+                  },
+                  activeColor: appColor,
+                  selected: false,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryList(int i) {
+    return  Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          flex: 0,
+          child: Theme(
+            data: ThemeData(
+              unselectedWidgetColor: appColor,
+            ),
+            child: SizedBox(
+              width: ScreenUtil().setWidth(250),
+              child: RadioListTile(
+                dense: true,
+                visualDensity: const VisualDensity(
+                    horizontal: VisualDensity.minimumDensity,
+                    vertical: VisualDensity.minimumDensity),
+                contentPadding: EdgeInsets.zero,
+                value:  catList![i].id.toString(),
+                groupValue: categoryType,
+                title: Transform(
+                  transform:
+                  Matrix4.translationValues(-12.0, 0.0, 0.0),
+                  child: Text(catList![i].name!,
+                      style: TextStyle(
+                        color: darkTextColor,
+                        fontSize: ScreenUtil().setHeight(12),
+                        fontFamily: 'work',
+                        fontWeight: FontWeight.w400,
+                      )),
+                ),
+                onChanged: (newValue) {
+                  setState(() {
+                    categoryType = newValue.toString();
+                    categoryName = catList![i].name!.toString();
+
+                  });
+                },
+                activeColor: appColor,
+                selected: false,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCommercialList(int i) {
+    return  Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          flex: 0,
+          child: Theme(
+            data: ThemeData(
+              unselectedWidgetColor: appColor,
+            ),
+            child: SizedBox(
+              width: ScreenUtil().setWidth(250),
+              child: RadioListTile(
+                dense: true,
+                visualDensity: const VisualDensity(
+                    horizontal: VisualDensity.minimumDensity,
+                    vertical: VisualDensity.minimumDensity),
+                contentPadding: EdgeInsets.zero,
+                value: items[i],
+                groupValue: commercialType,
+                title: Transform(
+                  transform:
+                  Matrix4.translationValues(-12.0, 0.0, 0.0),
+                  child: Text(items[i],
+                      style: TextStyle(
+                        color: darkTextColor,
+                        fontSize: ScreenUtil().setHeight(12),
+                        fontFamily: 'work',
+                        fontWeight: FontWeight.w400,
+                      )),
+                ),
+                onChanged: (newValue) {
+                  setState(() {
+                    commercialType = newValue.toString();
+                  });
+                },
+                activeColor: appColor,
+                selected: false,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFurnishList(int i) {
+    return  Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          flex: 0,
+          child: Theme(
+            data: ThemeData(
+              unselectedWidgetColor: appColor,
+            ),
+            child: SizedBox(
+              width: ScreenUtil().setWidth(250),
+              child: RadioListTile(
+                dense: true,
+                visualDensity: const VisualDensity(
+                    horizontal: VisualDensity.minimumDensity,
+                    vertical: VisualDensity.minimumDensity),
+                contentPadding: EdgeInsets.zero,
+                value: furnishItem[i],
+                groupValue: furnishType,
+                title: Transform(
+                  transform:
+                  Matrix4.translationValues(-12.0, 0.0, 0.0),
+                  child: Text(furnishItem[i],
+                      style: TextStyle(
+                        color: darkTextColor,
+                        fontSize: ScreenUtil().setHeight(12),
+                        fontFamily: 'work',
+                        fontWeight: FontWeight.w400,
+                      )),
+                ),
+                onChanged: (newValue) {
+                  setState(() {
+                    furnishType = newValue.toString();
+                  });
+                },
+                activeColor: appColor,
+                selected: false,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
+
+  Future<void> getCategory(String id) async {
     catList!.clear();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    setState(() {
-      catloading = true;
-    });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getcategory',
+      '/realpro/api/user/getcategory/${id}',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -1591,6 +1993,9 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
       if (getdata["status"]) {
         gecategoryData = GecategoryData.fromJson(jsonDecode(responseBody));
         catList!.addAll(gecategoryData.data!);
+        setState(() {
+
+        });
       } else {}
     }
     else
@@ -1642,6 +2047,173 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     }
   }
 
+  Future<void> getProperty() async {
+    propertyTypeList!.clear();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      catloading = true;
+    });
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/get_propertytype',
+    );
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await get(
+      uri,
+      headers: headers,
+    );
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("Property Resposne::$responseBody");
+    if (statusCode == 200) {
+      setState(() {
+        catloading = false;
+      });
+      if (mounted == true) {
+      }
+      if (getdata["success"]) {
+        getPropertyTypeData = GetPropertyTypeData.fromJson(jsonDecode(responseBody));
+        propertyTypeList!.addAll(getPropertyTypeData.data!);
+        setState(() {
+     //     categoryType = getPropertyDetails.data![0].category!.id.toString();
+        });
+      } else {}
+    }
+    else
+    {
+      setState(() {
+        catloading = false;
+      });
+    }
+  }
+
+  Future<void> getCity() async {
+    cityList!.clear();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      catloading = true;
+    });
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/getcity',
+    );
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await get(
+      uri,
+      headers: headers,
+    );
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("City Resposne::$responseBody");
+    if (statusCode == 200) {
+      setState(() {
+        catloading = false;
+      });
+      if (mounted == true) {
+      }
+      if (getdata["success"]) {
+        getCityData = GetCityData.fromJson(jsonDecode(responseBody));
+        cityList!.addAll(getCityData.data!);
+      } else {}
+    }
+    else
+    {
+      setState(() {
+        catloading = false;
+      });
+    }
+  }
+
+  Future<void> getArea(String id) async {
+    areaList!.clear();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      catloading = true;
+    });
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/getarea/${id}',
+    );
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await get(
+      uri,
+      headers: headers,
+    );
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("Area Resposne::$responseBody");
+    if (statusCode == 200) {
+      setState(() {
+        catloading = false;
+      });
+      if (mounted == true) {
+      }
+      if (getdata["success"]) {
+        getAreaData = GetAreaData.fromJson(jsonDecode(responseBody));
+        areaList!.addAll(getAreaData.data!);
+      } else {}
+    }
+    else
+    {
+      setState(() {
+        catloading = false;
+      });
+    }
+  }
+
+  Future<void> getTower(String id) async {
+    towerList!.clear();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      catloading = true;
+    });
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/gettower/${id}',
+    );
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await get(
+      uri,
+      headers: headers,
+    );
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("Tower Resposne::$responseBody");
+    if (statusCode == 200) {
+      setState(() {
+        catloading = false;
+      });
+      if (mounted == true) {
+      }
+      if (getdata["success"]) {
+        getTowerData = GetTowerData.fromJson(jsonDecode(responseBody));
+        towerList!.addAll(getTowerData.data!);
+      } else {}
+    }
+    else
+    {
+      setState(() {
+        catloading = false;
+      });
+    }
+  }
+
   Future<void> getPropertyDetailsAPI() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -1674,9 +2246,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
             GetPropertyDetails.fromJson(jsonDecode(responseBody));
         details!.addAll(getPropertyDetails.data!);
         setState(() {
-          getPropertyDetails.data![0].amenities!.forEach((element) {
-            _onJobLanguage(element , element.id);
-        });
+          getPostData();
         });
       } else {}
     }
@@ -1731,35 +2301,70 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     var url = Uri.https(apiBaseUrl, '/realpro/api/user/updateproperty/${widget.property_id}');
     //----------------------------------------------------------
     var request = new http.MultipartRequest("POST", url);
+
     request.headers['Authorization']=prefs.getString('access_token')!;
-    request.fields['property_name'] = _houseTitleController.text;
-    request.fields['price'] = _amountController.text;
-    request.fields['description'] = "ABC";
-    request.fields['category_id'] = selectedCategory;
-    request.fields['property_address'] = "Ahmedabad";
+    request.fields['city_id'] = selectedCity;
+    request.fields['area_id'] = selectedArea;
+    request.fields['tower_id'] = selectedTower;
     request.fields['bedroom_count'] = _bedroomController.text;
-    request.fields['kitchen_count'] = "1";
-    request.fields['feature'] = json.encode(textController);
     request.fields['bathroom_count'] = _toiletController.text;
-    request.fields['property_type'] = _typeController.text;
     request.fields['property_size'] = _sqftController.text;
-    request.fields['purpose'] =  _purposeController.text;
-    request.fields['refno'] = _realProController.text;
-    request.fields['addedon'] = _dateController.text;
+    request.fields['property_name'] = _houseTitleController.text;
+    request.fields['floor'] = _floorController.text;
+    request.fields['feature'] = json.encode(textController);
     request.fields['amenities'] = json.encode(_selectedAmenities);
-    request.fields['amount_type'] = "";
+    request.fields['price'] = _amountController.text;
     request.fields['is_post'] = "1";
     request.fields['type'] = "1";
     request.fields['location'] = _locationController.text;
+    request.fields['lat'] = pickUpLat.toString();
+    request.fields['lang'] = pickUpLong.toString();
+    request.fields['thamblain'] = " ";
+    request.fields['video'] = " ";
+    request.fields['image[]'] = " ";
 
-    for(int i = 0; i<imageFilePathList!.length; i++)
-    {
-      request.files.add(
-          await MultipartFile.fromPath(
-              'image[]',
-              imageFilePathList![i].path
-          ));
+
+    if (categoryName != null){
+      request.fields['property_type'] = categoryName!;
     }
+
+    if (categoryType != null){
+      request.fields['category_id'] = categoryType!;
+    }
+
+    if (propertyType != null){
+      request.fields['property_id'] = propertyType!;
+    }
+
+    if (commercialType != null){
+      request.fields['purpose'] = commercialType!;
+    }
+
+    if (furnishType != null){
+      request.fields['furniture'] = furnishType!;
+    }
+
+    if (amountName != null){
+      request.fields['amount_type'] = amountName!;
+    }
+
+    /*request.files.add(
+        await MultipartFile.fromPath(
+            'thamblain',
+           ""
+        ));
+
+    request.files.add(
+        await MultipartFile.fromPath(
+            'video',
+           ""
+        ));
+    request.files.add(
+        await MultipartFile.fromPath(
+            'image[]',
+            ""
+        ));
+*/
 
     request.send().then((response) {
       if (response.statusCode == 200) {
@@ -1808,136 +2413,168 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     return ListView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      itemCount: getPropertyDetails.data![0].vilaFeature!.length,
+      itemCount: _fields.length,
       itemBuilder: (context, index) {
         return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.arrow_circle_right,
-                  size: ScreenUtil().setHeight(18),
-                  color: appColor,),
-                SizedBox(
-                  width: ScreenUtil().setWidth(7),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: ScreenUtil().setHeight(5),
+                  bottom: ScreenUtil().setHeight(5)
+              ),
+              child: Container(
+                height: ScreenUtil().setHeight(34),
+                width: ScreenUtil().setWidth(250),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: textFieldBorderColor)
                 ),
-                isVisible ?
-                Container(
-                  decoration: BoxDecoration(),
-                  child: Text(getPropertyDetails.data![0].vilaFeature![index].toString(),
-                      style: TextStyle(
-                          fontSize: ScreenUtil()
-                              .setHeight(12),
-                          color: primaryColor,
-                          fontFamily: 'work',
-                          fontWeight:
-                          FontWeight.w400)),
-                )
-                : Container(
-                  width: ScreenUtil().setWidth(260),
-                  child: TextFieldUpload(
-                    title: 'Villa Feature',
-                    controller: _controllers[index],
+                child: TextFormField(
+                  controller: _controllers[index],
+                  keyboardType: TextInputType.text,
+                  textAlignVertical: TextAlignVertical.center,
+                  style: TextStyle(
+                    fontSize: ScreenUtil().setHeight(14),
+                    color: primaryColor,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'work',
+                  ),
+                  decoration: InputDecoration(
+                    filled: false,
+                    fillColor: secondaryColor,
+                    hintText: "Add Feature",
+                    hintStyle: TextStyle(
+                        fontFamily: 'work',
+                        fontSize: ScreenUtil().setHeight(14),
+                        fontWeight: FontWeight.w400,
+                        color: primaryColor),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(10)),
+                    contentPadding: EdgeInsets.only(left: 20),
                   ),
                 ),
+              ),
+            ),
+
+            index == 0 ?
+            IconButton(
+              icon: Icon(Icons.add_circle_outline),
+              color: appColor,
+              onPressed: () async {
+                final controller = TextEditingController();
+                final field = TextFormField(
+                  controller: _controllers[index],
+                  keyboardType: TextInputType.text,
+                  textAlignVertical: TextAlignVertical.center,
+                  style: TextStyle(
+                    fontSize: ScreenUtil().setHeight(14),
+                    color: primaryColor,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'work',
+                  ),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: secondaryColor,
+                    hintText: "Feature ${_controllers.length + 1}",
+                    hintStyle: TextStyle(
+                        fontFamily: 'work',
+                        fontSize: ScreenUtil().setHeight(14),
+                        fontWeight: FontWeight.w400,
+                        color: primaryColor),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(10)),
+                    contentPadding: EdgeInsets.only(left: 20),
+                  ),
+                );
+                setState(() {
+                  _controllers.add(controller);
+                  _fields.add(field);
+                });
+              },)
+                : Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.add_circle_outline),
+                  color: appColor,
+                  onPressed: () async {
+                    final controller = TextEditingController();
+                    final field = TextFormField(
+                      controller: _controllers[index],
+                      keyboardType: TextInputType.text,
+                      textAlignVertical: TextAlignVertical.center,
+                      style: TextStyle(
+                        fontSize: ScreenUtil().setHeight(14),
+                        color: primaryColor,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'work',
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: secondaryColor,
+                        hintText: "Feature ${_controllers.length + 1}",
+                        hintStyle: TextStyle(
+                            fontFamily: 'work',
+                            fontSize: ScreenUtil().setHeight(14),
+                            fontWeight: FontWeight.w400,
+                            color: primaryColor),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(10)),
+                        contentPadding: EdgeInsets.only(left: 20),
+                      ),
+                    );
+                    setState(() {
+                      _controllers.add(controller);
+                      _fields.add(field);
+                    });
+                  },),
+                IconButton(
+                  icon: Icon(Icons.remove_circle_outline),
+                  color: appColor,
+                  onPressed: () async {
+                    final controller = TextEditingController();
+                    final field = TextFormField(
+                      controller: _controllers[index],
+                      keyboardType: TextInputType.text,
+                      textAlignVertical: TextAlignVertical.center,
+                      style: TextStyle(
+                        fontSize: ScreenUtil().setHeight(14),
+                        color: primaryColor,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'work',
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: secondaryColor,
+                        hintText: "Feature ${_controllers.length + 1}",
+                        hintStyle: TextStyle(
+                            fontFamily: 'work',
+                            fontSize: ScreenUtil().setHeight(14),
+                            fontWeight: FontWeight.w400,
+                            color: primaryColor),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(10)),
+                        contentPadding: EdgeInsets.only(left: 20),
+                      ),
+                    );
+                    setState(() {
+                      _controllers.removeAt(index);
+                      _fields.removeAt(index);
+                    });
+                  },),
               ],
             ),
-            GestureDetector(
-              onTap: () {
-                showFeature();
-              },
-              child: Icon(Icons.edit_outlined,
-                size: ScreenUtil().setHeight(18.3),
-                color: appColor,),
-            ),
+
           ],
         );
       },
     );
   }
-
 }
 
-/*
-
-Row(
-mainAxisAlignment: MainAxisAlignment.start,
-crossAxisAlignment: CrossAxisAlignment.center,
-children: [
-Container(
-height: ScreenUtil().setHeight(50),
-width: ScreenUtil().setWidth(290),
-child: TextFormField(
-controller: _controllers[index],
-keyboardType: TextInputType.text,
-textAlignVertical: TextAlignVertical.center,
-style: TextStyle(
-fontSize: ScreenUtil().setHeight(14),
-color: primaryColor,
-fontWeight: FontWeight.w400,
-fontFamily: 'work',
-),
-decoration: InputDecoration(
-filled: true,
-fillColor: secondaryColor,
-hintText: "Feature",
-hintStyle: TextStyle(
-fontFamily: 'work',
-fontSize: ScreenUtil().setHeight(14),
-fontWeight: FontWeight.w400,
-color: primaryColor),
-border: OutlineInputBorder(
-borderSide: BorderSide.none,
-borderRadius: BorderRadius.circular(10)),
-contentPadding: EdgeInsets.only(left: 20),
-),
-),
-),
-IconButton(
-icon: Icon( index == 0 ? Icons.add_circle_outline  : Icons.remove_circle_outline),
-color: appColor,
-onPressed: () async {
-final controller = TextEditingController();
-final field = TextFormField(
-  controller: _controllers[index],
-  keyboardType: TextInputType.text,
-  textAlignVertical: TextAlignVertical.center,
-  style: TextStyle(
-    fontSize: ScreenUtil().setHeight(14),
-    color: primaryColor,
-    fontWeight: FontWeight.w400,
-    fontFamily: 'work',
-  ),
-  decoration: InputDecoration(
-    filled: true,
-    fillColor: secondaryColor,
-    hintText: "Feature ${_controllers.length + 1}",
-    hintStyle: TextStyle(
-        fontFamily: 'work',
-        fontSize: ScreenUtil().setHeight(14),
-        fontWeight: FontWeight.w400,
-        color: primaryColor),
-    border: OutlineInputBorder(
-        borderSide: BorderSide.none,
-        borderRadius: BorderRadius.circular(10)),
-    contentPadding: EdgeInsets.only(left: 20),
-  ),
-);
-setState(() {
-if(index == 0) {
-_controllers.add(controller);
-_fields.add(field);
-}
-else{
-_controllers.removeAt(index);
-_fields.removeAt(index);
-}
-
-});
-},)
-],
-);*/

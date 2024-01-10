@@ -808,14 +808,14 @@ class _HomePageVState extends State<HomePageV> {
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
+                                    /*Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) {
-                                          return EditPropertyOnRentPage(postList![i].id.toString());
+                                          return EditPropertyOnRentPage(postList![i].id.toString(), postList[i]);
                                         },
                                       ),
-                                    );
+                                    );*/
                                 /*    isLiked1(proppertyList![i].id,
                                         proppertyList![0]);*/
                                   },

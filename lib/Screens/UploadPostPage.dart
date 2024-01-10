@@ -9,7 +9,6 @@ import 'package:real_pro_vendor/Models/GetAreaData.dart';
 import 'package:real_pro_vendor/Models/GetCityData.dart';
 import 'package:real_pro_vendor/Models/GetTowerData.dart';
 import 'package:real_pro_vendor/Presentation/BottomNavigationBarVendor.dart';
-import 'package:real_pro_vendor/Presentation/common_textfeild.dart';
 import '../Constants/Api.dart';
 import '../Constants/Colors.dart';
 import '../Models/GetAmenitiesData.dart';
@@ -17,7 +16,6 @@ import '../Models/GetAmountTypeData.dart';
 import '../Models/GetCaategoryData.dart';
 import '../Models/GetPropertyTypeData.dart';
 import '../Presentation/common_button.dart';
-import '../Presentation/upload_textfeild.dart';
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,7 +26,6 @@ import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_webservice/directions.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:video_player/video_player.dart';
-import 'HomePageV.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:geolocator/geolocator.dart';
@@ -138,9 +135,9 @@ class _UploadPostPageState extends State<UploadPostPage> {
       video: _video!.path,
       thumbnailPath: (await getTemporaryDirectory()).path, /// path_provider
       imageFormat: ImageFormat.PNG,
-      maxWidth: 320,
-      maxHeight: 620,
-      quality: 120,
+      maxHeight: 1920,
+      maxWidth: 1080,
+      quality: 60,
     );
     print(File(_path!));
     _videoPlayerController = VideoPlayerController.file(File(_video!.path))..initialize().then((_) {
@@ -209,8 +206,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
   static List<TextEditingController> _controllers = [];
   List<Widget> _fields = [];
 
-  static List<TextEditingController> _furnishingControllers = [];
-  List<Widget> _furnishingList = [];
+
 
   @override
   void initState() {
@@ -263,9 +259,11 @@ class _UploadPostPageState extends State<UploadPostPage> {
             autovalidateMode: AutovalidateMode.always,
             child: Column(
               children: [
+
                 SizedBox(
                   height: ScreenUtil().setHeight(7),
                 ),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
@@ -280,7 +278,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                             ),
                             child:  VideoPlayer(_videoPlayerController),
                           )
-                          : Container()
+                          : CircularProgressIndicator()
                     else
                       Container(),
                     GestureDetector(
@@ -470,54 +468,12 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 ) :
                 Container(),
 
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            selectImages();
-                          },
-                          child: Container(
-                            height: ScreenUtil().setHeight(83),
-                            width: ScreenUtil().setWidth(83),
-                            decoration: DottedDecoration(
-                                color: appColor,
-                                shape: Shape.box,
-                                borderRadius: BorderRadius.circular(10)
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_a_photo_outlined,
-                                  size: 34,
-                                  color: appColor,),
-                                SizedBox(
-                                  height: ScreenUtil().setHeight(10),
-                                ),
-                                Text(
-                                  "Upload Image",
-                                  style: TextStyle(
-                                      fontSize: ScreenUtil().setHeight(8),
-                                      color: appColor),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: ScreenUtil().setHeight(10),
-                    ),
 
-                    _gridImageView(),
+                _buildContent(),
 
-                  ],
-                ),
+
+
+              //  _gridImageView(),
 
                 Divider(
                   thickness: 0.5,
@@ -1952,7 +1908,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
     );
   }
 
-
   _amountListWidget() {
     return  Expanded(
       child: ListView.builder(
@@ -2287,28 +2242,117 @@ class _UploadPostPageState extends State<UploadPostPage> {
     _fields.add(field);
   }
 
+  Widget _buildContent() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () {
+                selectImages();
+              },
+              child: Container(
+                height: ScreenUtil().setHeight(83),
+                width: ScreenUtil().setWidth(83),
+                decoration: DottedDecoration(
+                    color: appColor,
+                    shape: Shape.box,
+                    borderRadius: BorderRadius.circular(10)
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add_a_photo_outlined,
+                      size: 34,
+                      color: appColor,),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(10),
+                    ),
+                    Text(
+                      "Upload Image",
+                      style: TextStyle(
+                          fontSize: ScreenUtil().setHeight(8),
+                          color: appColor),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        SizedBox(
+          height: ScreenUtil().setHeight(10),
+        ),
+
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+    children: [
+      Expanded(child: _gridImageView())
+    ],
+    ),
+
+        // Other widgets below the grid
+      ],
+    );
+  }
+
   Widget _gridImageView() {
     return  Container(
-        child:  GridView.count(
-          shrinkWrap: true,
+      child: ListView.builder(
+   //   scrollDirection: Axis.horizontal,
+        shrinkWrap: true,
+        primary: false,
+        itemCount:imageFileList!.length,
+        itemBuilder: (context, index) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.all(8.0),
+                child: Image.file(
+                  File(imageFileList![index].path),
+                  height: ScreenUtil().setHeight(83),
+                  width: ScreenUtil().setWidth(83),
+                  fit: BoxFit.cover,  // Adjust the BoxFit as per your design needs
+                ),
+              ),
+            ],
+          );
+        },
+      ),  /*GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          mainAxisSpacing: 0,
-          crossAxisSpacing: 0,
-          childAspectRatio: 1.8,
-          physics: const NeverScrollableScrollPhysics(),
-          children: List.generate(
-              imageFileList!.length,
-                  (index) => Column(
-                children: [
-                  Image.file(
-                    File(imageFileList![index].path),
-                    height: ScreenUtil().setHeight(83),
-                    width: ScreenUtil().setWidth(83),
-                    fit: BoxFit.fill,),
-                ],
-              )
-          ),
-        ));
+          crossAxisSpacing: 0,  // No horizontal spacing
+          mainAxisSpacing: 0,   // No vertical spacing
+          childAspectRatio: 1.8,  // Aspect ratio for each grid item
+        ),
+        itemCount: imageFileList!.length,
+        itemBuilder: (context, index) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.file(
+                File(imageFileList![index].path),
+                height: ScreenUtil().setHeight(83),
+                width: ScreenUtil().setWidth(83),
+                fit: BoxFit.cover,  // Adjust the BoxFit as per your design needs
+              ),
+            ],
+          );
+        },
+      ),*/
+    );
   }
 
   Future<void> getCategory(String id) async {
@@ -2663,12 +2707,13 @@ class _UploadPostPageState extends State<UploadPostPage> {
     request.fields['location'] = _locationController.text;
     request.fields['lat'] = pickUpLat.toString();
     request.fields['lang'] = pickUpLong.toString();
-    request.files.add(
+
+  /*  request.files.add(
         await MultipartFile.fromPath(
             'thamblain',
             thumbnailImage!.path
-        ));
-   /* if(thumbnailType == "Upload manually")
+        ));*/
+    if(thumbnailType == "Upload manually")
     {
       request.files.add(
           await MultipartFile.fromPath(
@@ -2682,7 +2727,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
               'thamblain',
               _path!
           ));
-    }*/
+    }
 
     if(_video == null)
      {
@@ -2763,7 +2808,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
             child: Image.asset(
               "assets/images/checklist.png",
               color: appColor,
-              height: 110.0,
+              height: 85.0,
             ),
           ),
           Center(
@@ -2831,7 +2876,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                   style: TextStyle(
                                       fontFamily: 'railway',
                                       fontSize: size.width * 0.04,
-                                      color: appColor),
+                                      color: secondaryColor),
                                 ))),
                       ],
                     ),
