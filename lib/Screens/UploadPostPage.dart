@@ -48,6 +48,13 @@ class _UploadPostPageState extends State<UploadPostPage> {
   String? amountName;
   String? furnishType;
 
+  bool isVisibleS = false;
+
+  void showImageList()
+  {
+    isVisibleS = !isVisibleS;
+  }
+
   bool isloading = false;
   bool catloading = false;
 
@@ -258,8 +265,8 @@ class _UploadPostPageState extends State<UploadPostPage> {
             key: _formKey,
             autovalidateMode: AutovalidateMode.always,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-
                 SizedBox(
                   height: ScreenUtil().setHeight(7),
                 ),
@@ -411,7 +418,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-
                         GestureDetector(
                           onTap: () {
                             selectPhoto();
@@ -468,12 +474,98 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 ) :
                 Container(),
 
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    imageFileList!.length == 0 ?
+                    GestureDetector(
+                      onTap: () {
+                        selectImages();
+                        showImageList();
+                      },
+                      child: Container(
+                        height: ScreenUtil().setHeight(83),
+                        width: ScreenUtil().setWidth(83),
+                        decoration: DottedDecoration(
+                            color: appColor,
+                            shape: Shape.box,
+                            borderRadius: BorderRadius.circular(10)
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add_a_photo_outlined,
+                              size: 34,
+                              color: appColor,),
+                            SizedBox(
+                              height: ScreenUtil().setHeight(10),
+                            ),
+                            Text(
+                              "Upload Image",
+                              style: TextStyle(
+                                  fontSize: ScreenUtil().setHeight(8),
+                                  color: appColor),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                    :GestureDetector(
+                      onTap: () {
+                        selectImages();
+                      },
+                      child: Container(
+                        height: ScreenUtil().setHeight(83),
+                        width: ScreenUtil().setWidth(83),
+                        decoration: DottedDecoration(
+                            color: appColor,
+                            shape: Shape.box,
+                            borderRadius: BorderRadius.circular(10)
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add_a_photo_outlined,
+                              size: 34,
+                              color: appColor,),
+                            SizedBox(
+                              height: ScreenUtil().setHeight(10),
+                            ),
+                            Text(
+                              "Upload Image",
+                              style: TextStyle(
+                                  fontSize: ScreenUtil().setHeight(8),
+                                  color: appColor),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
 
-                _buildContent(),
+                SizedBox(
+                  height: ScreenUtil().setHeight(10),
+                ),
 
+                isVisibleS ?
+                 Flexible(
+                    child: _gridImageView()) :
+                Container(
+                    height: ScreenUtil().setHeight(10),
+                ) ,
 
-
-              //  _gridImageView(),
+              ],
+            ),
 
                 Divider(
                   thickness: 0.5,
@@ -2242,10 +2334,9 @@ class _UploadPostPageState extends State<UploadPostPage> {
     _fields.add(field);
   }
 
-  Widget _buildContent() {
+  _buildContent() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -2290,68 +2381,38 @@ class _UploadPostPageState extends State<UploadPostPage> {
           height: ScreenUtil().setHeight(10),
         ),
 
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-    children: [
-      Expanded(child: _gridImageView())
-    ],
-    ),
+        Container(
+        height: ScreenUtil().setHeight(120),
+          child: _gridImageView())
 
-        // Other widgets below the grid
+
       ],
     );
   }
 
   Widget _gridImageView() {
     return  Container(
+      height: ScreenUtil().setHeight(95),
+      width: ScreenUtil().screenWidth,
+      alignment: Alignment.topLeft,
       child: ListView.builder(
-   //   scrollDirection: Axis.horizontal,
+        scrollDirection: Axis.horizontal,
         shrinkWrap: true,
-        primary: false,
-        itemCount:imageFileList!.length,
-        itemBuilder: (context, index) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.all(8.0),
-                child: Image.file(
-                  File(imageFileList![index].path),
-                  height: ScreenUtil().setHeight(83),
-                  width: ScreenUtil().setWidth(83),
-                  fit: BoxFit.cover,  // Adjust the BoxFit as per your design needs
-                ),
-              ),
-            ],
-          );
-        },
-      ),  /*GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 0,  // No horizontal spacing
-          mainAxisSpacing: 0,   // No vertical spacing
-          childAspectRatio: 1.8,  // Aspect ratio for each grid item
-        ),
+        primary: true,
         itemCount: imageFileList!.length,
+        itemExtent: ScreenUtil().setWidth(83),
         itemBuilder: (context, index) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.file(
-                File(imageFileList![index].path),
-                height: ScreenUtil().setHeight(83),
-                width: ScreenUtil().setWidth(83),
-                fit: BoxFit.cover,  // Adjust the BoxFit as per your design needs
-              ),
-            ],
+          return Container(
+            padding: EdgeInsets.only(right: 5.0),
+            child: Image.file(
+              File(imageFileList![index].path),
+              height: ScreenUtil().setHeight(83),
+              width: ScreenUtil().setWidth(83),
+              fit: BoxFit.cover,
+            ),
           );
         },
-      ),*/
+      ),
     );
   }
 
