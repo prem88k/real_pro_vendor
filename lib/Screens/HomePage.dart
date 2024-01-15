@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> {
                   child: Container(
                     padding: EdgeInsets.only(left: ScreenUtil().setWidth(12)),
                     height: ScreenUtil().setHeight(38),
-                    width: ScreenUtil().setWidth(275),
+                    width: ScreenUtil().setWidth(300),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.0),
                       color: secondaryColor,
@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   width: ScreenUtil().setWidth(12),
                 ),
-                Container(
+              /*  Container(
                   height: ScreenUtil().setHeight(38),
                   width: ScreenUtil().setHeight(38),
                   child: Container(
@@ -137,7 +137,7 @@ class _HomePageState extends State<HomePage> {
                       width: ScreenUtil().setHeight(30),
                       height: ScreenUtil().setHeight(30),
                       child: Image.asset("assets/images/filter.png")),
-                )
+                )*/
               ],
             ),
             SizedBox(
@@ -147,7 +147,18 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               height: ScreenUtil().setHeight(15),
             ),
-            _buildPropertyList(),
+            proppertyList!.length!=0?_buildPropertyList():Center(
+              child: Container(
+                margin: EdgeInsets.only(top:ScreenUtil().setHeight(45) ),
+                child: Text("You didn't uploaded any property Yet!",style:TextStyle(
+                  color:  darkTextColor,
+                  fontSize: ScreenUtil().setWidth(13),
+                  fontFamily: 'work',
+                  fontWeight:
+                  FontWeight.w600,
+                ),),
+              ),
+            ),
           ],
         ),
       ),

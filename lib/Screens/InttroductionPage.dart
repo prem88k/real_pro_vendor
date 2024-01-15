@@ -42,7 +42,7 @@ class _SplashScreenTwoState extends State<IntroductionScreen> {
               height: ScreenUtil().setHeight(475),
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage('assets/images/intro.jpeg'),
+                    image: AssetImage('assets/images/into_img.png'),
                     fit: BoxFit.fill),
               ),
               alignment: Alignment.center,
@@ -83,8 +83,8 @@ class _SplashScreenTwoState extends State<IntroductionScreen> {
                         color: secondaryColor,
                         fontSize: ScreenUtil().setWidth(20),
                         height: ScreenUtil().setWidth(1.2) ,
-
                         fontFamily: 'work',
+                        letterSpacing: 1.5,
                         fontWeight: FontWeight.w600,
                       ),
                       textAlign: TextAlign.center,

@@ -752,7 +752,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                     mode: Mode.overlay,
                                     types: [],
                                     strictbounds: false,
-                                    components: [Component(Component.country, 'in')],
+                                    components: [Component(Component.country, 'ae')],
                                     //google_map_webservice package
                                     onError: (err){
                                       print(err);

@@ -59,7 +59,7 @@ class _EditPeronalDetailsPageState extends State<EditPeronalDetailsPage> {
     aboutCompany = widget.getCountData.user!.aboutCompany.toString();
     language = widget.getCountData.user!.language.toString();
     nationality = widget.getCountData.user!.nationality.toString();
-    experience = widget.getCountData.user!.experience!;
+    experience = widget.getCountData.user!.experience!=null?widget.getCountData.user!.experience!:"";
     location = widget.getCountData.user!.location.toString();
     print(aboutCompany);
     getTextFormField();

@@ -1013,7 +1013,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                   mode: Mode.overlay,
                                   types: [],
                                   strictbounds: false,
-                                  components: [Component(Component.country, 'in')],
+                                  components: [Component(Component.country, 'ae')],
                                   //google_map_webservice package
                                   onError: (err){
                                     print(err);
