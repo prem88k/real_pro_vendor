@@ -1,25 +1,32 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:video_player/video_player.dart';
+
 import '../Constants/Api.dart';
 import '../Constants/Colors.dart';
+import '../Models/GetPropertyData.dart';
 import '../Models/GetPropertyDetailsData.dart';
-import '../Models/GetTredingPropertyData.dart';
+import '../Presentation/CommentSheet.dart';
 import '../Presentation/PagerState.dart';
-import '../Presentation/common_button.dart';
-import 'LoginPageVendor.dart';
+
+enum UrlType { IMAGE, VIDEO, UNKNOWN }
 
 class PropertyDetailsPage extends StatefulWidget {
-  PropertyDetailsPage(this.property_id);
+  PropertyDetailsPage(this.property_id, this.video);
 
   String property_id;
+  String video;
 
   @override
   State<PropertyDetailsPage> createState() => _PropertyDetailsPageState();
@@ -28,333 +35,571 @@ class PropertyDetailsPage extends StatefulWidget {
 class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
   bool isloading = false;
   bool isLoadingD = false;
-
+  late VideoPlayerController _controller;
+  late Future<void> _initializeVideoPlayerFuture;
   late GetPropertyDetails getPropertyDetails;
   List<PropertyDetails>? details = [];
-  List<ImagesList>? images=[];
+  List<ImagesList>? images = [];
+  List<String>? imagesList = [];
+  Completer<GoogleMapController> _controller11 = Completer();
 
-  List<TredingPropertyList>? proppertyList = [];
-  late GetTredingPropertyData getPropertyData;
+  final Set<Marker> _markers = {};
+  final Set<Polyline> _polyline = {};
+  late BitmapDescriptor customIcon;
+
+  // list of locations to display polylines
+
+  List<LatLng> latLenCo = [];
+  List<LatLng> latLengates = [];
+  List<PropertyList>? proppertyList = [];
+  late GetPropertyData getPropertyData;
   PageController? controller1;
   final StreamController<PagerState> pagerStreamController =
   StreamController<PagerState>.broadcast();
+
   @override
   void initState() {
     // TODO: implement initState
     getPropertyDetailsAPI();
+    latLenCo.add(LatLng(23.5, 25.5));
+    _markers.add(
+      // added markers
+      Marker(
+        markerId: MarkerId("1"),
+        position: LatLng(23.5, 25.5),
+        infoWindow: InfoWindow(
+          title: 'RealPro',
+          snippet: 'Property',
+        ),
+        icon: BitmapDescriptor.defaultMarker,
+      ),
+    );
     getPropertyAPI("0");
+    _controller = VideoPlayerController.networkUrl(
+      Uri.parse(
+        widget.video,
+      ),
+    );
+    _initializeVideoPlayerFuture = _controller.initialize();
     controller1 =
         PageController(viewportFraction: 0.9, initialPage: 0, keepPage: true);
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: isLoadingD&&details!.length==0
+      body: isLoadingD && details!.length == 0
           ? Center(
-              child: CircularProgressIndicator(
-              color: appColor,
-            ))
+          child: CircularProgressIndicator(
+            color: appColor,
+          ))
           : Stack(
-              children: [
-                SingleChildScrollView(
-                  child: Container(
-                    child: Column(
-                      children: [
-                        Container(
-                          height: ScreenUtil().setHeight(250),
-                          child: Stack(
-                            children: [
-                              details!=null || details!.length!=0 ? ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: images!.length,
-                                controller: controller1,
+        children: [
+          SingleChildScrollView(
+            child: Container(
 
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Container(
-                                    margin:
-                                    EdgeInsets.only(right: ScreenUtil().setWidth(10)),
+              child: Column(
+                children: [
+                  Container(
+                    color: primaryColor,
+                    height: ScreenUtil().setHeight(250),
+                    child: Stack(
+                      children: [
+                        details != null || details!.length != 0
+                            ? ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: imagesList!.length,
+                          controller: controller1,
+                          itemBuilder:
+                              (BuildContext context, int index) {
+                            return Container(
+                              margin: EdgeInsets.only(
+                                  right: ScreenUtil().setWidth(10)),
+                              child: Stack(
+                                children: [
+                                  if (getUrlType(imagesList![index]) ==
+                                      UrlType.IMAGE) images != null
+                                      ? Container(
+
+                                    height: ScreenUtil()
+                                        .setHeight(250),
+                                    width: MediaQuery.of(
+                                        context)
+                                        .size
+                                        .width,
+                                    decoration:
+                                    BoxDecoration(
+                                      image: DecorationImage(
+                                          image: CachedNetworkImageProvider(
+                                              imagesList![
+                                              index]),
+                                          fit: BoxFit
+                                              .fill),
+                                    ),
+                                  )
+                                      : Container(
+                                    height: ScreenUtil()
+                                        .setHeight(250),
+                                    width: MediaQuery.of(
+                                        context)
+                                        .size
+                                        .width,
+                                    decoration:
+                                    BoxDecoration(
+                                      image: DecorationImage(
+                                          image: AssetImage(
+                                              "assets/images/property_img.png"),
+                                          fit: BoxFit
+                                              .cover),
+                                      border: Border.all(
+                                          color:
+                                          secondaryColor,
+                                          width: 0.2),
+                                    ),
+                                  ) else Container(
+                                    width:  ScreenUtil().setWidth(360),
+                                    alignment: Alignment.center,
                                     child: Stack(
                                       children: [
-                                        images!=null?Container(
-                                          height: ScreenUtil().setHeight(250),
-                                          width:
-                                          MediaQuery.of(context).size.width,
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                                image: CachedNetworkImageProvider(
-                                                    images![index].image!),
-                                                fit: BoxFit.fill),
-                                          ),
-                                        ):Container(
-                                          height: ScreenUtil().setHeight(250),
-                                          width:
-                                          MediaQuery.of(context).size.width,
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                                image: AssetImage("assets/images/property_img.png"),
-                                                fit: BoxFit.cover),
-                                            border: Border.all(color: secondaryColor, width: 0.2),
-                                          ),
-                                        ),
-                                        Container(
-                                            width: MediaQuery.of(context).size.width *
-                                                0.9,
-
-                                            padding: EdgeInsets.only(
-                                                bottom: ScreenUtil().setWidth(15),left:ScreenUtil().setWidth(15) ),
-                                            alignment: Alignment.bottomLeft,
-                                            child: SmoothPageIndicator(
-                                              controller: controller1!,
-                                              count:  images!.length,
-                                              effect: ExpandingDotsEffect(
-                                                  expansionFactor: 3,strokeWidth: .5,
-                                                  spacing: 3.0,
-                                                  radius: 2.0,
-                                                  dotWidth: 5.0,
-                                                  dotHeight: 5.0,
-                                                  dotColor: borderColor,
-                                                  activeDotColor: secondaryColor),
-                                            ))
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ):Container(),
-
-                              Container(
-
-                                  alignment: Alignment.topLeft,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                        top: ScreenUtil().setHeight(26)),
-                                    child: Column(
-                                      children: [
-                                        Column(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        GestureDetector(
+                                        FutureBuilder(
+                                          future:
+                                          _initializeVideoPlayerFuture,
+                                          builder: (context,
+                                              snapshot) {
+                                            if (snapshot
+                                                .connectionState ==
+                                                ConnectionState
+                                                    .done) {
+                                              return FittedBox(
+                                                fit: BoxFit.cover,
+                                                child: SizedBox(
+                                                  height:  _controller.value.size.height ?? 0,
+                                                  width: _controller.value.size.width ?? 0,
+                                                  child: Stack(
+                                                    children: [
+                                                      VideoPlayer( _controller),
+                                                      Center(
+                                                        child: GestureDetector(
                                                           onTap: () {
-                                                            Navigator.pop(context);
+                                                            setState(
+                                                                    () {
+                                                                  // pause
+                                                                  if (_controller
+                                                                      .value
+                                                                      .isPlaying) {
+                                                                    _controller
+                                                                        .pause();
+                                                                  } else {
+                                                                    // play
+                                                                    _controller
+                                                                        .play();
+                                                                  }
+                                                                });
                                                           },
-                                                          child: Padding(
-                                                            padding:
-                                                            const EdgeInsets.all(
-                                                                8.0),
-                                                            child: ClipRRect(
-                                                              borderRadius:
-                                                              BorderRadius.circular(
-                                                                  100),
-                                                              child: Container(
-                                                                  height: ScreenUtil()
-                                                                      .setHeight(30),
-                                                                  width: ScreenUtil()
-                                                                      .setHeight(30),
-                                                                  color: secondaryColor,
-                                                                  child: Center(
-                                                                      child: Icon(
-                                                                        Icons
-                                                                            .arrow_back_ios_new,
-                                                                        color: lineColor,
-                                                                        size: ScreenUtil()
-                                                                            .setHeight(11),
-                                                                      ))),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          width:
-                                                          ScreenUtil().setWidth(8),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                          const EdgeInsets.all(8.0),
-                                                          child: ClipRRect(
-                                                            borderRadius:
-                                                            BorderRadius.circular(
-                                                                5),
-                                                            child: Container(
-                                                                height: ScreenUtil()
-                                                                    .setHeight(26),
-                                                                width: ScreenUtil()
-                                                                    .setWidth(80),
-                                                                color:
-                                                                Color(0xffFFE500),
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                                  children: [
-                                                                    Image.asset(
-                                                                        "assets/images/verified.png",
-                                                                        height:
-                                                                        ScreenUtil()
-                                                                            .setHeight(
-                                                                            14),
-                                                                        width: ScreenUtil()
-                                                                            .setWidth(
-                                                                            18)),
-                                                                    SizedBox(
-                                                                      width:
-                                                                      ScreenUtil()
-                                                                          .setWidth(
-                                                                          5),
-                                                                    ),
-                                                                    Text(
-                                                                      "Verified",
-                                                                      style: TextStyle(
-                                                                        color: appColor,
-                                                                        fontSize:
-                                                                        ScreenUtil()
-                                                                            .setWidth(
-                                                                            12),
-                                                                        fontFamily:
-                                                                        'work',
-                                                                        fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                )),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        isLiked(details![0].id,
-                                                            details![0]);
-                                                      },
-                                                      child: Padding(
-                                                        padding:
-                                                        const EdgeInsets.all(8.0),
-                                                        child: ClipRRect(
-                                                          borderRadius:
-                                                          BorderRadius.circular(
-                                                              100),
                                                           child: Container(
-                                                              height: ScreenUtil()
-                                                                  .setHeight(30),
-                                                              width: ScreenUtil()
-                                                                  .setHeight(30),
-                                                              color: secondaryColor,
-                                                              child: Icon(
-                                                                  !details![0].liked!
-                                                                      ? Icons
-                                                                      .favorite_border
-                                                                      : Icons.favorite,
-                                                                  size: ScreenUtil()
-                                                                      .setHeight(15),
-                                                                  color:
-                                                                  details![0].liked!
-                                                                      ? Colors.red
-                                                                      : lineColor)),
+                                                              width: ScreenUtil().screenWidth,
+                                                              alignment: Alignment.center,
+                                                              child: Padding(
+                                                                padding:
+                                                                const EdgeInsets.all(8.0),
+                                                                child:
+                                                                ClipRRect(
+                                                                  borderRadius:
+                                                                  BorderRadius.circular(100),
+                                                                  child: Container(
+                                                                      height: ScreenUtil().setHeight(100),
+                                                                      width: ScreenUtil().setHeight(100),
+                                                                      color: Colors.black.withOpacity(0.5),
+                                                                      child: Center(
+                                                                          child: Icon(
+                                                                            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                                                                            color: secondaryColor,
+                                                                            size: ScreenUtil().setHeight(50),
+                                                                          ))),
+                                                                ),
+                                                              )),
                                                         ),
                                                       ),
-                                                    )
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: ScreenUtil().setHeight(30),
-                                            ),
-                                          ],
+                                              );
+                                            } else {
+                                              return Center(
+                                                  child:
+                                                  CircularProgressIndicator());
+                                            }
+                                          },
                                         ),
                                       ],
-                                    ),
-                                  ))
-                            ],
-                          ),
-
-                        ),
-                        SizedBox(
-                          height: ScreenUtil().setWidth(12),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                              left: ScreenUtil().setWidth(15),
-                              right: ScreenUtil().setWidth(15),
-                              bottom: ScreenUtil().setHeight(10),
-                              top: ScreenUtil().setHeight(10)),
-                          padding: EdgeInsets.only(
-                              left: ScreenUtil().setWidth(15),
-                              right: ScreenUtil().setWidth(15),
-                              bottom: ScreenUtil().setHeight(10),
-                              top: ScreenUtil().setHeight(10)),
-                          width: ScreenUtil().screenWidth,
-                          decoration: BoxDecoration(
-                              color: secondaryColor,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.only(
-                                        left: ScreenUtil().setWidth(10)),
-                                    // width: ScreenUtil().setWidth(200),
-                                    child: Text(
-                                      details![0].propertyName!,
-                                      style: TextStyle(
-                                        color: appColor,
-                                        fontSize: ScreenUtil().setHeight(11),
-                                        fontFamily: 'work',
-                                        fontWeight: FontWeight.w600,
-                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                              SizedBox(
-                                height: ScreenUtil().setWidth(2.5),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                            );
+                          },
+                        )
+                            : Container(),
+                        Container(
+                            width:
+                            MediaQuery.of(context).size.width * 0.9,
+                            padding: EdgeInsets.only(
+                                bottom: ScreenUtil().setWidth(15),
+                                left: ScreenUtil().setWidth(15)),
+                            alignment: Alignment.bottomLeft,
+                            child: SmoothPageIndicator(
+                              controller: controller1!,
+                              count: imagesList!.length,
+                              effect: ExpandingDotsEffect(
+                                  expansionFactor: 3,
+                                  strokeWidth: .5,
+                                  spacing: 3.0,
+                                  radius: 2.0,
+                                  dotWidth: 5.0,
+                                  dotHeight: 5.0,
+                                  dotColor: borderColor,
+                                  activeDotColor: secondaryColor),
+                            )),
+                        Container(
+                            alignment: Alignment.topLeft,
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                  top: ScreenUtil().setHeight(26)),
+                              child: Column(
                                 children: [
-                                  Container(
-                                    margin: EdgeInsets.only(
-                                        top: ScreenUtil().setHeight(1),
-                                        left: ScreenUtil().setWidth(10)),
-                                    // width: ScreenUtil().setWidth(200),
-                                    child: Text(
-                                      "${details![0].price} AED yearly",
+                                  Column(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment
+                                            .spaceBetween,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.pop(
+                                                          context);
+                                                      _controller.pause();
+                                                      _controller.dispose();
+
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                      const EdgeInsets
+                                                          .all(8.0),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                        BorderRadius
+                                                            .circular(
+                                                            100),
+                                                        child: Container(
+                                                            height: ScreenUtil()
+                                                                .setHeight(
+                                                                30),
+                                                            width: ScreenUtil()
+                                                                .setHeight(
+                                                                30),
+                                                            color:
+                                                            secondaryColor,
+                                                            child: Center(
+                                                                child:
+                                                                Icon(
+                                                                  Icons
+                                                                      .arrow_back_ios_new,
+                                                                  color:
+                                                                  lineColor,
+                                                                  size: ScreenUtil()
+                                                                      .setHeight(
+                                                                      11),
+                                                                ))),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: ScreenUtil()
+                                                        .setWidth(5),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              _onShare1(
+                                                context,
+                                                details![0],
+                                                "For ${details![0].purpose!}: ${details![0].propertyType!} in ${details![0].propertyName!} in ${details![0].area!}, ${details![0].city!}.",
+                                              );
+                                            },
+                                            child: Padding(
+                                              padding:
+                                              const EdgeInsets.all(
+                                                  8.0),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                BorderRadius.circular(
+                                                    100),
+                                                child: Container(
+                                                    height: ScreenUtil()
+                                                        .setHeight(30),
+                                                    width: ScreenUtil()
+                                                        .setHeight(30),
+                                                    color: Colors.black
+                                                        .withOpacity(0.5),
+                                                    child: Center(
+                                                      child: Image.asset(
+                                                        "assets/images/share.png",
+                                                        height:
+                                                        ScreenUtil()
+                                                            .setHeight(
+                                                            22),
+                                                        width: ScreenUtil()
+                                                            .setHeight(
+                                                            22),
+                                                      ),
+                                                    )),
+                                              ),
+                                            ),
+                                          ),
+
+                                          //fav
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height:
+                                        ScreenUtil().setHeight(30),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ))
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: ScreenUtil().setWidth(12),
+                  ),
+                  Container(
+                      margin: EdgeInsets.only(
+                          bottom: ScreenUtil().setHeight(0),
+                          left: ScreenUtil().setWidth(15),
+                          right: ScreenUtil().setWidth(15)),
+                      alignment: Alignment.centerRight,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              isLiked(details![0].id, details![0]);
+                            },
+                            child: Container(
+                              alignment: Alignment.centerLeft,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5.0),
+                                color: secondaryColor,
+                              ),
+                              width: ScreenUtil().setWidth(95),
+                              height: ScreenUtil().setHeight(32),
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                        height:
+                                        ScreenUtil().setHeight(26),
+                                        width: ScreenUtil().setHeight(26),
+                                        child: Icon(
+                                          !details![0].liked!
+                                              ? Icons.favorite_border
+                                              : Icons.favorite,
+                                          color: !details![0].liked!
+                                              ? appColor
+                                              : Colors.red,
+                                          size:
+                                          ScreenUtil().setHeight(16),
+                                        )),
+                                    SizedBox(
+                                      width: ScreenUtil().setWidth(0),
+                                    ),
+                                    Text(
+                                      "Likes ( ${details![0].like!.toString()} ) ",
                                       style: TextStyle(
                                         color: darkTextColor,
-                                        fontSize: ScreenUtil().setHeight(14),
+                                        fontSize:
+                                        ScreenUtil().setWidth(12),
                                         fontFamily: 'work',
+                                        height: ScreenUtil().setWidth(1),
                                         fontWeight: FontWeight.w800,
                                       ),
                                     ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: ScreenUtil().setWidth(15),),
+                          GestureDetector(
+                            onTap: () {
+                              /*     MyBottomSheet(
+                                            details![0].comment, details![0].id).show(context);*/
+
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => MyBottomSheet(
+                                        details![0].comment,
+                                        details![0].id,"details",widget.video)),
+                              );
+
+                              //_commentBottomSheet(proppertyList![i].comment);
+                              //       new MyBottomSheet(proppertyList![i].comment,proppertyList![i].id).show(context);
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5.0),
+                                color: secondaryColor,
+                              ),
+                              width: ScreenUtil().setWidth(125),
+                              height: ScreenUtil().setHeight(32),
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: ScreenUtil().setWidth(6),
+                                    ),
+                                    Container(
+                                        height:
+                                        ScreenUtil().setHeight(26),
+                                        width: ScreenUtil().setHeight(26),
+                                        child: Icon(
+                                          Icons.chat_bubble_outline,
+                                          color: appColor,
+                                          size:
+                                          ScreenUtil().setHeight(14),
+                                        )),
+                                    Text(
+                                      "Comments ( ${details![0].totalComment} )",
+                                      style: TextStyle(
+                                        color: darkTextColor,
+                                        fontSize:
+                                        ScreenUtil().setWidth(10),
+                                        fontFamily: 'work',
+                                        height: ScreenUtil().setWidth(1),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )),
+                  SizedBox(
+                    height: ScreenUtil().setWidth(0),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(
+                        left: ScreenUtil().setWidth(15),
+                        right: ScreenUtil().setWidth(15),
+                        bottom: ScreenUtil().setHeight(10),
+                        top: ScreenUtil().setHeight(10)),
+                    padding: EdgeInsets.only(
+                        left: ScreenUtil().setWidth(15),
+                        right: ScreenUtil().setWidth(8),
+                        bottom: ScreenUtil().setHeight(10),
+                        top: ScreenUtil().setHeight(10)),
+                    width: ScreenUtil().screenWidth,
+                    decoration: BoxDecoration(
+                        color: secondaryColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(
+                                  top: ScreenUtil().setHeight(4),
+                                  left: ScreenUtil().setWidth(10)),
+                              // width: ScreenUtil().setWidth(200),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "AED ${formatAmount(details![0].price.toString())}",
+                                    style: TextStyle(
+                                      color: darkTextColor,
+                                      fontSize:
+                                      ScreenUtil().setHeight(15),
+                                      fontFamily: 'workdark',
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
+                                  details![0].purpose == "Rent" ||
+                                      details![0].purpose == "rent"
+                                      ? Text(
+                                    "  Monthly",
+                                    style: TextStyle(
+                                      color: darkTextColor,
+                                      fontSize: ScreenUtil()
+                                          .setHeight(12),
+                                      fontFamily: 'work',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  )
+                                      : Container(),
                                 ],
                               ),
-                              SizedBox(
-                                height: ScreenUtil().setWidth(2.5),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: ScreenUtil().setHeight(8),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: ScreenUtil().screenWidth -
+                                  ScreenUtil().setWidth(64),
+                              margin: EdgeInsets.only(
+                                  left: ScreenUtil().setWidth(10)),
+                              // width: ScreenUtil().setWidth(200),
+                              child: Text(
+                                "For ${details![0].purpose!}: ${details![0].propertyType!} in ${details![0].tower!}, ${details![0].area!}, ${details![0].city!} ",
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontSize: ScreenUtil().setHeight(11),
+                                  fontFamily: 'work',
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        /*                              SizedBox(
+                                height: ScreenUtil().setHeight(2.5),
                               ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -370,56 +615,40 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                                         color: lineColor,
                                         fontSize: ScreenUtil().setHeight(11),
                                         fontFamily: 'work',
-                                        fontWeight: FontWeight.w400,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),
                                 ],
-                              ),
-                              SizedBox(
-                                height: ScreenUtil().setWidth(5),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                              ),*/
+                        SizedBox(
+                          height: ScreenUtil().setHeight(8),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(
+                                  top: ScreenUtil().setHeight(1),
+                                  left: ScreenUtil().setWidth(8)),
+                              child: Row(
                                 children: [
                                   Container(
-                                    margin: EdgeInsets.only(
-                                        top: ScreenUtil().setHeight(1),
-                                        left: ScreenUtil().setWidth(8)),
-                                    child: Row(
-                                      children: [
-                                        Image.asset("assets/images/bed.png",
-                                            height: ScreenUtil().setHeight(15),
-                                            width: ScreenUtil().setWidth(18)),
-                                        SizedBox(
-                                          width: ScreenUtil().setWidth(5),
-                                        ),
-                                        Text(
-                                          details![0].bedroomCount.toString(),
-                                          style: TextStyle(
-                                            color: darkTextColor,
-                                            fontSize: ScreenUtil().setWidth(12),
-                                            fontFamily: 'work',
-                                            height: ScreenUtil().setWidth(1),
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
+                                    height: ScreenUtil().setHeight(22),
+                                    child: Center(
+                                      child: Image.asset("assets/images/bed.png",
+                                          height: ScreenUtil().setHeight(20),
+                                          width: ScreenUtil().setWidth(25)),
                                     ),
                                   ),
                                   SizedBox(
-                                    width: ScreenUtil().setWidth(12),
+                                    width: ScreenUtil().setWidth(5),
                                   ),
-                                  Row(
-                                    children: [
-                                      Image.asset("assets/images/bath.png",
-                                          height: ScreenUtil().setHeight(15),
-                                          width: ScreenUtil().setWidth(18)),
-                                      SizedBox(
-                                        width: ScreenUtil().setWidth(5),
-                                      ),
-                                      Text(
-                                        details![0].bathroomCount.toString(),
+                                  Container(
+                                    height: ScreenUtil().setHeight(22),
+                                    child: Center(
+                                      child: Text(
+                                        details![0].bedroomCount.toString(),
                                         style: TextStyle(
                                           color: darkTextColor,
                                           fontSize: ScreenUtil().setWidth(12),
@@ -428,387 +657,607 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
-                                    ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              width: ScreenUtil().setWidth(12),
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                  height: ScreenUtil().setHeight(22),
+                                  child: Center(
+                                    child: Image.asset("assets/images/bath.png",
+                                        height: ScreenUtil().setHeight(17),
+                                        width: ScreenUtil().setWidth(19)),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: ScreenUtil().setWidth(5),
+                                ),
+                                Container(
+                                  height: ScreenUtil().setHeight(22),
+                                  child: Center(
+                                    child: Text(
+                                      details![0].bathroomCount.toString(),
+                                      style: TextStyle(
+                                        color: darkTextColor,
+                                        fontSize: ScreenUtil().setWidth(12),
+                                        fontFamily: 'work',
+                                        height: ScreenUtil().setWidth(1),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              width: ScreenUtil().setWidth(12),
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                  height: ScreenUtil().setHeight(22),
+                                  child: Center(
+                                    child: Image.asset("assets/images/crop.png",
+                                        height: ScreenUtil().setHeight(17),
+                                        width: ScreenUtil().setWidth(19)),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: ScreenUtil().setWidth(5),
+                                ),
+                                Container(
+                                  height: ScreenUtil().setHeight(22),
+                                  child: Center(
+                                    child: Text(
+                                      details![0].propertySize != null
+                                          ? "${details![0].propertySize} sq.ft."
+                                          : "2300 sq.ft.",
+                                      style: TextStyle(
+                                        color: darkTextColor,
+                                        fontSize: ScreenUtil().setWidth(12),
+                                        fontFamily: 'work',
+                                        height: ScreenUtil().setWidth(1),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              width: ScreenUtil().setWidth(12),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(
+                        left: ScreenUtil().setWidth(15),
+                        right: ScreenUtil().setWidth(15),
+                        bottom: ScreenUtil().setHeight(10),
+                        top: ScreenUtil().setHeight(5)),
+                    padding: EdgeInsets.only(
+                        left: ScreenUtil().setWidth(15),
+                        right: ScreenUtil().setWidth(15),
+                        bottom: ScreenUtil().setHeight(10),
+                        top: ScreenUtil().setHeight(10)),
+                    width: ScreenUtil().screenWidth,
+                    decoration: BoxDecoration(
+                        color: secondaryColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: ScreenUtil().setWidth(250),
+                              margin: EdgeInsets.only(
+                                  left: ScreenUtil().setWidth(10)),
+                              // width: ScreenUtil().setWidth(200),
+                              child: Text(
+                                details![0].propertyName != null
+                                    ? details![0].propertyName!
+                                    : "2 BR single row villa | ready to occupy | Book for viewing",
+                                style: TextStyle(
+                                  color: lineColor,
+                                  fontSize: ScreenUtil().setHeight(15),
+                                  letterSpacing: 0.4,
+                                  fontFamily: 'workdark',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: ScreenUtil().setWidth(5),
+                        ),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(
+                                  top: ScreenUtil().setHeight(10),
+                                  left: ScreenUtil().setWidth(10)),
+                              // width: ScreenUtil().setWidth(200),
+                              child: Text(
+                                "Villa Features :",
+                                style: TextStyle(
+                                  color: lineColor,
+                                  fontSize: ScreenUtil().setHeight(11),
+                                  fontFamily: 'work',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: ScreenUtil().setWidth(5),
+                        ),
+                        ListView.builder(
+                          itemCount: details![0].vilaFeature!.length,
+                          shrinkWrap: true,
+                          padding: EdgeInsets.all(0),
+                          physics: NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, i) {
+                            return _buildList(i);
+                          },
+                        ),
+                        SizedBox(
+                          height: ScreenUtil().setHeight(14),
+                        ),
+                        //property INfo
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: ScreenUtil().setWidth(250),
+                              margin: EdgeInsets.only(
+                                  left: ScreenUtil().setWidth(10)),
+                              // width: ScreenUtil().setWidth(200),
+                              child: Text(
+                                "Property Information",
+                                style: TextStyle(
+                                  color: lineColor,
+                                  fontSize: ScreenUtil().setHeight(15),
+                                  letterSpacing: 0.2,
+                                  fontFamily: 'workdark',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: ScreenUtil().setHeight(13),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                              top: ScreenUtil().setHeight(1),
+                              left: ScreenUtil().setWidth(10)),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      "Purpose",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
                                   ),
                                   SizedBox(
-                                    width: ScreenUtil().setWidth(12),
+                                    width: ScreenUtil().setHeight(12),
                                   ),
-                                  Row(
-                                    children: [
-                                      Image.asset("assets/images/crop.png",
-                                          height: ScreenUtil().setHeight(15),
-                                          width: ScreenUtil().setWidth(18)),
-                                      SizedBox(
-                                        width: ScreenUtil().setWidth(5),
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      details![0].purpose!,
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      Text(
-                                        details![0].propertySize != null
-                                            ? "${details![0].propertySize} SQFT"
-                                            : "2300 SQFT",
-                                        style: TextStyle(
-                                          color: darkTextColor,
-                                          fontSize: ScreenUtil().setWidth(12),
-                                          fontFamily: 'work',
-                                          height: ScreenUtil().setWidth(1),
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: ScreenUtil().setHeight(5),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      "Type",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.normal,
                                       ),
-                                    ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: ScreenUtil().setHeight(12),
+                                  ),
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      details![0].type != null
+                                          ? details![0].type!
+                                          : "Villa",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              details![0].type!="Villa" ? SizedBox(
+                                height: ScreenUtil().setHeight(5),
+                              ):Container(),
+
+                              details![0].type!="Villa" ? Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      "Floor",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: ScreenUtil().setHeight(12),
+                                  ),
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      "-",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ):Container(),
+
+                              SizedBox(
+                                height: ScreenUtil().setHeight(5),
+                              ),
+
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      "Property Name",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: ScreenUtil().setHeight(12),
+                                  ),
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      details![0].tower!,
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              SizedBox(
+                                height: ScreenUtil().setHeight(5),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      "Area",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: ScreenUtil().setHeight(12),
+                                  ),
+                                  Container(
+                                    width: ScreenUtil().setWidth(150),
+                                    child: Text(
+                                      details![0].area!,
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+
+                              SizedBox(
+                                height: ScreenUtil().setHeight(5),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      "City",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: ScreenUtil().setHeight(12),
+                                  ),
+                                  Container(
+                                    width: ScreenUtil().setWidth(150),
+                                    child: Text(
+                                      details![0].city!,
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              SizedBox(
+                                height: ScreenUtil().setHeight(5),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      "Added on",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: ScreenUtil().setHeight(12),
+                                  ),
+                                  Container(
+                                    width: ScreenUtil().setWidth(150),
+                                    child: Text(
+                                      details![0].createdAt!,
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              SizedBox(
+                                height: ScreenUtil().setHeight(5),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      "Reference No.",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: ScreenUtil().setHeight(12),
+                                  ),
+                                  Container(
+                                    width: ScreenUtil().setWidth(150),
+                                    child: Text(
+                                      details![0].refNum!,
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(
+                        left: ScreenUtil().setWidth(15),
+                        right: ScreenUtil().setWidth(15),
+                        bottom: ScreenUtil().setHeight(10),
+                        top: ScreenUtil().setHeight(5)),
+                    padding: EdgeInsets.only(
+                        left: ScreenUtil().setWidth(15),
+                        right: ScreenUtil().setWidth(15),
+                        bottom: ScreenUtil().setHeight(10),
+                        top: ScreenUtil().setHeight(10)),
+                    width: ScreenUtil().screenWidth,
+                    decoration: BoxDecoration(
+                        color: secondaryColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        //property INfo
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: ScreenUtil().setWidth(250),
+                              margin: EdgeInsets.only(
+                                  left: ScreenUtil().setWidth(10)),
+                              // width: ScreenUtil().setWidth(200),
+                              child: Text(
+                                "Amenities",
+                                style: TextStyle(
+                                  color: lineColor,
+                                  fontSize: ScreenUtil().setHeight(14),
+                                  letterSpacing: 1.0,
+                                  fontFamily: 'workdark',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: ScreenUtil().setHeight(10),
                         ),
                         Container(
                           margin: EdgeInsets.only(
-                              left: ScreenUtil().setWidth(15),
-                              right: ScreenUtil().setWidth(15),
-                              bottom: ScreenUtil().setHeight(10),
-                              top: ScreenUtil().setHeight(5)),
-                          padding: EdgeInsets.only(
-                              left: ScreenUtil().setWidth(15),
-                              right: ScreenUtil().setWidth(15),
-                              bottom: ScreenUtil().setHeight(10),
-                              top: ScreenUtil().setHeight(10)),
-                          width: ScreenUtil().screenWidth,
-                          decoration: BoxDecoration(
-                              color: secondaryColor,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: ScreenUtil().setWidth(250),
-                                    margin: EdgeInsets.only(
-                                        left: ScreenUtil().setWidth(10)),
-                                    // width: ScreenUtil().setWidth(200),
-                                    child: Text(
-                                      details![0].description != null
-                                          ? details![0].description!
-                                          : "2 BR single row villa | ready to occupy | Book for viewing",
-                                      style: TextStyle(
-                                        color: lineColor,
-                                        fontSize: ScreenUtil().setHeight(14),
-                                        letterSpacing: 1.0,
-                                        fontFamily: 'work',
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: ScreenUtil().setWidth(5),
-                              ),
-
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.only(
-                                        top: ScreenUtil().setHeight(1),
-                                        left: ScreenUtil().setWidth(10)),
-                                    // width: ScreenUtil().setWidth(200),
-                                    child: Text(
-                                      "Villa Features :",
-                                      style: TextStyle(
-                                        color: lineColor,
-                                        fontSize: ScreenUtil().setHeight(11),
-                                        fontFamily: 'work',
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: ScreenUtil().setWidth(5),
-                              ),
-                              ListView.builder(
-                                itemCount: details![0].vilaFeature!.length,
-                                shrinkWrap: true,
-                                padding: EdgeInsets.all(0),
-                                physics: NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, i) {
-                                  return _buildList(i);
-                                },
-                              ),
-                              SizedBox(
-                                height: ScreenUtil().setHeight(14),
-                              ),
-                              //property INfo
-
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: ScreenUtil().setWidth(250),
-                                    margin: EdgeInsets.only(
-                                        left: ScreenUtil().setWidth(10)),
-                                    // width: ScreenUtil().setWidth(200),
-                                    child: Text(
-                                      "Property Information",
-                                      style: TextStyle(
-                                        color: lineColor,
-                                        fontSize: ScreenUtil().setHeight(14),
-                                        letterSpacing: 1.0,
-                                        fontFamily: 'work',
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: ScreenUtil().setHeight(10),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    top: ScreenUtil().setHeight(1),
-                                    left: ScreenUtil().setWidth(10)),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: ScreenUtil().setHeight(100),
-                                          child: Text(
-                                            "Type",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: ScreenUtil().setHeight(12),
-                                        ),
-                                        Container(
-                                          width: ScreenUtil().setHeight(100),
-                                          child: Text(
-                                            details![0].type != null
-                                                ? details![0].type!
-                                                : "Villa",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: ScreenUtil().setHeight(5),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: ScreenUtil().setHeight(100),
-                                          child: Text(
-                                            "Purpose",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: ScreenUtil().setHeight(12),
-                                        ),
-                                        Container(
-                                          width: ScreenUtil().setHeight(100),
-                                          child: Text(
-                                            details![0].purpose!,
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: ScreenUtil().setHeight(5),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: ScreenUtil().setHeight(100),
-                                          child: Text(
-                                            "Reference No.",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: ScreenUtil().setHeight(12),
-                                        ),
-                                        Container(
-                                          width: ScreenUtil().setWidth(150),
-                                          child: Text(
-                                            details![0].refNum!,
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: ScreenUtil().setHeight(5),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: ScreenUtil().setHeight(100),
-                                          child: Text(
-                                            "Added on",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: ScreenUtil().setHeight(12),
-                                        ),
-                                        Container(
-                                          width: ScreenUtil().setWidth(150),
-                                          child: Text(
-                                            details![0].addon!,
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
+                              top: ScreenUtil().setHeight(1),
+                              left: ScreenUtil().setWidth(10)),
+                          child: GridView.builder(
+                            padding: EdgeInsets.all(5),
+                            gridDelegate:
+                            SliverGridDelegateWithFixedCrossAxisCount(
+                              childAspectRatio: 5.5,
+                              crossAxisCount:
+                              2, // number of items in each row
+                              mainAxisSpacing: 2, // spacing between rows
+                              crossAxisSpacing:
+                              2, // spacing between columns
+                            ),
+                            itemCount: details![0].amenities!.length,
+                            physics: NeverScrollableScrollPhysics(),
+                            //    scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            itemBuilder: (context, i) {
+                              return _buildAmenititesList(i);
+                            },
                           ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                              left: ScreenUtil().setWidth(15),
-                              right: ScreenUtil().setWidth(15),
-                              bottom: ScreenUtil().setHeight(10),
-                              top: ScreenUtil().setHeight(5)),
-                          padding: EdgeInsets.only(
-                              left: ScreenUtil().setWidth(15),
-                              right: ScreenUtil().setWidth(15),
-                              bottom: ScreenUtil().setHeight(10),
-                              top: ScreenUtil().setHeight(10)),
-                          width: ScreenUtil().screenWidth,
-                          decoration: BoxDecoration(
-                              color: secondaryColor,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              //property INfo
+                        )
+                      ],
+                    ),
+                  ),
 
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: ScreenUtil().setWidth(250),
-                                    margin: EdgeInsets.only(
-                                        left: ScreenUtil().setWidth(10)),
-                                    // width: ScreenUtil().setWidth(200),
-                                    child: Text(
-                                      "Amenities",
-                                      style: TextStyle(
-                                        color: lineColor,
-                                        fontSize: ScreenUtil().setHeight(14),
-                                        letterSpacing: 1.0,
-                                        fontFamily: 'work',
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: ScreenUtil().setHeight(10),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    top: ScreenUtil().setHeight(1),
-                                    left: ScreenUtil().setWidth(10)),
-                                child: GridView.builder(
-                                  padding: EdgeInsets.all(5),
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                    childAspectRatio: 5.5,
-                                    crossAxisCount:
-                                        2, // number of items in each row
-                                    mainAxisSpacing: 2, // spacing between rows
-                                    crossAxisSpacing:
-                                        2, // spacing between columns
-                                  ),
-                                  itemCount: details![0].amenities!.length,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  //    scrollDirection: Axis.horizontal,
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, i) {
-                                    return _buildAmenititesList(i);
-                                  },
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Container(
+
+                  /* Container(
                           margin: EdgeInsets.only(
                               left: ScreenUtil().setWidth(15),
                               right: ScreenUtil().setWidth(15),
@@ -927,41 +1376,87 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                               ),
                             ],
                           ),
+                        ),*/
+                  Container(
+                    margin: EdgeInsets.only(
+                        left: ScreenUtil().setWidth(15),
+                        right: ScreenUtil().setWidth(15),
+                        bottom: ScreenUtil().setHeight(10),
+                        top: ScreenUtil().setHeight(5)),
+                    padding: EdgeInsets.only(
+                        left: ScreenUtil().setWidth(15),
+                        right: ScreenUtil().setWidth(15),
+                        bottom: ScreenUtil().setHeight(10),
+                        top: ScreenUtil().setHeight(10)),
+                    width: ScreenUtil().screenWidth,
+                    decoration: BoxDecoration(
+                        color: secondaryColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        //property INfo
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: ScreenUtil().setWidth(250),
+                              margin: EdgeInsets.only(
+                                  left: ScreenUtil().setWidth(10)),
+                              // width: ScreenUtil().setWidth(200),
+                              child: Text(
+                                "Agent Information",
+                                style: TextStyle(
+                                  color: lineColor,
+                                  fontSize: ScreenUtil().setHeight(14),
+                                  letterSpacing: 0.4,
+                                  fontFamily: 'workdark',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: ScreenUtil().setHeight(10),
                         ),
                         Container(
                           margin: EdgeInsets.only(
-                              left: ScreenUtil().setWidth(15),
-                              right: ScreenUtil().setWidth(15),
-                              bottom: ScreenUtil().setHeight(10),
-                              top: ScreenUtil().setHeight(5)),
-                          padding: EdgeInsets.only(
-                              left: ScreenUtil().setWidth(15),
-                              right: ScreenUtil().setWidth(15),
-                              bottom: ScreenUtil().setHeight(10),
-                              top: ScreenUtil().setHeight(10)),
-                          width: ScreenUtil().screenWidth,
-                          decoration: BoxDecoration(
-                              color: secondaryColor,
-                              borderRadius: BorderRadius.circular(10)),
+                              top: ScreenUtil().setHeight(1),
+                              left: ScreenUtil().setWidth(10)),
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              //property INfo
-
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
                                 children: [
                                   Container(
-                                    width: ScreenUtil().setWidth(250),
-                                    margin: EdgeInsets.only(
-                                        left: ScreenUtil().setWidth(10)),
-                                    // width: ScreenUtil().setWidth(200),
+                                    width: ScreenUtil().setHeight(100),
                                     child: Text(
-                                      "Key Information",
+                                      "Agent Name",
                                       style: TextStyle(
                                         color: lineColor,
-                                        fontSize: ScreenUtil().setHeight(14),
-                                        letterSpacing: 1.0,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: ScreenUtil().setHeight(12),
+                                  ),
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      details![0].createdBy!.name!,
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
                                         fontFamily: 'work',
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -970,172 +1465,144 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                                 ],
                               ),
                               SizedBox(
-                                height: ScreenUtil().setHeight(10),
+                                height: ScreenUtil().setHeight(5),
                               ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    top: ScreenUtil().setHeight(1),
-                                    left: ScreenUtil().setWidth(10)),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: ScreenUtil().setHeight(100),
-                                          child: Text(
-                                            "Reference",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: ScreenUtil().setHeight(12),
-                                        ),
-                                        Container(
-                                          width: ScreenUtil().setHeight(100),
-                                          child: Text(
-                                            "ES-1003747",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      "Agent BRN",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.normal,
+                                      ),
                                     ),
-                                    SizedBox(
-                                      height: ScreenUtil().setHeight(5),
+                                  ),
+                                  SizedBox(
+                                    width: ScreenUtil().setHeight(12),
+                                  ),
+                                  Container(
+                                    width: ScreenUtil().setWidth(150),
+                                    child: Text(
+                                      details![0].createdBy!.agentBrn !=
+                                          null
+                                          ? details![0]
+                                          .createdBy!
+                                          .agentBrn!
+                                          : "-",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: ScreenUtil().setHeight(100),
-                                          child: Text(
-                                            "Listed",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: ScreenUtil().setHeight(12),
-                                        ),
-                                        Container(
-                                          width: ScreenUtil().setHeight(100),
-                                          child: Text(
-                                            "11 JUL 2023",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: ScreenUtil().setHeight(5),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      "Company Name",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.normal,
+                                      ),
                                     ),
-                                    SizedBox(
-                                      height: ScreenUtil().setHeight(5),
+                                  ),
+                                  SizedBox(
+                                    width: ScreenUtil().setHeight(12),
+                                  ),
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      details![0]
+                                          .createdBy!
+                                          .companyName !=
+                                          null
+                                          ? details![0]
+                                          .createdBy!
+                                          .companyName!
+                                          : "-",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: ScreenUtil().setHeight(100),
-                                          child: Text(
-                                            "Broker ORN",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: ScreenUtil().setHeight(12),
-                                        ),
-                                        Container(
-                                          width: ScreenUtil().setWidth(150),
-                                          child: Text(
-                                            "936",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: ScreenUtil().setHeight(5),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: ScreenUtil().setHeight(100),
+                                    child: Text(
+                                      "Broker ORN",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.normal,
+                                      ),
                                     ),
-                                    SizedBox(
-                                      height: ScreenUtil().setHeight(5),
+                                  ),
+                                  SizedBox(
+                                    width: ScreenUtil().setHeight(12),
+                                  ),
+                                  Container(
+                                    width: ScreenUtil().setWidth(150),
+                                    child: Text(
+                                      details![0].createdBy!.brokerOrn !=
+                                          null
+                                          ? details![0]
+                                          .createdBy!
+                                          .brokerOrn!
+                                          : "-",
+                                      style: TextStyle(
+                                        color: lineColor,
+                                        fontSize:
+                                        ScreenUtil().setHeight(12),
+                                        letterSpacing: .2,
+                                        fontFamily: 'work',
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: ScreenUtil().setHeight(100),
-                                          child: Text(
-                                            "Agent BRN",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: ScreenUtil().setHeight(12),
-                                        ),
-                                        Container(
-                                          width: ScreenUtil().setWidth(150),
-                                          child: Text(
-                                            "53032",
-                                            style: TextStyle(
-                                              color: lineColor,
-                                              fontSize:
-                                                  ScreenUtil().setHeight(12),
-                                              letterSpacing: .2,
-                                              fontFamily: 'work',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
+                                  ),
+                                ],
+                              ),
+
+                              /*SizedBox(
                                       height: ScreenUtil().setHeight(5),
                                     ),
                                     Row(
@@ -1175,174 +1642,33 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                              left: ScreenUtil().setWidth(15),
-                              right: ScreenUtil().setWidth(15),
-                              bottom: ScreenUtil().setHeight(10),
-                              top: ScreenUtil().setHeight(5)),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Recommended properties",
-                                    style: TextStyle(
-                                      color: lineColor,
-                                      fontSize: ScreenUtil().setHeight(14),
-                                      letterSpacing: 1.0,
-                                      fontFamily: 'work',
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: ScreenUtil().setWidth(12),
-                              ),
-                              _buildPropertyList(),
+*/
                             ],
                           ),
                         )
                       ],
                     ),
                   ),
-                ),
-                Container(
-                    margin: EdgeInsets.only(
-                        bottom: ScreenUtil().setHeight(135),
-                        right: ScreenUtil().setWidth(15)),
-                    alignment: Alignment.centerRight,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        /* GestureDetector(
-                      onTap: () {
-                        isLiked(details![0].id, details![0]);
-                      },
-                      child:   Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(100),
-                          child: Container(
-                              height: ScreenUtil().setHeight(30),
-                              width: ScreenUtil().setHeight(30),
-                              color: appColor,
-                              child: Icon(
-                                  !details![0].liked!
-                                      ? Icons.favorite_border
-                                      : Icons.favorite,
-                                  size: ScreenUtil().setHeight(15),
-                                  color: details![0].liked!
-                                      ? Colors.red
-                                      : secondaryColor)),
-                        ),
-                      )),*/
-                        SizedBox(
-                          height: ScreenUtil().setHeight(30),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            _callENquiryAPI(details![0].id.toString(), "phone");
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100),
-                              child: Container(
-                                  height: ScreenUtil().setHeight(40),
-                                  width: ScreenUtil().setHeight(40),
-                                  color: appColor,
-                                  child: Padding(
-                                    padding: EdgeInsets.all(
-                                        ScreenUtil().setHeight(13)),
-                                    child: Image.asset("assets/images/call.png",
-                                        height: ScreenUtil().setHeight(15),
-                                        width: ScreenUtil().setHeight(15),
-                                        color: secondaryColor),
-                                  )),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: ScreenUtil().setHeight(5),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            _callENquiryAPI(details![0].id.toString(), "mail");
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100),
-                              child: Container(
-                                  height: ScreenUtil().setHeight(40),
-                                  width: ScreenUtil().setHeight(40),
-                                  color: appColor,
-                                  child: Padding(
-                                    padding: EdgeInsets.all(
-                                        ScreenUtil().setHeight(13)),
-                                    child: Image.asset("assets/images/mail.png",
-                                        height: ScreenUtil().setHeight(15),
-                                        width: ScreenUtil().setHeight(15),
-                                        color: secondaryColor),
-                                  )),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: ScreenUtil().setHeight(5),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            _callENquiryAPI(
-                                details![0].id.toString(), "whatsapp");
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100),
-                              child: Container(
-                                  height: ScreenUtil().setHeight(40),
-                                  width: ScreenUtil().setHeight(40),
-                                  color: Color(0xff00CA7D),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(
-                                        ScreenUtil().setHeight(13)),
-                                    child: Image.asset(
-                                        "assets/images/whatsapp.png",
-                                        height: ScreenUtil().setHeight(15),
-                                        width: ScreenUtil().setHeight(15),
-                                        color: secondaryColor),
-                                  )),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: ScreenUtil().setHeight(30),
-                        ),
-                      ],
-                    ))
-              ],
+                ],
+              ),
             ),
+          ),
+          //add floting
+        ],
+      ),
     );
   }
 
   Widget _buildList(int i) {
-    return Container(
+    return details![0].vilaFeature![i] != ""
+        ? Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             margin: EdgeInsets.only(
-                top: ScreenUtil().setHeight(1), left: ScreenUtil().setWidth(8)),
+                top: ScreenUtil().setHeight(1),
+                left: ScreenUtil().setWidth(8)),
             padding: EdgeInsets.only(
               top: ScreenUtil().setHeight(5),
             ),
@@ -1375,7 +1701,8 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
           ),
         ],
       ),
-    );
+    )
+        : Container();
   }
 
   Widget _buildAmenititesList(int i) {
@@ -1412,438 +1739,8 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
     );
   }
 
-  Widget _buildPropertyList() {
-    return Container(
-      height: ScreenUtil().setHeight(255),
-      child: ListView.builder(
-        itemCount: proppertyList!.length,
-        shrinkWrap: true,
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.all(0),
-        itemBuilder: (context, i) {
-          return _buildProList(i);
-        },
-      ),
-    );
-  }
 
-  Widget _buildProList(int i) {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        margin: EdgeInsets.only(right: ScreenUtil().setWidth(15)),
-        decoration: BoxDecoration(
-            color: secondaryColor,
-            border: Border.all(color: secondaryColor, width: 0.2),
-            borderRadius: BorderRadius.circular(10.0)),
-        height: ScreenUtil().setHeight(250),
-        child: Column(
-          children: [
-            ColorFiltered(
-              colorFilter: ColorFilter.mode(
-                Colors.grey.shade100,
-                BlendMode.darken,
-              ),
-              child: Container(
-                height: ScreenUtil().setHeight(155),
-                width: ScreenUtil().setWidth(325),
-                decoration: proppertyList![i].images != null
-                    ? BoxDecoration(
-                        image: DecorationImage(
-                            image: CachedNetworkImageProvider(
-                                proppertyList![i].images![0].image!),
-                            fit: BoxFit.cover),
-                        border: Border.all(color: secondaryColor, width: 0.2),
-                      )
-                    : BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage("assets/images/property_img.png"),
-                            fit: BoxFit.cover),
-                        border: Border.all(color: secondaryColor, width: 0.2),
-                      ),
-                alignment: Alignment.center,
-                child: Column(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(5),
-                                    child: Container(
-                                        height: ScreenUtil().setHeight(26),
-                                        width: ScreenUtil().setWidth(80),
-                                        color: Color(0xffFFE500),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Image.asset(
-                                                "assets/images/verified.png",
-                                                height:
-                                                    ScreenUtil().setHeight(14),
-                                                width:
-                                                    ScreenUtil().setWidth(18)),
-                                            SizedBox(
-                                              width: ScreenUtil().setWidth(5),
-                                            ),
-                                            Text(
-                                              "Verified",
-                                              style: TextStyle(
-                                                color: appColor,
-                                                fontSize:
-                                                    ScreenUtil().setWidth(12),
-                                                fontFamily: 'work',
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                          ],
-                                        )),
-                                  ),
-                                )
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    isLiked1(proppertyList![i].id,
-                                        proppertyList![0]);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(100),
-                                      child: Container(
-                                          height: ScreenUtil().setHeight(26),
-                                          width: ScreenUtil().setHeight(26),
-                                          color: secondaryColor,
-                                          child: Icon(
-                                              !proppertyList![i].liked!
-                                                  ? Icons
-                                                  .favorite_border
-                                                  : Icons.favorite,
-                                              size: ScreenUtil()
-                                                  .setHeight(15),
-                                              color:
-                                              proppertyList![i].liked!
-                                                  ? Colors.red
-                                                  : lineColor)),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: ScreenUtil().setHeight(30),
-                        ),
-                        Container(
-                          height: ScreenUtil().setHeight(80),
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                                left: ScreenUtil().setWidth(12),
-                                top: ScreenUtil().setWidth(12)),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          proppertyList![i].propertyName!,
-                                          style: TextStyle(
-                                            color: secondaryColor,
-                                            fontSize: ScreenUtil().setWidth(12),
-                                            fontFamily: 'work',
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: ScreenUtil().setHeight(5),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "C203",
-                                          style: TextStyle(
-                                            color: secondaryColor,
-                                            fontSize: ScreenUtil().setWidth(15),
-                                            fontFamily: 'work',
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: ScreenUtil().setHeight(5),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          proppertyList![i].propertyAddress!=null?proppertyList![i].propertyAddress!:"UAE,Dabai",
-                                          style: TextStyle(
-                                            color: secondaryColor,
-                                            fontSize: ScreenUtil().setWidth(12),
-                                            fontFamily: 'work',
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: ScreenUtil().setHeight(10),
-            ),
-            Container(
-              alignment: Alignment.bottomLeft,
-              padding: EdgeInsets.only(
-                  left: ScreenUtil().setWidth(10),
-                  right: ScreenUtil().setWidth(10)),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Image.asset("assets/images/bed.png",
-                              height: ScreenUtil().setHeight(15),
-                              color: appColor,
-                              width: ScreenUtil().setWidth(18)),
-                          SizedBox(
-                            width: ScreenUtil().setWidth(5),
-                          ),
-                          Text(
-                            proppertyList![i].bedroomCount.toString(),
-                            style: TextStyle(
-                              color: darkTextColor,
-                              fontSize: ScreenUtil().setWidth(12),
-                              fontFamily: 'work',
-                              height: ScreenUtil().setWidth(1),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        width: ScreenUtil().setWidth(12),
-                      ),
-                      Row(
-                        children: [
-                          Image.asset("assets/images/bath.png",
-                              height: ScreenUtil().setHeight(15),
-                              color: appColor,
-                              width: ScreenUtil().setWidth(18)),
-                          SizedBox(
-                            width: ScreenUtil().setWidth(5),
-                          ),
-                          Text(
-                            proppertyList![i].bathroomCount.toString(),
-                            style: TextStyle(
-                              color: darkTextColor,
-                              fontSize: ScreenUtil().setWidth(12),
-                              fontFamily: 'work',
-                              height: ScreenUtil().setWidth(1),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        width: ScreenUtil().setWidth(12),
-                      ),
-                      Row(
-                        children: [
-                          Image.asset("assets/images/crop.png",
-                              height: ScreenUtil().setHeight(15),
-                              width: ScreenUtil().setWidth(18)),
-                          SizedBox(
-                            width: ScreenUtil().setWidth(5),
-                          ),
-                          Text(
-                            "${proppertyList![i].propertySize.toString()} sqft",
-                            style: TextStyle(
-                              color: darkTextColor,
-                              fontSize: ScreenUtil().setWidth(12),
-                              fontFamily: 'work',
-                              height: ScreenUtil().setWidth(1),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: ScreenUtil().setHeight(10),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          _callENquiryAPI(
-                              proppertyList![i].id.toString(), "phone");
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0),
-                            color: Color(0xffF5F6F8),
-                          ),
-                          width: ScreenUtil().setWidth(95),
-                          height: ScreenUtil().setHeight(32),
-                          child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset("assets/images/call.png",
-                                    height: ScreenUtil().setHeight(15),
-                                    color: appColor,
-                                    width: ScreenUtil().setWidth(18)),
-                                SizedBox(
-                                  width: ScreenUtil().setWidth(5),
-                                ),
-                                Text(
-                                  "Call",
-                                  style: TextStyle(
-                                    color: darkTextColor,
-                                    fontSize: ScreenUtil().setWidth(12),
-                                    fontFamily: 'work',
-                                    height: ScreenUtil().setWidth(1),
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: ScreenUtil().setHeight(10),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          _callENquiryAPI(
-                              proppertyList![0].id.toString(), "mail");
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0),
-                            color: Color(0xffF5F6F8),
-                          ),
-                          width: ScreenUtil().setWidth(100),
-                          height: ScreenUtil().setHeight(32),
-                          child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset("assets/images/mail.png",
-                                    height: ScreenUtil().setHeight(15),
-                                    color: appColor,
-                                    width: ScreenUtil().setWidth(18)),
-                                SizedBox(
-                                  width: ScreenUtil().setWidth(5),
-                                ),
-                                Text(
-                                  "E Mail",
-                                  style: TextStyle(
-                                    color: darkTextColor,
-                                    fontSize: ScreenUtil().setWidth(12),
-                                    fontFamily: 'work',
-                                    height: ScreenUtil().setWidth(1),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: ScreenUtil().setHeight(10),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          _callENquiryAPI(
-                              proppertyList![0].id.toString(), "whatsapp");
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0),
-                            color: Color(0xff00CA7D),
-                          ),
-                          width: ScreenUtil().setWidth(100),
-                          height: ScreenUtil().setHeight(32),
-                          child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset("assets/images/wp.png",
-                                    height: ScreenUtil().setHeight(15),
-                                    width: ScreenUtil().setWidth(18)),
-                                SizedBox(
-                                  width: ScreenUtil().setWidth(5),
-                                ),
-                                Text(
-                                  "Whatsapp",
-                                  style: TextStyle(
-                                    color: secondaryColor,
-                                    fontSize: ScreenUtil().setWidth(12),
-                                    fontFamily: 'work',
-                                    height: ScreenUtil().setWidth(1),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
+
 
   Future<void> getPropertyDetailsAPI() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -1877,8 +1774,15 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
             GetPropertyDetails.fromJson(jsonDecode(responseBody));
         details!.addAll(getPropertyDetails.data!);
         details!.forEach((element) {
+          imagesList!.add(element.thamblain!);
           images!.addAll(element.images!);
-
+          element.images!.forEach((element) {
+            imagesList!.add(element.image!);
+          });
+          images!.forEach((element) {
+            print("----images----");
+            print(getUrlType(element.image!));
+          });
         });
       } else {}
     }
@@ -1886,7 +1790,6 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
 
   Future<void> isLiked(int? id, PropertyDetails propertyList) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
 
     var uri = Uri.https(
       apiBaseUrl,
@@ -1908,8 +1811,10 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
         setState(() {
           if (propertyList.liked!) {
             propertyList.liked = false;
+            propertyList.like = propertyList.like! - 1;
           } else {
             propertyList.liked = true;
+            propertyList.like = propertyList.like! + 1;
           }
         });
       }
@@ -1919,11 +1824,10 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
   }
 
   Future<void> isLiked1(
-    int? id,
-      TredingPropertyList propertyList,
-  ) async {
+      int? id,
+      PropertyList propertyList,
+      ) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
 
     var uri = Uri.https(
       apiBaseUrl,
@@ -1945,73 +1849,12 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
         setState(() {
           if (propertyList.liked!) {
             propertyList.liked = false;
+            propertyList.like = propertyList.like! - 1;
           } else {
             propertyList.liked = true;
+            propertyList.like = propertyList.like! + 1;
           }
         });
-      }
-      if (getdata["status"]) {
-      } else {}
-    }
-  }
-
-  void _launchCall(CreatedBy? createdBy) {
-    launch("tel://${createdBy!.mobileNumber!}");
-  }
-
-  void _launchMail(CreatedBy? createdBy) {
-    launch("mailto:${createdBy!.email!}");
-  }
-
-  whatsapp(CreatedBy? createdBy, PropertyDetails propertyList) async {
-    var contact = "${createdBy!.mobileNumber!}";
-    var androidUrl =
-        "whatsapp://send?phone=$contact&text=Hi, I need To know More about ${propertyList.propertyName} this property and its Location is ${propertyList.propertyAddress}";
-    var iosUrl =
-        "https://wa.me/$contact?text=${Uri.parse('Hi,  I need To know More about ${propertyList.propertyName} this property and its Location is ${propertyList.propertyAddress}')}";
-
-    try {
-      if (Platform.isIOS) {
-        await launchUrl(Uri.parse(iosUrl));
-      } else {
-        await launchUrl(Uri.parse(androidUrl));
-      }
-    } on Exception {
-      Message(context, "oops! you didn't install whatsapp yet");
-    }
-  }
-
-  Future<void> _callENquiryAPI(String id, String type) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setState(() {
-      isloading = true;
-    });
-    var uri = Uri.https(
-      apiBaseUrl,
-      '/realpro/api/user/addenquiry',
-    );
-    Map<String, dynamic> body = {'property_id': id.toString(), 'type': type};
-    final headers = {'Authorization': '${prefs.getString('access_token')}'};
-    Response response = await post(uri, headers: headers, body: body);
-
-    int statusCode = response.statusCode;
-    String responseBody = response.body;
-    var getdata = json.decode(response.body);
-
-    print("EnquiryResposne::$responseBody");
-    if (statusCode == 200) {
-      if (mounted == true) {
-        setState(() {
-          isloading = false;
-        });
-        if (type == "phone") {
-          _launchCall(details![0].createdBy!);
-        } else if (type == "mail") {
-          _launchMail(details![0].createdBy!);
-        } else {
-          whatsapp(details![0].createdBy!, details![0]);
-        }
       }
       if (getdata["status"]) {
       } else {}
@@ -2049,10 +1892,134 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
         });
       }
       if (getdata["status"]) {
-        getPropertyData =
-            GetTredingPropertyData.fromJson(jsonDecode(responseBody));
+        getPropertyData = GetPropertyData.fromJson(jsonDecode(responseBody));
         proppertyList!.addAll(getPropertyData.data!);
       } else {}
     }
+  }
+
+  Future<void> isCollect(int? id, PropertyDetails propertyList) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/property_add_collect',
+    );
+    Map<String, dynamic> body = {
+      'property_id': id.toString(),
+    };
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await post(uri, headers: headers, body: body);
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("PropResposne::$responseBody");
+    if (statusCode == 200) {
+      if (mounted == true) {
+        setState(() {
+          if (propertyList.collected!) {
+            propertyList.collected = false;
+          } else {
+            propertyList.collected = true;
+          }
+        });
+      }
+      if (getdata["status"]) {
+      } else {}
+    }
+  }
+
+  Future<void> isCollect1(int? id, PropertyList propertyList) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/property_add_collect',
+    );
+    Map<String, dynamic> body = {
+      'property_id': id.toString(),
+    };
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await post(uri, headers: headers, body: body);
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("PropResposne::$responseBody");
+    if (statusCode == 200) {
+      if (mounted == true) {
+        setState(() {
+          if (propertyList.collected!) {
+            propertyList.collected = false;
+          } else {
+            propertyList.collected = true;
+          }
+        });
+      }
+      if (getdata["status"]) {
+      } else {}
+    }
+  }
+
+  void _onShare(
+      BuildContext context, PropertyList reelsList, String title) async {
+    final response = await get(Uri.parse(reelsList.images![0].image!));
+    final directory = await getTemporaryDirectory();
+    File file = await File('${directory.path}/Image.png')
+        .writeAsBytes(response.bodyBytes);
+
+    await Share.shareXFiles([XFile(file.path)], text: title);
+    /*   final box = context.findRenderObject() as RenderBox?;
+    await Share.share(title,
+        subject: file.path,
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);*/
+  }
+
+  void _onShare1(
+      BuildContext context, PropertyDetails reelsList, String title) async {
+    final response = await get(Uri.parse(reelsList.images![0].image!));
+    final directory = await getTemporaryDirectory();
+    File file = await File('${directory.path}/Image.png')
+        .writeAsBytes(response.bodyBytes);
+
+    await Share.shareXFiles([XFile(file.path)], text: title);
+    /*   final box = context.findRenderObject() as RenderBox?;
+    await Share.share(title,
+        subject: file.path,
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);*/
+  }
+
+  String formatAmount(String id) {
+    String price = id;
+    String priceInText = "";
+    int counter = 0;
+    for (int i = (price.length - 1); i >= 0; i--) {
+      counter++;
+      String str = price[i];
+      if ((counter % 3) != 0 && i != 0) {
+        priceInText = "$str$priceInText";
+      } else if (i == 0) {
+        priceInText = "$str$priceInText";
+      } else {
+        priceInText = ",$str$priceInText";
+      }
+    }
+    return priceInText.trim();
+  }
+}
+
+UrlType getUrlType(String url) {
+  Uri uri = Uri.parse(url);
+  String typeString = uri.path.substring(uri.path.length - 3).toLowerCase();
+  if (typeString == "jpg") {
+    return UrlType.IMAGE;
+  }
+  if (typeString == "mp4") {
+    return UrlType.VIDEO;
+  } else {
+    return UrlType.UNKNOWN;
   }
 }

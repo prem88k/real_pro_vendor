@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:real_pro_vendor/Screens/LoginPageVendor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Constants/Colors.dart';
 import '../Presentation/BottomNavigationBarVendor.dart';
@@ -143,7 +144,7 @@ class _SplashScreenState extends State<SplashScreen>
         context,
         MaterialPageRoute(
           builder: (context) {
-            return IntroductionScreen();
+            return LoginPageVendor();
           },
         ),
       );
@@ -162,7 +163,7 @@ class _SplashScreenState extends State<SplashScreen>
           context,
           MaterialPageRoute(
             builder: (context) {
-              return IntroductionScreen();
+              return LoginPageVendor();
             },
           ),
         );

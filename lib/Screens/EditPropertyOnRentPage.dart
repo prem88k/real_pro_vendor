@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:convert';
+import 'package:place_picker/place_picker.dart';
 import 'package:http/http.dart';
 import 'package:real_pro_vendor/Presentation/BottomNavigationBarVendor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,6 +55,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
 
   bool isloading = false;
   bool catloading = false;
+  String ?locationName;
 
   final TextEditingController _houseTitleController = TextEditingController();
   final TextEditingController _floorController = TextEditingController();
@@ -63,6 +65,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
   final TextEditingController _feature1Controller = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _configController = TextEditingController();
 
   late String placeid;
   String googleApikey = "AIzaSyCkW__vI2DazIWYjIMigyxwDtc_kyCBVIo";
@@ -95,7 +98,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
 
 
 
-  void _onJobLanguage(AmenitiesList amenitiesList, int? id) {
+  void _onAmenititesLanguage(AmenitiesList amenitiesList, int? id) {
     print(_selectedAmenities.map((e) => e.name));
 
     print(_selectedAmenities.contains(amenitiesList));
@@ -276,16 +279,35 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
 
     getPropertyDetails.data![0].categoryId == null ?
      propertyType : propertyType = getPropertyDetails.data![0].categoryId.toString();
+    if(getPropertyDetails.data![0].categoryId != null)
+      {
+        getCategory(propertyType!);
 
+      }
     getPropertyDetails.data![0].category!.id == null ?
      categoryType : categoryType = getPropertyDetails.data![0].category!.id.toString();
+    if(getPropertyDetails.data![0].category!.id!=null)
+      {
+        catList!.where((element) => element.id==getPropertyDetails.data![0].category!.id).forEach((element) {
+          setState(() {
+            categoryName=element.name;
+          });
+        });
+      }
 
     commercialType = getPropertyDetails.data![0].purpose.toString();
 
     getPropertyDetails.data![0].cityId == null ?
     "City" :
     dropdownCityValue = getPropertyDetails.data![0].cityId.toString();
-
+    if(getPropertyDetails.data![0].cityId != null)
+      {
+        getArea(getPropertyDetails.data![0].cityId.toString());
+      }
+    if(getPropertyDetails.data![0].areaId != null)
+      {
+        getTower(getPropertyDetails.data![0].areaId.toString());
+      }
     getPropertyDetails.data![0].areaId == null ?
      "Area" :
     dropdownAreaValue = getPropertyDetails.data![0].areaId.toString();
@@ -293,7 +315,11 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     getPropertyDetails.data![0].towerId == null ?
     "Tower" :
     dropdownTowerValue = getPropertyDetails.data![0].towerId.toString();
-
+    furnishType=getPropertyDetails.data![0].furniture.toString();
+    setState(() {
+      _selectedAmenities.addAll(getPropertyDetails.data![0].amenities!);
+    });
+    print(_selectedAmenities!.map((e) => e.name));
   /*  _controllers = _fields.map((item) => TextEditingController(text: )).toList();*/
 
   }
@@ -347,7 +373,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                               color: primaryColor,
                               fontFamily: 'work',
                               fontSize: ScreenUtil().setHeight(14),
-                              fontWeight: FontWeight.w500),
+                              fontWeight: FontWeight.w600),
                         ),
                       ),
                       SizedBox(
@@ -444,7 +470,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                           color: primaryColor,
                           fontFamily: 'work',
                           fontSize: ScreenUtil().setHeight(14),
-                          fontWeight: FontWeight.w500),
+                          fontWeight: FontWeight.w600),
                     ),
                   ),
 
@@ -632,7 +658,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                   ),
 
                   //tower
-                  Column(
+                  categoryName=="Villa"||categoryName=="Townhouse"||categoryName=="Bungalow"||categoryName==null?Container():Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -745,41 +771,8 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                         ),
                         child: Center(
                           child: InkWell(
-                              onTap: () async {
-                                var place = await PlacesAutocomplete.show(
-                                    context: context,
-                                    apiKey: googleApikey,
-                                    mode: Mode.overlay,
-                                    types: [],
-                                    strictbounds: false,
-                                    components: [Component(Component.country, 'ae')],
-                                    //google_map_webservice package
-                                    onError: (err){
-                                      print(err);
-                                    }
-                                );
-                                if(place != null){
-                                  final plist = GoogleMapsPlaces(
-                                    apiKey:googleApikey,
-                                    apiHeaders: await GoogleApiHeaders().getHeaders(),
-                                    //from google_api_headers package
-                                  );
-                                  placeid = place.placeId ?? "0";
-                                  final detail = await plist.getDetailsByPlaceId(placeid);
-                                  final geometry = detail.result.geometry!;
-                                  final lat = geometry.location.lat;
-                                  final lang = geometry.location.lng;
-                                  setState(() {
-                                    _locationController.text = place.description.toString();
-                                    pickUpLat=lat;
-                                    pickUpLong=lang;
-                                    print(place.description);
-
-                                    var newlatlang = LatLng(lat, lang);
-                                    //move map camera to selected place with animation
-                                    mapController?.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: newlatlang, zoom: 17)));
-                                  });
-                                }
+                              onTap: () {
+                                showPlacePicker();
                               },
                               child:Padding(
                                 padding: EdgeInsets.all(0),
@@ -789,15 +782,19 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        /*_locationController.text.isEmpty != null ?
-                                        getPropertyDetails.data![0].location.toString():*/
-                                        _locationController.text,
-                                        style: TextStyle(
-                                            fontFamily: 'work',
-                                            fontSize: ScreenUtil().setHeight(14),
-                                            fontWeight: FontWeight.normal,
-                                            color: primaryColor),),
+                                      Expanded(
+                                        child: Text(
+                                          /*_locationController.text.isEmpty != null ?
+                                          getPropertyDetails.data![0].location.toString():*/
+                                          _locationController.text,
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                              fontFamily: 'work',
+                                              fontSize: ScreenUtil().setHeight(14),
+                                              overflow: TextOverflow.ellipsis,
+                                              fontWeight: FontWeight.normal,
+                                              color: primaryColor),),
+                                      ),
 
                                       Icon(Icons.my_location,
                                           color: appColor, size: ScreenUtil().setHeight(14)),
@@ -815,6 +812,58 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                   ),
                   SizedBox(
                     height: ScreenUtil().setHeight(10),
+                  ),
+                  categoryName=="Apartments"||categoryName=="Penthouse"||categoryName=="Hotel Apartments"||categoryName==null?Container(): Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text("Configuration",
+                            style: TextStyle(
+                                fontSize: ScreenUtil()
+                                    .setHeight(12),
+                                color: primaryColor,
+                                fontFamily: 'work',
+                                fontWeight:
+                                FontWeight.w400)),
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(5),
+                      ),
+                      TextFormField(
+                        controller: _configController,
+                        keyboardType: TextInputType.text,
+                        textAlignVertical: TextAlignVertical.center,
+
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setHeight(13),
+                          color: primaryColor,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'work',
+                        ),
+                        validator: (value) {
+
+                          if (value == null || _configController.text.isEmpty) {
+                            return 'This field is required';
+                          }
+
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          filled: false,
+                          hintText: "Example - G +1",
+                          hintStyle: TextStyle(
+                              fontFamily: 'work',
+                              fontSize: ScreenUtil().setHeight(13),
+                              fontWeight: FontWeight.w400,
+                              color: lightTextColor),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color: textFieldBorderColor),
+                              borderRadius: BorderRadius.circular(10)),
+                          contentPadding: EdgeInsets.only(left: ScreenUtil().setWidth(20), top: ScreenUtil().setHeight(10)),
+                        ),
+                      ),
+                    ],
                   ),
 
                   Divider(
@@ -839,7 +888,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                 color: primaryColor,
                                 fontFamily: 'work',
                                 fontWeight:
-                                FontWeight.w400)),
+                                FontWeight.w600)),
                       ),
                     ],
                   ),
@@ -1194,7 +1243,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                     height: ScreenUtil().setHeight(10),
                   ),
 
-                  Column(
+                  categoryName=="Villa"||categoryName=="Townhouse"||categoryName=="Bungalow"||categoryName==null?Container():  Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1248,19 +1297,20 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        child: Text("Villa Feature",
+                        child: Text("Property Feature",
                             style: TextStyle(
                                 fontSize: ScreenUtil()
                                     .setHeight(14),
                                 color: primaryColor,
                                 fontFamily: 'work',
                                 fontWeight:
-                                FontWeight.w400)),
+                                FontWeight.w600)),
                       ),
-                      _listView(),
                       SizedBox(
                         height: ScreenUtil().setHeight(10),
                       ),
+                      _listView(),
+
                       _featureListView()
                     ],
                   ),
@@ -1327,7 +1377,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                                 padding: const EdgeInsets.all(5.0),
                                 child: GestureDetector(
                                   onTap: () {
-                                    _onJobLanguage(value, value.id);
+                                    _onAmenititesLanguage(value, value.id);
                                   },
                                   child: Chip(
                                     padding: EdgeInsets.all(5.0),
@@ -1541,8 +1591,8 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
                 ],
               ),
             ),
-          ),
-    );
+          ));
+
   }
 
   Widget _listView() {
@@ -1993,6 +2043,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
       if (getdata["status"]) {
         gecategoryData = GecategoryData.fromJson(jsonDecode(responseBody));
         catList!.addAll(gecategoryData.data!);
+        catList!.removeWhere((element) => element.id==0);
         setState(() {
 
         });
@@ -2245,8 +2296,9 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
         getPropertyDetails =
             GetPropertyDetails.fromJson(jsonDecode(responseBody));
         details!.addAll(getPropertyDetails.data!);
+        getPostData();
+
         setState(() {
-          getPostData();
         });
       } else {}
     }
@@ -2412,6 +2464,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
   Widget _featureListView() {
     return ListView.builder(
       shrinkWrap: true,
+      padding: EdgeInsets.all(0),
       physics: NeverScrollableScrollPhysics(),
       itemCount: _fields.length,
       itemBuilder: (context, index) {
@@ -2421,7 +2474,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
           children: [
             Padding(
               padding: EdgeInsets.only(
-                  top: ScreenUtil().setHeight(5),
+                  top: ScreenUtil().setHeight(0),
                   bottom: ScreenUtil().setHeight(5)
               ),
               child: Container(
@@ -2575,6 +2628,23 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
         );
       },
     );
+  }
+
+  void showPlacePicker() async {
+    LocationResult? result = await Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => PlacePicker("AIzaSyCkW__vI2DazIWYjIMigyxwDtc_kyCBVIo",defaultLocation: LatLng(25.2048, 55.2708),displayLocation:LatLng(25.2048, 55.2708) ,),));
+    setState(() {
+      locationName=result!.formattedAddress;
+      _locationController.text=result.formattedAddress!;
+      pickUpLong=result.latLng!.longitude;
+      pickUpLat=result.latLng!.latitude;
+
+    });
+    // Handle the result in your way
+    print(result!.formattedAddress.toString());
+    print(result.latLng!.longitude);
+    print(result.latLng!.latitude);
+
   }
 }
 

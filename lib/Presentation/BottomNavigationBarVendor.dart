@@ -131,69 +131,75 @@ class _BottomNavigationBarVendorState extends State<BottomNavigationBarVendor> {
           ),*/
           Text('Real Pro',
               style: TextStyle(
-                  fontFamily: 'railway',
+                  fontFamily: 'work',
                   fontSize: size.height * 0.02,
                   color: appColor,
                   fontWeight: FontWeight.bold))
         ]),
-        content: Text("Are You Sure, You Want To Exit the App?",
+        content: Text("Do you want to exit from the app?",
             style: TextStyle(
-                fontFamily: 'railway',
+                fontFamily: 'work',
                 fontSize: size.height * 0.022,
                 color: appColor,
                 fontWeight: FontWeight.normal)),
         actions: <Widget>[
-          MaterialButton(
-            child: Container(
-              height: size.height * 0.050,
-              width:size.width * 0.25,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  border: Border.all(color: appColor),
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                  color: appColor
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              MaterialButton(
+                child: Container(
+                  height: size.height * 0.050,
+                  width:size.width * 0.25,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      border: Border.all(color: appColor),
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      color: appColor
+                  ),
+                  child: Text(
+                    "YES",
+                    style: TextStyle(
+                        fontFamily: 'work',
+                        fontSize: size.height * 0.015,
+                        color: secondaryColor,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                onPressed: () {
+                  //Put your code here which you want to execute on Yes button click.
+                  if (Platform.isAndroid) {
+                    SystemNavigator.pop();
+                  } else if (Platform.isIOS) {
+                    exit(0);
+                  }
+                },
               ),
-              child: Text(
-                "YES",
-                style: TextStyle(
-                    fontFamily: 'railway',
-                    fontSize: size.height * 0.015,
-                    color: secondaryColor,
-                    fontWeight: FontWeight.bold),
+              MaterialButton(
+                child: Container(
+                  height: size.height * 0.050,
+                  width:size.width * 0.25,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      border: Border.all(color: appColor),
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      color: appColor
+                  ),
+                  child: Text(
+                    "CANCEL",
+                    style: TextStyle(
+                        fontFamily: 'work',
+                        fontSize: size.height * 0.015,
+                        color: secondaryColor,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                onPressed: () {
+                  //Put your code here which you want to execute on Cancel button click.
+                  Navigator.of(context).pop();
+                },
               ),
-            ),
-            onPressed: () {
-              //Put your code here which you want to execute on Yes button click.
-              if (Platform.isAndroid) {
-                SystemNavigator.pop();
-              } else if (Platform.isIOS) {
-                exit(0);
-              }
-            },
-          ),
-          MaterialButton(
-            child: Container(
-              height: size.height * 0.050,
-              width:size.width * 0.25,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  border: Border.all(color: appColor),
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                  color: appColor
-              ),
-              child: Text(
-                "CANCEL",
-                style: TextStyle(
-                    fontFamily: 'railway',
-                    fontSize: size.height * 0.015,
-                    color: secondaryColor,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-            onPressed: () {
-              //Put your code here which you want to execute on Cancel button click.
-              Navigator.of(context).pop();
-            },
+
+            ],
           ),
         ],
       ),

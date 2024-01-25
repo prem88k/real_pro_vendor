@@ -4,14 +4,19 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart';
+import 'package:real_pro_vendor/Screens/AddInfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Constants/Colors.dart';
 import '../Constants/Api.dart';
+import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+
 import '../Presentation/BottomNavigationBarVendor.dart';
 import '../Presentation/common_button.dart';
 import '../Presentation/common_textfeild.dart';
@@ -107,7 +112,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                     ),
                   ),
                 ),
-                SizedBox(
+           /*     SizedBox(
                   height: ScreenUtil().setHeight(8),
                 ),
                 Container(
@@ -121,7 +126,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                ),
+                )*/
                 SizedBox(
                   height: ScreenUtil().setHeight(25),
                 ),
@@ -183,9 +188,32 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: ScreenUtil().setHeight(15),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return ForgotPasswordPage();
+                        },
+                      ),
+                    );
+                  },
+                  child: Container(
+                    alignment: Alignment.centerRight,
+                    height: ScreenUtil().setHeight(30),
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        color: appColor,
+                        fontSize: ScreenUtil().setWidth(12),
+                        fontFamily: 'work',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
+
                 isloading
                     ? CircularProgressIndicator(
                         color: appColor,
@@ -254,37 +282,51 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                           color: appColor,
                         ),
                       ),
+
+
+                SizedBox(height: ScreenUtil().setHeight(10)),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return ForgotPasswordPage();
+                          return RegistrationPageVendor("","");
                         },
                       ),
                     );
                   },
                   child: Container(
-                    alignment: Alignment.centerRight,
                     height: ScreenUtil().setHeight(40),
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        color: appColor,
-                        fontSize: ScreenUtil().setWidth(12),
-                        fontFamily: 'work',
-                        fontWeight: FontWeight.bold,
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'You dont have any account?',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: ScreenUtil().setWidth(12),
+                              fontFamily: 'work',
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            ' Register Now',
+                            style: TextStyle(
+                              color: appColor,
+                              fontSize: ScreenUtil().setWidth(14),
+                              fontFamily: 'work',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: ScreenUtil().setHeight(15),
-                ),
-                SizedBox(
-                  height: ScreenUtil().setHeight(15),
-                ),
+                SizedBox(height: ScreenUtil().setHeight(10)),
+
                 Container(
                   child: Row(children: <Widget>[
                     Expanded(
@@ -317,7 +359,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                   height: ScreenUtil().setHeight(15),
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: !Platform.isIOS?MainAxisAlignment.center:MainAxisAlignment.spaceEvenly,
                   children: [
                     GestureDetector(
                       onTap: () {
@@ -391,39 +433,44 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                       ),
                     ),
                     SizedBox(width: ScreenUtil().setWidth(5)),
-                    Container(
-                      height: ScreenUtil().setHeight(65),
-                      width: ScreenUtil().setWidth(90),
-                      decoration: BoxDecoration(
-                          color: secondaryColor,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "assets/images/apple.png",
-                            width: ScreenUtil().setHeight(20),
-                            height: ScreenUtil().setHeight(20),
-                            fit: BoxFit.contain,
-                          ),
-                          SizedBox(
-                            height: ScreenUtil().setHeight(10),
-                          ),
-                          Text(
-                            'Apple',
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: ScreenUtil().setWidth(12),
-                              fontFamily: 'work',
-                              fontWeight: FontWeight.w400,
+                    !Platform.isIOS?Container():GestureDetector(
+                      onTap: (){
+                        _appleLogin();
+                      },
+                      child: Container(
+                        height: ScreenUtil().setHeight(65),
+                        width: ScreenUtil().setWidth(90),
+                        decoration: BoxDecoration(
+                            color: secondaryColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/images/apple.png",
+                              width: ScreenUtil().setHeight(20),
+                              height: ScreenUtil().setHeight(20),
+                              fit: BoxFit.contain,
                             ),
-                          ),
-                        ],
+                            SizedBox(
+                              height: ScreenUtil().setHeight(10),
+                            ),
+                            Text(
+                              'Apple',
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontSize: ScreenUtil().setWidth(12),
+                                fontFamily: 'work',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: ScreenUtil().setHeight(25)),
+                SizedBox(height: ScreenUtil().setHeight(2)),
 
                 /*   Container(
                   child: Row(children: <Widget>[
@@ -563,47 +610,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                     ),
                   ],
                 ),*/
-                SizedBox(height: ScreenUtil().setHeight(20)),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return RegistrationPageVendor();
-                        },
-                      ),
-                    );
-                  },
-                  child: Container(
-                    height: ScreenUtil().setHeight(40),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'You dont have any account?',
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: ScreenUtil().setWidth(12),
-                              fontFamily: 'work',
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          Text(
-                            ' Register Now',
-                            style: TextStyle(
-                              color: appColor,
-                              fontSize: ScreenUtil().setWidth(14),
-                              fontFamily: 'work',
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+
                 SizedBox(
                   height: ScreenUtil().setHeight(15),
                 ),
@@ -678,27 +685,37 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
         prefs.setBool("isLogging", true);
 
         /*bookTable();*/
-        Future.delayed(const Duration(milliseconds: 1000), () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return BottomNavigationBarVendor();
-              },
-            ),
-          );
-        });
+        if(getdata["isLogin"])
+          {
+            Future.delayed(const Duration(milliseconds: 1000), () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return BottomNavigationBarVendor();
+                  },
+                ),
+              );
+            });
+          }
+        else
+          {
+            Future.delayed(const Duration(milliseconds: 2000), () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => RegistrationPageVendor(name,email)));
+            });
+          }
       } else {
         setState(() {
           isloading = false;
         });
-        Message(context, getdata["data"]["message"]);
+        ErrorMessage(context, getdata["data"]["message"]);
       }
     } else {
       setState(() {
         isloading = false;
       });
-      Message(context, getdata["message"]);
+      ErrorMessage(context, getdata["message"]);
     }
   }
 
@@ -792,8 +809,8 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
     setState(() {
       isloading = true;
     });
-    String? token = await FirebaseMessaging.instance.getToken();
-    print("Tpkoen::$token");
+    /*String? token = await FirebaseMessaging.instance.getToken();
+    print("Tpkoen::$token");*/
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       setState(() {
@@ -820,7 +837,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
       'device_id': deviceId,
       'platform': deviceName,
       'email': email,
-      'fcm_token': token,
+     // 'fcm_token': token,
       'role': "agent",
     };
     String jsonBody = json.encode(body);
@@ -842,7 +859,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
         setState(() {
           isloading = false;
         });
-        Message(context, "Login Successfully");
+        Message(context,getdata["message"]);
         prefs.setString("access_token",
             "Bearer ${getdata["0"]["original"]["access_token"].toString()}");
         prefs.setString(
@@ -858,26 +875,206 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
         prefs.setString("profileImage",
             getdata["0"]["original"]["user"]["image"].toString());
         prefs.setBool("isLogging", true);
-        Future.delayed(const Duration(milliseconds: 2000), () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => RegistrationPageVendor()));
-        });
+        if(getdata["isLogin"])
+        {
+          print(getdata["isLogin"]);
+          Future.delayed(const Duration(milliseconds: 1000), () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return BottomNavigationBarVendor();
+                },
+              ),
+            );
+          });
+        }
+        else
+        {
+          print("--false---");
+          print(getdata["isLogin"]);
 
+          Future.delayed(const Duration(milliseconds: 2000), () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => AddInfo(name,email)));
+          });
+        }
         /*bookTable();*/
       } else {
         setState(() {
           isloading = false;
         });
-        Message(context, getdata["message"]);
+        ErrorMessage(context, getdata["message"]);
       }
     } else {
       setState(() {
         isloading = false;
       });
-      Message(context, getdata["message"]);
+      ErrorMessage(context, getdata["message"]);
     }
   }
-}
+
+  Future<void> _appleLogin() async {
+
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+      webAuthenticationOptions: WebAuthenticationOptions(
+        // TODO: Set the `clientId` and `redirectUri` arguments to the values you entered in the Apple Developer portal during the setup
+        clientId:
+        'de.lunaone.flutter.signinwithappleexample.service',
+
+        redirectUri:
+        // For web your redirect URI needs to be the host of the "current page",
+        // while for Android you will be using the API server that redirects back into your app via a deep link
+        Uri.parse(
+          'https://flutter-sign-in-with-apple-example.glitch.me/callbacks/sign_in_with_apple',
+        ),
+      ),
+      // TODO: Remove these if you have no need for them
+      nonce: 'example-nonce',
+      state: 'example-state',
+    );
+
+    // ignore: avoid_print
+    print("abc::${credential.userIdentifier}");
+    print("abc::${credential.authorizationCode}");
+    print("abc::${credential.givenName}");
+    print("abc::${credential.identityToken}");
+
+    appleLoginAPI(credential.userIdentifier,credential.givenName!=null?credential.givenName!:"anonymous",credential.email!=null?credential.email!:"anonymous@gmail.com");
+    // This is the endpoint that will convert an authorization code obtained
+    // via Sign in with Apple into a session in your system
+    final signInWithAppleEndpoint = Uri(
+      scheme: 'https',
+      host: 'flutter-sign-in-with-apple-example.glitch.me',
+      path: '/sign_in_with_apple',
+      queryParameters: <String, String>{
+        'code': credential.authorizationCode,
+        if (credential.givenName != null)
+          'firstName': credential.givenName!,
+        if (credential.familyName != null)
+          'lastName': credential.familyName!,
+        'useBundleId':
+        !kIsWeb && (Platform.isIOS || Platform.isMacOS)
+            ? 'true'
+            : 'false',
+        if (credential.state != null) 'state': credential.state!,
+      },
+    );
+
+    final session = await http.Client().post(
+      signInWithAppleEndpoint,
+    );
+
+    // If we got this far, a session based on the Apple ID credential has been created in your system,
+    // and you can now set this as the app's session
+    // ignore: avoid_print
+    print(session);
+
+  }
+
+  Future<void> appleLoginAPI(
+      String? accessToken, String? name, String? email) async {
+    setState(() {
+      isloading = true;
+    });
+    /*   String? token = await FirebaseMessaging.instance.getToken();
+    print("Tpkoen::$token");*/
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      setState(() {
+        deviceName = 'android';
+        deviceId = androidInfo.id;
+        print("DeviceId::$deviceId");
+      });
+    } else {
+      var iosdeviceinfo = await deviceInfo.iosInfo;
+      setState(() {
+        deviceName = 'ios';
+        deviceId = iosdeviceinfo.identifierForVendor!;
+      });
+    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/auth/user/apple/login',
+    );
+    final headers = {'Accept': 'application/json'};
+    Map<String, dynamic> body = {
+      'name': name,
+      'social_id': accessToken,
+      'device_id': deviceId,
+      'platform': deviceName,
+      'email': email,
+      'fcm': "dkjsdksldks",
+    };
+    String jsonBody = json.encode(body);
+    final encoding = Encoding.getByName('utf-8');
+
+    Response response = await post(
+      uri,
+      headers: headers,
+      body: body,
+      encoding: encoding,
+    );
+    var getdata = json.decode(response.body);
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    print("responseStepSocial::$responseBody");
+    if (statusCode == 200) {
+      if (getdata["status"]) {
+        setState(() {
+          isloading = false;
+        });
+
+        Message(context, "Login Successfully");
+        prefs.setString("access_token",
+            "Bearer ${getdata["0"]["original"]["access_token"].toString()}");
+        prefs.setString(
+            "name", getdata["0"]["original"]["user"]["name"].toString());
+        prefs.setString(
+            "UserId", "${getdata["0"]["original"]["user"]["id"].toString()}");
+        prefs.setString(
+            "email", getdata["0"]["original"]["user"]["email"].toString());
+        prefs.setString(
+            "phone", getdata["0"]["original"]["user"]["mobile_number"].toString());
+        prefs.setString("phone",
+            getdata["0"]["original"]["user"]["mobile_number"].toString());
+        prefs.setBool("isLogging", true);
+        bool? isLogging = prefs.getBool("isHome");
+
+        print("=-----$isLogging");
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return BottomNavigationBarVendor();
+              },
+            ),
+          );
+        });
+        }
+      else {
+        setState(() {
+          isloading = false;
+        });
+        ErrorMessage(context, getdata["message"]);
+      }
+        /*bookTable();*/
+      } else {
+        setState(() {
+          isloading = false;
+        });
+        ErrorMessage(context, getdata["message"]);
+      }
+    }
+  }
+
 
 ScaffoldFeatureController<SnackBar, SnackBarClosedReason> Message(
     BuildContext context, String message) {
@@ -886,5 +1083,76 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> Message(
       content: Text(message),
       duration: Duration(milliseconds: 800),
     ),
+  );
+}
+
+Future ErrorMessage(
+    BuildContext context, String message) {
+  Size size = MediaQuery.of(context).size;
+
+  return showDialog(
+    builder: (context) => SimpleDialog(
+      children: <Widget>[
+        Center(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Container(
+                width: size.width*0.6,
+                child: Text(
+                  message,
+                  style: TextStyle(
+                      fontFamily: "work",
+                      fontWeight: FontWeight.w700,
+                      color: appColor,
+                      letterSpacing: 0.5,
+                      fontSize: 15.0),
+                ),
+              ),
+            )),
+        Container(
+          padding: EdgeInsets.only(top: 15.0),
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: size.height * 0.035,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                          alignment: Alignment.center,
+                          margin: EdgeInsets.all(size.width * 0.01),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: appColor,
+                          ),
+                          width: size.width * 0.25,
+                          height: size.height * 0.05,
+                          child: Center(
+                              child: Text(
+                                "Ok",
+                                style: TextStyle(
+                                    fontFamily: 'work',
+                                    fontSize: size.width * 0.04,
+                                    color: secondaryColor),
+                              ))),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        )
+
+      ],
+    ),
+    context: context,
+    barrierDismissible: true,
   );
 }

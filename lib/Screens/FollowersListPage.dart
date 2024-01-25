@@ -49,7 +49,14 @@ class _FollowersListPageState extends State<FollowersListPage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
+      body: followerList!.length==0?Center(
+        child: Text("No Data found!", style: TextStyle(
+            fontSize: ScreenUtil().setHeight(15),
+        fontWeight: FontWeight.w600,
+        color: primaryColor,
+        fontFamily: 'work',
+    ),),
+      ):SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.only(
             left: ScreenUtil().setWidth(10),

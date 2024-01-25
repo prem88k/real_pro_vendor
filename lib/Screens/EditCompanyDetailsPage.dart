@@ -319,7 +319,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
       isloading = true;
     });
     final headers = {'Accept': 'application/json'};
-    String? token = await FirebaseMessaging.instance.getToken();
+   // String? token = await FirebaseMessaging.instance.getToken();
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var url = Uri.https(
@@ -334,7 +334,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
     request.fields['broker_orn'] =_brokerOrnController.text;
     request.fields['country_code'] ="+971";
 
-    /*if(image!=null)
+    if(image!=null)
     {
       request.files.add(
         await http.MultipartFile.fromPath(
@@ -342,7 +342,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
           image!.path,
         ),
       );
-    }*/
+    }
 
     request.send().then((response) {
         if (response.statusCode == 200) print("Uploaded!");

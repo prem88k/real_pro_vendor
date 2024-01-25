@@ -232,7 +232,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       setState(() {
         isloading = false;
       });
-      Message(context, getdata["message"]);
+      ErrorMessage(context, getdata["message"]);
     }
   }
 }

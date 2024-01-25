@@ -30,6 +30,7 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _brnController = TextEditingController();
   bool isloading=false;
+  final TextEditingController _aboutController = TextEditingController();
 
   bool isVisibleV = false;
   File? image;
@@ -102,94 +103,6 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
                 height: ScreenUtil().setHeight(25),
               ),
 
-              GestureDetector(
-                onTap: (){
-                  selectPhoto();
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  child:
-                  profileImage!=null?
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(
-                     profileImage,
-                    ),
-                    radius: 50,
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: GestureDetector(
-                        onTap: () {
-                          //  getImage1();
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(05),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: primaryColor),
-                              color: secondaryColor,
-                              borderRadius: BorderRadius.circular(100)),
-                          child: Icon(
-                            Icons.add_a_photo,
-                            color: appColor,
-                            size: ScreenUtil().setHeight(17),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ): image==null?
-                  CircleAvatar(
-                    backgroundImage: AssetImage(
-                      "assets/images/dp.png",
-                    ),
-                    radius: 50,
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: GestureDetector(
-                        onTap: () {
-                          //  getImage1();
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(05),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: primaryColor),
-                              color: secondaryColor,
-                              borderRadius: BorderRadius.circular(100)),
-                          child: Icon(
-                            Icons.add_a_photo,
-                            color: appColor,
-                            size: ScreenUtil().setHeight(17),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ):
-                  CircleAvatar(
-                    backgroundImage: FileImage(
-                      image!,
-                    ),
-                    radius: 50,
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: GestureDetector(
-                        onTap: () {
-                          //  getImage1();
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(05),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: primaryColor),
-                              color: secondaryColor,
-                              borderRadius: BorderRadius.circular(100)),
-                          child: Icon(
-                            Icons.add_a_photo,
-                            color: appColor,
-                            size: ScreenUtil().setHeight(17),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
 
               SizedBox(
                 height: ScreenUtil().setHeight(15),
@@ -293,6 +206,32 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
                   ],
                 ),
               ),
+              SizedBox(
+                height: ScreenUtil().setHeight(7),
+              ),
+
+              Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: Text(
+                        'About Me',
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontSize: ScreenUtil().setWidth(12),
+                          fontFamily: 'work',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    TextFieldUpload(
+                      title: widget.getCountData.user!.description != null ? widget.getCountData.user!.description.toString() : "About Me",
+                      controller: _aboutController,
+                    ),
+                  ],
+                ),
+              ),
 
               /*  TextFieldUpload(
                 title: 'Agency Name',
@@ -349,7 +288,7 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
       isloading = true;
     });
     final headers = {'Accept': 'application/json'};
-    String? token = await FirebaseMessaging.instance.getToken();
+    //String? token = await FirebaseMessaging.instance.getToken();
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var url = Uri.https(
@@ -361,6 +300,7 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
     request.fields['email'] =prefs.getString('email')!;
     request.fields['mobile_number'] =_mobileController.text;
     request.fields['name'] = _nameController.text;
+    request.fields['description'] = _aboutController.text;
     request.fields['agent_brn'] =_brnController.text;
     request.fields['agency_name'] = _agencyNameController.text;
     request.fields['country_code'] ="+971";

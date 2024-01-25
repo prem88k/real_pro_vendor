@@ -251,7 +251,7 @@ class _ForgotPasswordChangePageState extends State<ForgotPasswordChangePage> {
       setState(() {
         isloading = false;
       });
-      Message(context, getdata["data"]["message"]);
+      ErrorMessage(context, getdata["data"]["message"]);
     }
   }
 

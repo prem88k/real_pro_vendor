@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "996579167363-v963f4f2mahde2vljlcpg27a3ns2fmra.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.realpro",
+            "certificate_hash": "0d69557ebb52f5ba0f13e2405a2036a6df131212"
+          }
+        },
+        {
           "client_id": "996579167363-f58lhaog2v11garc8rcbhabn9kl0er61.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -118,6 +126,30 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "996579167363-0ja84g902fpusp6njur0r69n9j1poiqg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.realpro.vendor",
+            "certificate_hash": "7be2e5ccdb06f8961584d8a1ad93bbee83af0099"
+          }
+        },
+        {
+          "client_id": "996579167363-3c055nig12p776a465sgbau5v7gh6guf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.realpro.vendor",
+            "certificate_hash": "1005ca7ff78a64123caeee6dd865a220ddce0780"
+          }
+        },
+        {
+          "client_id": "996579167363-64u1008sgmql9l7vu2tlbovvbio8m3a2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.realpro.vendor",
+            "certificate_hash": "0d69557ebb52f5ba0f13e2405a2036a6df131212"
+          }
+        },
         {
           "client_id": "996579167363-f58lhaog2v11garc8rcbhabn9kl0er61.apps.googleusercontent.com",
           "client_type": 3

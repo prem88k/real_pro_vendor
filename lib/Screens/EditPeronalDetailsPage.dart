@@ -538,7 +538,7 @@ class _EditPeronalDetailsPageState extends State<EditPeronalDetailsPage> {
       isloading = true;
     });
     final headers = {'Accept': 'application/json'};
-    String? token = await FirebaseMessaging.instance.getToken();
+    //String? token = await FirebaseMessaging.instance.getToken();
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var url = Uri.https(

@@ -9,6 +9,8 @@ import '../../Constants/Colors.dart';
 class TextFieldWidget extends StatefulWidget {
   final String title;
   bool obs;
+  bool isEnable;
+
   bool isPassword;
   bool isReadOnly;
   final String? Function(String?) validator;
@@ -18,6 +20,7 @@ class TextFieldWidget extends StatefulWidget {
     required this.title,
     required this.controller,
     this.obs = false,
+    this.isEnable = true,
     this.isPassword=false,
     this.isReadOnly=false,
     required this.validator,
@@ -42,6 +45,7 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
           child: TextFormField(
             maxLines: widget.title=="What is your concern?"?5:1,
             minLines: widget.title=="What is your concern?"?5:1,
+            enabled: widget.isEnable,
             textAlignVertical: TextAlignVertical.center,
               style: TextStyle(
                 fontSize: ScreenUtil().setWidth(12.5),

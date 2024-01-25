@@ -46,9 +46,9 @@ class User {
   String? email;
   String? fcm;
   String? deviceType;
-  Null? appleId;
-  Null? deviceId;
-  Null? platform;
+  String? appleId;
+  String? deviceId;
+  String? platform;
   String? role;
   String? countryCode;
   String? mobileNumber;

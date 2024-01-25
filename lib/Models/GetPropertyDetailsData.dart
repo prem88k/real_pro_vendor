@@ -1,3 +1,7 @@
+
+import 'GetAmenitiesData.dart';
+import 'GetPropertyData.dart';
+
 class GetPropertyDetails {
   bool? status;
   List<PropertyDetails>? data;
@@ -33,18 +37,29 @@ class PropertyDetails {
   String? propertyAddress;
   String? location;
   int? bedroomCount;
+  int? totalComment;
   int? kitchenCount;
   int? bathroomCount;
+  String?furniture;
   String? description;
   List<String>? vilaFeature;
   String? type;
   int? propertySize;
-  String? lat;
-  String? lang;
   String? purpose;
   String? refNum;
   String? addon;
-  List<Amenities>? amenities;
+  String? lat;
+  String? lang;
+
+  List<AmenitiesList>? amenities;
+  int? isverified;
+  String? thamblain;
+  List<ImagesList>? images;
+  Null? privacyPolicy;
+  String? createdAt;
+  int? shopId;
+  CreatedBy? createdBy;
+  Amenities? category;
   String? city;
   String? area;
   String? tower;
@@ -54,21 +69,12 @@ class PropertyDetails {
   int? towerId;
   int? propertyTypeId;
   String? floor;
-  int? isverified;
-  String? thamblain;
-  List<ImagesList>? images;
-  String? privacyPolicy;
-  String? createdAt;
-  int? shopId;
-  CreatedBy? createdBy;
-  Category? category;
-  List<Comment>? comment;
-  int? totalcomment;
   int? like;
   int? isPost;
   bool? liked;
-  int? view;
-  int? salePrice;
+  Null? view;
+  Null? salePrice;
+  List<Comment>? comment;
   bool? collected;
 
   PropertyDetails(
@@ -77,6 +83,9 @@ class PropertyDetails {
         this.categoryId,
         this.propertyName,
         this.price,
+        this.furniture,
+        this.lat,
+        this.lang,
         this.propertyAddress,
         this.location,
         this.bedroomCount,
@@ -85,22 +94,21 @@ class PropertyDetails {
         this.description,
         this.vilaFeature,
         this.type,
-        this.propertySize,
-        this.lat,
-        this.lang,
-        this.purpose,
-        this.refNum,
-        this.addon,
-        this.amenities,
         this.city,
-        this.area,
-        this.tower,
+        this.area,this.tower,
         this.propertyType,
         this.cityId,
         this.areaId,
         this.towerId,
         this.propertyTypeId,
         this.floor,
+        this.propertySize,
+        this.purpose,
+        this.refNum,
+        this.totalComment,
+        this.comment,
+        this.addon,
+        this.amenities,
         this.isverified,
         this.thamblain,
         this.images,
@@ -109,8 +117,6 @@ class PropertyDetails {
         this.shopId,
         this.createdBy,
         this.category,
-        this.comment,
-        this.totalcomment,
         this.like,
         this.isPost,
         this.liked,
@@ -124,35 +130,43 @@ class PropertyDetails {
     categoryId = json['category_id'];
     propertyName = json['property_name'];
     price = json['price'];
+    lat=json['lat'];
+    lang=json['lang'];
+    furniture=json['furniture'];
+    propertyType = json['property_type'];
+    cityId = json['city_id'];
+    areaId = json['area_id'];
+    towerId = json['tower_id'];
+    propertyTypeId = json['property_type_id'];
+    floor = json['floor'];
     propertyAddress = json['property_address'];
     location = json['location'];
+    totalComment=json['totalcomment'];
     bedroomCount = json['bedroom_count'];
     kitchenCount = json['kitchen_count'];
+    city=json['city'];
+    area=json['area'];
+    tower=json['tower'];
     bathroomCount = json['bathroom_count'];
     description = json['description'];
     vilaFeature = json['vila_feature'].cast<String>();
+    if (json['comment'] != null) {
+      comment = <Comment>[];
+      json['comment'].forEach((v) {
+        comment!.add(new Comment.fromJson(v));
+      });
+    }
     type = json['type'];
     propertySize = json['property_size'];
-    lat = json['lat'];
-    lang = json['lang'];
     purpose = json['purpose'];
     refNum = json['ref_num'];
     addon = json['addon'];
     if (json['amenities'] != null) {
-      amenities = <Amenities>[];
+      amenities = <AmenitiesList>[];
       json['amenities'].forEach((v) {
-        amenities!.add(new Amenities.fromJson(v));
+        amenities!.add(new AmenitiesList.fromJson(v));
       });
     }
-    city = json['city'];
-    area = json['area'];
-    tower = json['tower'];
-    propertyType = json['property_type'];
-    cityId = json['city_id'];
-    areaId = json['area-id'];
-    towerId = json['tower_id'];
-    propertyTypeId = json['property_type_id'];
-    floor = json['floor'];
     isverified = json['isverified'];
     thamblain = json['thamblain'];
     if (json['images'] != null) {
@@ -168,15 +182,8 @@ class PropertyDetails {
         ? new CreatedBy.fromJson(json['created_by'])
         : null;
     category = json['category'] != null
-        ? new Category.fromJson(json['category'])
+        ? new Amenities.fromJson(json['category'])
         : null;
-    if (json['comment'] != null) {
-      comment = <Comment>[];
-      json['comment'].forEach((v) {
-        comment!.add(new Comment.fromJson(v));
-      });
-    }
-    totalcomment = json['totalcomment'];
     like = json['like'];
     isPost = json['is_post'];
     liked = json['liked'];
@@ -189,11 +196,15 @@ class PropertyDetails {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['user_id'] = this.userId;
+    data['lat']=this.lat;
+    data['lang']=this.lang;
     data['category_id'] = this.categoryId;
     data['property_name'] = this.propertyName;
     data['price'] = this.price;
+    data['furniture']=this.furniture;
     data['property_address'] = this.propertyAddress;
     data['location'] = this.location;
+    data['totalcomment']=this.totalComment;
     data['bedroom_count'] = this.bedroomCount;
     data['kitchen_count'] = this.kitchenCount;
     data['bathroom_count'] = this.bathroomCount;
@@ -201,27 +212,27 @@ class PropertyDetails {
     data['vila_feature'] = this.vilaFeature;
     data['type'] = this.type;
     data['property_size'] = this.propertySize;
-    data['lat'] = this.lat;
-    data['lang'] = this.lang;
     data['purpose'] = this.purpose;
     data['ref_num'] = this.refNum;
     data['addon'] = this.addon;
-    if (this.amenities != null) {
-      data['amenities'] = this.amenities!.map((v) => v.toJson()).toList();
-    }
-    data['city'] = this.city;
-    data['area'] = this.area;
-    data['tower'] = this.tower;
+    data['city']=this.city;
+    data['area']=this.area;
+    data['tower']=this.tower;
     data['property_type'] = this.propertyType;
     data['city_id'] = this.cityId;
     data['area-id'] = this.areaId;
     data['tower_id'] = this.towerId;
     data['property_type_id'] = this.propertyTypeId;
-    data['floor'] = this.floor;
+    data['floor'] = this.floor;    if (this.amenities != null) {
+      data['amenities'] = this.amenities!.map((v) => v.toJson()).toList();
+    }
     data['isverified'] = this.isverified;
     data['thamblain'] = this.thamblain;
     if (this.images != null) {
       data['images'] = this.images!.map((v) => v.toJson()).toList();
+    }
+    if (this.comment != null) {
+      data['comment'] = this.comment!.map((v) => v.toJson()).toList();
     }
     data['privacy_policy'] = this.privacyPolicy;
     data['created_at'] = this.createdAt;
@@ -232,10 +243,6 @@ class PropertyDetails {
     if (this.category != null) {
       data['category'] = this.category!.toJson();
     }
-    if (this.comment != null) {
-      data['comment'] = this.comment!.map((v) => v.toJson()).toList();
-    }
-    data['totalcomment'] = this.totalcomment;
     data['like'] = this.like;
     data['is_post'] = this.isPost;
     data['liked'] = this.liked;
@@ -293,32 +300,25 @@ class CreatedBy {
   int? newFollowers;
   int? comment;
   String? name;
+  String? companyName;
   String? email;
   String? fcm;
   String? deviceType;
-  Null? appleId;
-  Null? deviceId;
-  Null? platform;
+  String? appleId;
+  String? deviceId;
+  String? platform;
   String? role;
   String? countryCode;
   String? mobileNumber;
   String? image;
-  Null? coverPhoto;
-  Null? description;
+  String? coverPhoto;
+  String? description;
   int? emailVerify;
   String? uid;
   String? agentRef;
   String? agentBrn;
   String? dldNo;
   String? brokerOrn;
-  String? companyName;
-  String? companyAddress;
-  String? aboutCompany;
-  String? language;
-  String? experience;
-  Null? companyLogo;
-  String? nationality;
-  String? agencyName;
   String? location;
   int? socialLogin;
 
@@ -335,6 +335,7 @@ class CreatedBy {
         this.deviceId,
         this.platform,
         this.role,
+        this.companyName,
         this.countryCode,
         this.mobileNumber,
         this.image,
@@ -346,14 +347,6 @@ class CreatedBy {
         this.agentBrn,
         this.dldNo,
         this.brokerOrn,
-        this.companyName,
-        this.companyAddress,
-        this.aboutCompany,
-        this.language,
-        this.experience,
-        this.companyLogo,
-        this.nationality,
-        this.agencyName,
         this.location,
         this.socialLogin});
 
@@ -365,6 +358,7 @@ class CreatedBy {
     name = json['name'];
     email = json['email'];
     fcm = json['fcm'];
+    companyName=json['company_name'];
     deviceType = json['device_type'];
     appleId = json['apple_id'];
     deviceId = json['device_id'];
@@ -381,14 +375,6 @@ class CreatedBy {
     agentBrn = json['agent_brn'];
     dldNo = json['dld_no'];
     brokerOrn = json['broker_orn'];
-    companyName = json['company_name'];
-    companyAddress = json['company_address'];
-    aboutCompany = json['about_company'];
-    language = json['language'];
-    experience = json['experience'];
-    companyLogo = json['company_logo'];
-    nationality = json['nationality'];
-    agencyName = json['agency_name'];
     location = json['location'];
     socialLogin = json['social_login'];
   }
@@ -402,6 +388,7 @@ class CreatedBy {
     data['name'] = this.name;
     data['email'] = this.email;
     data['fcm'] = this.fcm;
+    data['company_name']=this.companyName;
     data['device_type'] = this.deviceType;
     data['apple_id'] = this.appleId;
     data['device_id'] = this.deviceId;
@@ -418,140 +405,8 @@ class CreatedBy {
     data['agent_brn'] = this.agentBrn;
     data['dld_no'] = this.dldNo;
     data['broker_orn'] = this.brokerOrn;
-    data['company_name'] = this.companyName;
-    data['company_address'] = this.companyAddress;
-    data['about_company'] = this.aboutCompany;
-    data['language'] = this.language;
-    data['experience'] = this.experience;
-    data['company_logo'] = this.companyLogo;
-    data['nationality'] = this.nationality;
-    data['agency_name'] = this.agencyName;
     data['location'] = this.location;
     data['social_login'] = this.socialLogin;
-    return data;
-  }
-}
-
-class Category {
-  int? id;
-  int? propertyId;
-  String? name;
-
-  Category({this.id, this.propertyId, this.name});
-
-  Category.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    propertyId = json['property_id'];
-    name = json['name'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['property_id'] = this.propertyId;
-    data['name'] = this.name;
-    return data;
-  }
-}
-
-class Comment {
-  int? id;
-  int? userId;
-  String? name;
-  String? userLogo;
-  int? productId;
-  String? comment;
-  String? createdAt;
-  int? countCommentLike;
-  int? liked;
-  List<CommentReply>? commentReply;
-
-  Comment(
-      {this.id,
-        this.userId,
-        this.name,
-        this.userLogo,
-        this.productId,
-        this.comment,
-        this.createdAt,
-        this.countCommentLike,
-        this.liked,
-        this.commentReply});
-
-  Comment.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    userId = json['user_id'];
-    name = json['name'];
-    userLogo = json['user_logo'];
-    productId = json['product_id'];
-    comment = json['comment'];
-    createdAt = json['created_at'];
-    countCommentLike = json['count_comment_like'];
-    liked = json['liked'];
-    if (json['comment_reply'] != null) {
-      commentReply = <CommentReply>[];
-      json['comment_reply'].forEach((v) {
-        commentReply!.add(new CommentReply.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['user_id'] = this.userId;
-    data['name'] = this.name;
-    data['user_logo'] = this.userLogo;
-    data['product_id'] = this.productId;
-    data['comment'] = this.comment;
-    data['created_at'] = this.createdAt;
-    data['count_comment_like'] = this.countCommentLike;
-    data['liked'] = this.liked;
-    if (this.commentReply != null) {
-      data['comment_reply'] =
-          this.commentReply!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
-
-class CommentReply {
-  int? id;
-  int? commentId;
-  int? userId;
-  String? comment;
-  String? createdAt;
-  String? userLogo;
-  String? name;
-
-  CommentReply(
-      {this.id,
-        this.commentId,
-        this.userId,
-        this.comment,
-        this.createdAt,
-        this.userLogo,
-        this.name});
-
-  CommentReply.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    commentId = json['comment_id'];
-    userId = json['user_id'];
-    comment = json['comment'];
-    createdAt = json['created_at'];
-    userLogo = json['user_logo'];
-    name = json['name'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['comment_id'] = this.commentId;
-    data['user_id'] = this.userId;
-    data['comment'] = this.comment;
-    data['created_at'] = this.createdAt;
-    data['user_logo'] = this.userLogo;
-    data['name'] = this.name;
     return data;
   }
 }
