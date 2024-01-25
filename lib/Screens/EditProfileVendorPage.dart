@@ -3,22 +3,20 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:real_pro_vendor/Models/GetCountData.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../Constants/Colors.dart';
 import '../Constants/Api.dart';
-import '../Models/GetProfileData.dart';
 import '../Presentation/BottomNavigationBarVendor.dart';
 import '../Presentation/common_button.dart';
 import '../Presentation/upload_textfeild.dart';
 import 'LoginPageVendor.dart';
 
-
 class EditProfileVendorPage extends StatefulWidget {
-  GetProfileData getProfileData;
-  EditProfileVendorPage(this.getProfileData);
-
+  GetCountData getCountData;
+  EditProfileVendorPage(this.getCountData);
 
   @override
   State<EditProfileVendorPage> createState() => _EditProfileVendorPageState();
@@ -26,20 +24,18 @@ class EditProfileVendorPage extends StatefulWidget {
 
 class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
 
-
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _refNumController = TextEditingController();
-  final TextEditingController _ornController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _agencyNameController = TextEditingController();
+  final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _brnController = TextEditingController();
-  final TextEditingController _dldController = TextEditingController();
   bool isloading=false;
-
+  final TextEditingController _aboutController = TextEditingController();
 
   bool isVisibleV = false;
   File? image;
-  String profileImage="";
+  String profileImage = "";
+  String agencyName = "";
 
   void showWidget() {
     setState(() {
@@ -51,27 +47,25 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
 
   @override
   void initState() {
-    profileImage = widget.getProfileData.user!.image.toString();
-    _nameController.text = widget.getProfileData.user!.name.toString();
-    _phoneController.text = widget.getProfileData.user!.mobileNumber.toString();
-   _refNumController.text = widget.getProfileData.user!.agentRef.toString();
-   _ornController.text = widget.getProfileData.user!.brokerOrn.toString();
-   _brnController.text = widget.getProfileData.user!.agentBrn.toString();
-   _dldController.text = widget.getProfileData.user!.dldNo.toString();
+    getToken();
+     profileImage = widget.getCountData.user!.image.toString();
+    _nameController.text = widget.getCountData.user!.name.toString();
+    _mobileController.text = widget.getCountData.user!.mobileNumber.toString();
+   _emailController.text = widget.getCountData.user!.email.toString();
+   _brnController.text = widget.getCountData.user!.agentBrn.toString();
+
    // getToken();
     // TODO: implement initState
     super.initState();
+    agencyName = widget.getCountData.user!.agencyName.toString();
   }
 
-  /*getToken() async {
+  getToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _phoneController.text=prefs.getString("phone")!;
-      _nameController.text=prefs.getString("name")!;
       profileImage=prefs.getString("profileImage")!;
-
     });
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,10 +73,23 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(
-            color: primaryColor
+            color: secondaryColor
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
+        backgroundColor: appColor,
+        elevation: 0,
+        centerTitle: true,
+        title:
+        Container(
+          child: Text(
+            'Edit Profile',
+            style: TextStyle(
+              color: secondaryColor,
+              fontSize: ScreenUtil().setWidth(15),
+              fontFamily: 'work',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -92,153 +99,153 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
           child: Column(
             children: [
 
-              Container(
-                alignment: Alignment.center,
-                child: Text(
-                  'Edit Profile',
-                  style: TextStyle(
-                    color: primaryTextColor,
-                    fontSize: ScreenUtil().setWidth(22),
-                    fontFamily: 'work',
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
               SizedBox(
                 height: ScreenUtil().setHeight(25),
               ),
-              GestureDetector(
-                onTap: (){
-                  selectPhoto();
 
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  child:profileImage!=null?CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      profileImage,
-                    ),
-                    radius: 50,
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: GestureDetector(
-                        onTap: () {
-                          //  getImage1();
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(05),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: primaryColor),
-                              color: secondaryColor,
-                              borderRadius: BorderRadius.circular(100)),
-                          child: Icon(
-                            Icons.add_a_photo,
-                            color: appColor,
-                            size: ScreenUtil().setHeight(17),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ): image==null?CircleAvatar(
-                    backgroundImage: AssetImage(
-                      "assets/images/dp.png",
-                    ),
-                    radius: 50,
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: GestureDetector(
-                        onTap: () {
-                          //  getImage1();
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(05),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: primaryColor),
-                              color: secondaryColor,
-                              borderRadius: BorderRadius.circular(100)),
-                          child: Icon(
-                            Icons.add_a_photo,
-                            color: appColor,
-                            size: ScreenUtil().setHeight(17),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ):CircleAvatar(
-                    backgroundImage: FileImage(
-                      image!,
-                    ),
-                    radius: 50,
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: GestureDetector(
-                        onTap: () {
-                          //  getImage1();
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(05),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: primaryColor),
-                              color: secondaryColor,
-                              borderRadius: BorderRadius.circular(100)),
-                          child: Icon(
-                            Icons.add_a_photo,
-                            color: appColor,
-                            size: ScreenUtil().setHeight(17),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+
               SizedBox(
                 height: ScreenUtil().setHeight(15),
               ),
-              TextFieldUpload(
-                title: 'Name',
-                controller: _nameController,
+
+              Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: Text(
+                        'Email',
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontSize: ScreenUtil().setWidth(12),
+                          fontFamily: 'work',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    TextFieldUpload(
+                      title: 'Agent Name',
+                      controller: _nameController,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: ScreenUtil().setHeight(7),
+              ),
+              Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: Text(
+                        'Mobile Number',
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontSize: ScreenUtil().setWidth(12),
+                          fontFamily: 'work',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    TextFieldUpload(
+                      title: 'Mobile Number',
+                      controller: _mobileController,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: ScreenUtil().setHeight(7),
+              ),
+              Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: Text(
+                        'Agent BRN',
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontSize: ScreenUtil().setWidth(12),
+                          fontFamily: 'work',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    TextFieldUpload(
+                      title: 'Agent BRN',
+                      controller: _brnController,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: ScreenUtil().setHeight(7),
               ),
 
-
-              TextFieldUpload(
-                title: 'Phone Number',
-                controller: _phoneController,
+              Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: Text(
+                        'Agency Name',
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontSize: ScreenUtil().setWidth(12),
+                          fontFamily: 'work',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    TextFieldUpload(
+                      title: widget.getCountData.user!.agencyName != null ? widget.getCountData.user!.agencyName.toString() : "Add Agency Name",
+                      controller: _agencyNameController,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: ScreenUtil().setHeight(7),
               ),
 
-
-              TextFieldUpload(
-                title: 'Address',
-                controller: _addressController,
+              Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: Text(
+                        'About Me',
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontSize: ScreenUtil().setWidth(12),
+                          fontFamily: 'work',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    TextFieldUpload(
+                      title: widget.getCountData.user!.description != null ? widget.getCountData.user!.description.toString() : "About Me",
+                      controller: _aboutController,
+                    ),
+                  ],
+                ),
               ),
 
-              TextFieldUpload(
-                title: 'Reference Number',
-                controller: _refNumController,
-              ),
-
-              TextFieldUpload(
-                title: 'Broker ORN',
-                controller: _ornController,
-              ),
-
-              TextFieldUpload(
-                title: 'Agent BRN',
-                controller: _brnController,
-              ),
-
-              TextFieldUpload(
-                title: 'DLD Permit Number',
+              /*  TextFieldUpload(
+                title: 'Agency Name',
                 controller: _dldController,
-              ),
+              ),*/
 
               SizedBox(
-                height: ScreenUtil().setHeight(10),
+                height: ScreenUtil().setHeight(25),
               ),
-              isloading?CircularProgressIndicator(color: appColor,):GestureDetector(
+
+              isloading?CircularProgressIndicator(color: appColor,):
+              GestureDetector(
                 onTap: () {
                   callApi();
-
                 },
                 child: RoundedButton(
                   text: 'Edit Profile',
@@ -247,13 +254,12 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
                 ),
               ),
 
-
-
               SizedBox(height:ScreenUtil().setHeight(15)),
 
               SizedBox(
                 height: ScreenUtil().setHeight(15),
               ),
+
             ],
           ),
         ),
@@ -282,7 +288,7 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
       isloading = true;
     });
     final headers = {'Accept': 'application/json'};
-    String? token = await FirebaseMessaging.instance.getToken();
+    //String? token = await FirebaseMessaging.instance.getToken();
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var url = Uri.https(
@@ -292,13 +298,11 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
     var request = new http.MultipartRequest("POST", url);
     request.headers['Authorization']=prefs.getString('access_token')!;
     request.fields['email'] =prefs.getString('email')!;
-    request.fields['mobile_number'] =_phoneController.text;
+    request.fields['mobile_number'] =_mobileController.text;
     request.fields['name'] = _nameController.text;
-    request.fields['location'] =_addressController.text;
-    request.fields['agent_ref'] =_refNumController.text;
-    request.fields['broker_orn'] = _ornController.text;
+    request.fields['description'] = _aboutController.text;
     request.fields['agent_brn'] =_brnController.text;
-    request.fields['dld_no'] = _dldController.text;
+    request.fields['agency_name'] = _agencyNameController.text;
     request.fields['country_code'] ="+971";
 
     if(image!=null)
@@ -310,8 +314,6 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
         ),
       );
     }
-
-
     request
         .send()
         .then((response) {
@@ -330,9 +332,12 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
               isloading = false;
             });
             Message(context, "Edit Profile Successfully");
-            if (getdata["data"]["user"]["image"] != null) {
+            /*if (getdata["data"]["user"]["image"] != null) {
               prefs.setString("profileImage", getdata["data"]["user"]["image"]);
             }
+            if (getdata["data"]["user"]["agency_name"] != null) {
+              prefs.setString("agencyName", getdata["data"]["user"]["agency_name"]);
+            }*/
             Future.delayed(const Duration(milliseconds: 1000), () {
               Navigator.pushReplacement(
                 context,
@@ -362,6 +367,5 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
         .catchError((err) => print('error : ' + err.toString()))
         .whenComplete(() {});
   }
-
 }
 

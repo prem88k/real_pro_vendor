@@ -34,15 +34,23 @@ class PropertyList {
   String? propertyName;
   int? price;
   int? isPost;
-  Null? salePrice;
+  String? salePrice;
   int? propertySize;
   bool? liked;
   String? propertyAddress;
   int? bedroomCount;
+  String? city;
+  String? area;
+  String? tower;
+  String? propertyType;
+  String? purpose;
+  String?lat;
+  String ?lang;
   int? kitchenCount;
   int? bathroomCount;
   int? isverified;
   String? thamblain;
+  String? video;
   List<Images>? images;
   String? privacyPolicy;
   String? createdAt;
@@ -50,8 +58,10 @@ class PropertyList {
   String? description;
   CreatedBy? createdBy;
   Category? category;
+  List<Comment>? comment;
+  int? totalComment;
   int? like;
-  String? view;
+  int? view;
   bool? collected;
 
   PropertyList(
@@ -60,9 +70,16 @@ class PropertyList {
         this.categoryId,
         this.propertyName,
         this.price,
+        this.lat,
+        this.lang,
         this.isPost,
         this.salePrice,
         this.propertySize,
+        this.city,
+        this.area,this.tower,
+        this.propertyType,
+        this.purpose,
+
         this.liked,
         this.propertyAddress,
         this.bedroomCount,
@@ -70,6 +87,7 @@ class PropertyList {
         this.bathroomCount,
         this.isverified,
         this.thamblain,
+        this.video,
         this.images,
         this.privacyPolicy,
         this.createdAt,
@@ -77,6 +95,8 @@ class PropertyList {
         this.description,
         this.createdBy,
         this.category,
+        this.comment,
+        this.totalComment,
         this.like,
         this.view,
         this.collected});
@@ -91,12 +111,24 @@ class PropertyList {
     salePrice = json['sale_price'];
     propertySize = json['property_size'];
     liked = json['liked'];
+    lat=json["lat"];
+    lang=json["lang"];
+
     propertyAddress = json['property_address'];
     bedroomCount = json['bedroom_count'];
     kitchenCount = json['kitchen_count'];
+    city=json['city'];
+    area=json['area'];
+    tower=json['tower'];
+    propertyType=json['property_type'];
+    purpose=json['purpose'];
+    lat=json["lat"];
+    lang=json["lang"];
+
     bathroomCount = json['bathroom_count'];
     isverified = json['isverified'];
     thamblain = json['thamblain'];
+    video = json['video'];
     if (json['images'] != null) {
       images = <Images>[];
       json['images'].forEach((v) {
@@ -113,6 +145,13 @@ class PropertyList {
     category = json['category'] != null
         ? new Category.fromJson(json['category'])
         : null;
+    if (json['comment'] != null) {
+      comment = <Comment>[];
+      json['comment'].forEach((v) {
+        comment!.add(new Comment.fromJson(v));
+      });
+    }
+    totalComment = json['total_comment'];
     like = json['like'];
     view = json['view'];
     collected = json['collected'];
@@ -132,9 +171,16 @@ class PropertyList {
     data['property_address'] = this.propertyAddress;
     data['bedroom_count'] = this.bedroomCount;
     data['kitchen_count'] = this.kitchenCount;
+    data['purpose']=this.purpose;
+
+    data['city']=this.city;
+    data['area']=this.area;
+    data['tower']=this.tower;
+    data['property_type']=this.propertyType;
     data['bathroom_count'] = this.bathroomCount;
     data['isverified'] = this.isverified;
     data['thamblain'] = this.thamblain;
+    data['video'] = this.video;
     if (this.images != null) {
       data['images'] = this.images!.map((v) => v.toJson()).toList();
     }
@@ -148,6 +194,10 @@ class PropertyList {
     if (this.category != null) {
       data['category'] = this.category!.toJson();
     }
+    if (this.comment != null) {
+      data['comment'] = this.comment!.map((v) => v.toJson()).toList();
+    }
+    data['total_comment'] = this.totalComment;
     data['like'] = this.like;
     data['view'] = this.view;
     data['collected'] = this.collected;
@@ -186,16 +236,21 @@ class CreatedBy {
   String? email;
   String? fcm;
   String? deviceType;
-  Null? appleId;
-  Null? deviceId;
-  Null? platform;
+  String? appleId;
+  String? deviceId;
+  String? platform;
   String? role;
   String? countryCode;
   String? mobileNumber;
   String? image;
-  Null? coverPhoto;
+  String? coverPhoto;
   String? description;
+  int? emailVerify;
   String? uid;
+  String? agentRef;
+  String? agentBrn;
+  String? dldNo;
+  String? brokerOrn;
   String? location;
   int? socialLogin;
 
@@ -217,7 +272,12 @@ class CreatedBy {
         this.image,
         this.coverPhoto,
         this.description,
+        this.emailVerify,
         this.uid,
+        this.agentRef,
+        this.agentBrn,
+        this.dldNo,
+        this.brokerOrn,
         this.location,
         this.socialLogin});
 
@@ -239,7 +299,12 @@ class CreatedBy {
     image = json['image'];
     coverPhoto = json['cover_photo'];
     description = json['description'];
+    emailVerify = json['email_verify'];
     uid = json['uid'];
+    agentRef = json['agent_ref'];
+    agentBrn = json['agent_brn'];
+    dldNo = json['dld_no'];
+    brokerOrn = json['broker_orn'];
     location = json['location'];
     socialLogin = json['social_login'];
   }
@@ -263,7 +328,12 @@ class CreatedBy {
     data['image'] = this.image;
     data['cover_photo'] = this.coverPhoto;
     data['description'] = this.description;
+    data['email_verify'] = this.emailVerify;
     data['uid'] = this.uid;
+    data['agent_ref'] = this.agentRef;
+    data['agent_brn'] = this.agentBrn;
+    data['dld_no'] = this.dldNo;
+    data['broker_orn'] = this.brokerOrn;
     data['location'] = this.location;
     data['social_login'] = this.socialLogin;
     return data;
@@ -272,19 +342,125 @@ class CreatedBy {
 
 class Category {
   int? id;
+  int? propertyId;
   String? name;
 
-  Category({this.id, this.name});
+  Category({this.id, this.propertyId, this.name});
 
   Category.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    propertyId = json['property_id'];
     name = json['name'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
+    data['property_id'] = this.propertyId;
     data['name'] = this.name;
+    return data;
+  }
+}
+
+class Comment {
+  int? id;
+  int? userId;
+  String? userLogo;
+  String? name;
+  int? productId;
+  String? comment;
+  String? createdAt;
+  int? countCommentLike;
+  int? liked;
+  List<CommentReply>? commentReply;
+
+  Comment(
+      {this.id,
+        this.userId,
+        this.userLogo,
+        this.productId,
+        this.name,
+        this.comment,
+        this.createdAt,
+        this.countCommentLike,
+        this.liked,
+        this.commentReply});
+
+  Comment.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    userId = json['user_id'];
+    userLogo = json['user_logo'];
+    productId = json['product_id'];
+    comment = json['comment'];
+    name=json['name'];
+    createdAt = json['created_at'];
+    countCommentLike = json['count_comment_like'];
+    liked = json['liked'];
+    if (json['comment_reply'] != null) {
+      commentReply = <CommentReply>[];
+      json['comment_reply'].forEach((v) {
+        commentReply!.add(new CommentReply.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['user_id'] = this.userId;
+    data['user_logo'] = this.userLogo;
+    data['product_id'] = this.productId;
+    data['name']=this.name;
+    data['comment'] = this.comment;
+    data['created_at'] = this.createdAt;
+    data['count_comment_like'] = this.countCommentLike;
+    data['liked'] = this.liked;
+    if (this.commentReply != null) {
+      data['comment_reply'] =
+          this.commentReply!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class CommentReply {
+  int? id;
+  int? commentId;
+  int? userId;
+  String? comment;
+  String? name;
+
+  String? createdAt;
+  String? userLogo;
+
+  CommentReply(
+      {this.id,
+        this.commentId,
+        this.userId,
+        this.name,
+        this.comment,
+        this.createdAt,
+        this.userLogo});
+
+  CommentReply.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    commentId = json['comment_id'];
+    userId = json['user_id'];
+    comment = json['comment'];
+    createdAt = json['created_at'];
+    userLogo = json['user_logo'];
+    name=json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['comment_id'] = this.commentId;
+    data['user_id'] = this.userId;
+    data['comment'] = this.comment;
+    data['created_at'] = this.createdAt;
+    data['user_logo'] = this.userLogo;
+    data['name']=this.name;
     return data;
   }
 }

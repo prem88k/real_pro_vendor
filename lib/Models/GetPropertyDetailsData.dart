@@ -1,4 +1,6 @@
+
 import 'GetAmenitiesData.dart';
+import 'GetPropertyData.dart';
 
 class GetPropertyDetails {
   bool? status;
@@ -35,8 +37,10 @@ class PropertyDetails {
   String? propertyAddress;
   String? location;
   int? bedroomCount;
+  int? totalComment;
   int? kitchenCount;
   int? bathroomCount;
+  String?furniture;
   String? description;
   List<String>? vilaFeature;
   String? type;
@@ -44,6 +48,9 @@ class PropertyDetails {
   String? purpose;
   String? refNum;
   String? addon;
+  String? lat;
+  String? lang;
+
   List<AmenitiesList>? amenities;
   int? isverified;
   String? thamblain;
@@ -53,11 +60,21 @@ class PropertyDetails {
   int? shopId;
   CreatedBy? createdBy;
   Amenities? category;
+  String? city;
+  String? area;
+  String? tower;
+  String? propertyType;
+  int? cityId;
+  int? areaId;
+  int? towerId;
+  int? propertyTypeId;
+  String? floor;
   int? like;
   int? isPost;
   bool? liked;
   Null? view;
   Null? salePrice;
+  List<Comment>? comment;
   bool? collected;
 
   PropertyDetails(
@@ -66,6 +83,9 @@ class PropertyDetails {
         this.categoryId,
         this.propertyName,
         this.price,
+        this.furniture,
+        this.lat,
+        this.lang,
         this.propertyAddress,
         this.location,
         this.bedroomCount,
@@ -74,9 +94,19 @@ class PropertyDetails {
         this.description,
         this.vilaFeature,
         this.type,
+        this.city,
+        this.area,this.tower,
+        this.propertyType,
+        this.cityId,
+        this.areaId,
+        this.towerId,
+        this.propertyTypeId,
+        this.floor,
         this.propertySize,
         this.purpose,
         this.refNum,
+        this.totalComment,
+        this.comment,
         this.addon,
         this.amenities,
         this.isverified,
@@ -100,13 +130,32 @@ class PropertyDetails {
     categoryId = json['category_id'];
     propertyName = json['property_name'];
     price = json['price'];
+    lat=json['lat'];
+    lang=json['lang'];
+    furniture=json['furniture'];
+    propertyType = json['property_type'];
+    cityId = json['city_id'];
+    areaId = json['area_id'];
+    towerId = json['tower_id'];
+    propertyTypeId = json['property_type_id'];
+    floor = json['floor'];
     propertyAddress = json['property_address'];
     location = json['location'];
+    totalComment=json['totalcomment'];
     bedroomCount = json['bedroom_count'];
     kitchenCount = json['kitchen_count'];
+    city=json['city'];
+    area=json['area'];
+    tower=json['tower'];
     bathroomCount = json['bathroom_count'];
     description = json['description'];
     vilaFeature = json['vila_feature'].cast<String>();
+    if (json['comment'] != null) {
+      comment = <Comment>[];
+      json['comment'].forEach((v) {
+        comment!.add(new Comment.fromJson(v));
+      });
+    }
     type = json['type'];
     propertySize = json['property_size'];
     purpose = json['purpose'];
@@ -147,11 +196,15 @@ class PropertyDetails {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['user_id'] = this.userId;
+    data['lat']=this.lat;
+    data['lang']=this.lang;
     data['category_id'] = this.categoryId;
     data['property_name'] = this.propertyName;
     data['price'] = this.price;
+    data['furniture']=this.furniture;
     data['property_address'] = this.propertyAddress;
     data['location'] = this.location;
+    data['totalcomment']=this.totalComment;
     data['bedroom_count'] = this.bedroomCount;
     data['kitchen_count'] = this.kitchenCount;
     data['bathroom_count'] = this.bathroomCount;
@@ -162,13 +215,24 @@ class PropertyDetails {
     data['purpose'] = this.purpose;
     data['ref_num'] = this.refNum;
     data['addon'] = this.addon;
-    if (this.amenities != null) {
+    data['city']=this.city;
+    data['area']=this.area;
+    data['tower']=this.tower;
+    data['property_type'] = this.propertyType;
+    data['city_id'] = this.cityId;
+    data['area-id'] = this.areaId;
+    data['tower_id'] = this.towerId;
+    data['property_type_id'] = this.propertyTypeId;
+    data['floor'] = this.floor;    if (this.amenities != null) {
       data['amenities'] = this.amenities!.map((v) => v.toJson()).toList();
     }
     data['isverified'] = this.isverified;
     data['thamblain'] = this.thamblain;
     if (this.images != null) {
       data['images'] = this.images!.map((v) => v.toJson()).toList();
+    }
+    if (this.comment != null) {
+      data['comment'] = this.comment!.map((v) => v.toJson()).toList();
     }
     data['privacy_policy'] = this.privacyPolicy;
     data['created_at'] = this.createdAt;
@@ -236,18 +300,19 @@ class CreatedBy {
   int? newFollowers;
   int? comment;
   String? name;
+  String? companyName;
   String? email;
   String? fcm;
   String? deviceType;
-  Null? appleId;
-  Null? deviceId;
-  Null? platform;
+  String? appleId;
+  String? deviceId;
+  String? platform;
   String? role;
   String? countryCode;
   String? mobileNumber;
   String? image;
-  Null? coverPhoto;
-  Null? description;
+  String? coverPhoto;
+  String? description;
   int? emailVerify;
   String? uid;
   String? agentRef;
@@ -270,6 +335,7 @@ class CreatedBy {
         this.deviceId,
         this.platform,
         this.role,
+        this.companyName,
         this.countryCode,
         this.mobileNumber,
         this.image,
@@ -292,6 +358,7 @@ class CreatedBy {
     name = json['name'];
     email = json['email'];
     fcm = json['fcm'];
+    companyName=json['company_name'];
     deviceType = json['device_type'];
     appleId = json['apple_id'];
     deviceId = json['device_id'];
@@ -321,6 +388,7 @@ class CreatedBy {
     data['name'] = this.name;
     data['email'] = this.email;
     data['fcm'] = this.fcm;
+    data['company_name']=this.companyName;
     data['device_type'] = this.deviceType;
     data['apple_id'] = this.appleId;
     data['device_id'] = this.deviceId;

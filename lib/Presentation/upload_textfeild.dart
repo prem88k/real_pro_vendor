@@ -83,22 +83,29 @@ class _TextFieldUploadState extends State<TextFieldUpload> {
 
           },
           decoration: !widget.isPassword?InputDecoration(
-
-            fillColor: secondaryColor,
+            fillColor: widget.title=="Search Here"?Colors.transparent:Colors.transparent,
             filled: true,
             border: OutlineInputBorder(
-                borderSide: BorderSide.none
+              borderSide: BorderSide(
+                color: widget.title=="Search Here"?secondaryColor: lineColor,
+                width: 0.5,
+
+              ),
             ),
             enabledBorder: OutlineInputBorder(
 
               borderRadius: BorderRadius.circular(ScreenUtil().setWidth(5)),
-              borderSide: BorderSide.none
+              borderSide: BorderSide(
+                color: widget.title=="Search Here"?secondaryColor: lineColor,
+                width: 0.5,
+
+              ),
             ),
-            /*focusedBorder: OutlineInputBorder(
+            focusedBorder: OutlineInputBorder(
               borderSide:  BorderSide(
                   color:  lineColor, width: 0.5),
               borderRadius: BorderRadius.circular(ScreenUtil().setWidth(5)),
-            ),*/
+            ),
             hintText: widget.title,
             counterText: '',
             hintStyle: TextStyle(
@@ -126,18 +133,25 @@ class _TextFieldUploadState extends State<TextFieldUpload> {
             fillColor: secondaryColor,
             filled: true,
             border: OutlineInputBorder(
-                borderSide: BorderSide.none
-            ),
+              borderSide: BorderSide(
+                color: widget.title=="Search Here"?secondaryColor: lineColor,
+                width: 0.5,
 
+              ),
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(ScreenUtil().setWidth(5)),
-              borderSide: BorderSide.none
+              borderSide: BorderSide(
+                color: widget.title=="Search Here"?secondaryColor: lineColor,
+                width: 0.5,
+
+              ),
             ),
-           /* focusedBorder: OutlineInputBorder(
+            focusedBorder: OutlineInputBorder(
               borderSide:  BorderSide(
                   color:  lineColor, width: 0.5),
               borderRadius: BorderRadius.circular(ScreenUtil().setWidth(5)),
-            ),*/
+            ),
             hintText: widget.title,
             counterText: '',
             hintStyle: TextStyle(

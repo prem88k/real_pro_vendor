@@ -34,8 +34,8 @@ class TredingPropertyList {
   String? propertyName;
   int? price;
   int? isPost;
-  Null? salePrice;
-  String? propertySize;
+  String? salePrice;
+  int? propertySize;
   bool? liked;
   String? propertyAddress;
   int? bedroomCount;

@@ -1,21 +1,27 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:real_pro_vendor/Screens/EditPropertyOnRentPage.dart';
+import 'package:share_plus/share_plus.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
 import '../Constants/Api.dart';
 import '../Constants/Colors.dart';
 import '../Models/GetCaategoryData.dart';
 import '../Models/GetPropertyData.dart';
-import 'EditPropertyOnRentPage.dart';
-import 'EnquiryDetailsPage.dart';
-import 'LoginPageVendor.dart';
+import '../Presentation/CommentSheet.dart';
+import '../Presentation/common_button.dart';
 import 'PropertyDetailsPage.dart';
+import 'SearchBarPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -25,116 +31,197 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int? selectedIndex = -1;
+  final TextEditingController _searchController = TextEditingController();
+  int? selectedIndex=0;
   late GecategoryData gecategoryData;
   List<CategoryList>? catList = [];
+  List<String>? badList = [];
+  List<String>? commentList = [];
+
+  List<String>? filterList = [];
+  int? selectedBath = -1;
+  List<String> sortList=[];
+  int? selectedFurniture = -1;
+  bool isDispose=false;
+  int? selectedBad = -1;
+  PageController? controller1 =
+  PageController(viewportFraction: 0.9, initialPage: 0, keepPage: true);
+
+  List<String>? bathroomList = [];
+  List<String>? furnushedList = [];
+  List<String>? popularList = [];
+
+  final TextEditingController _minSize = TextEditingController();
+  final TextEditingController _keywordsController = TextEditingController();
+  final TextEditingController _maxSize = TextEditingController();
   bool isloading = false;
   List<PropertyList>? proppertyList = [];
   late GetPropertyData getPropertyData;
   bool catloading = false;
-  PageController? controller1;
+  bool _switchValue2 = false;
+  String? dropdown;
+  double heightOfModalBottomSheet = 10;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    print("123");
+    badList!.addAll(["0", "1", "2", "3", "4", "5", "6", "7"]);
+    bathroomList!.addAll(["0", "1", "2", "3", "4", "5", "6", "7"]);
+    furnushedList!
+        .addAll(["Furnished", "UnFurnished", "Partly Furnished", "All"]);
+    sortList!
+        .addAll(["Newest First", "Oldest First", "Price--Low to High", "Price--High to Low"]);
+    commentList!.addAll([
+      "test21213232",
+      "test34344",
+      "Partly Furnished",
+      "All",
+      "test21213232",
+      "test34344",
+      "Partly Furnished",
+      "All"
+    ]);
+    popularList!
+        .addAll(["Chiller Free", "Pool", "Balcony", "Brand New", "Metro"]);
+    filterList!.addAll(["Buy", "Rent"]);
+    getPropertyAPI(0);
     getCategory();
-    getPropertyAPI("0");
-    controller1 =
-        PageController(viewportFraction: 0.9, initialPage: 0, keepPage: true);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    controller1!.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Color(0xffF5F6F8),
-      body: isloading || catloading?Center(child: CircularProgressIndicator(color: appColor,)):Container(
-        margin: EdgeInsets.only(
-            top: ScreenUtil().setHeight(45),
-            left: ScreenUtil().setWidth(15),
-            right: ScreenUtil().setWidth(15)),
-        child: Column(
-          children: [
-            Row(
+      body: isloading || catloading
+          ? Center(
+          child: CircularProgressIndicator(
+            color: appColor,
+          ))
+          : Stack(
+        children: [
+          Container(
+            margin: EdgeInsets.only(
+                top: ScreenUtil().setHeight(45),
+                left: ScreenUtil().setWidth(15),
+                right: ScreenUtil().setWidth(15)),
+            child: Column(
               children: [
-                GestureDetector(
-                  onTap: () {
-                      // add your code here.
-                      /*Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return SearchPage(
-                              );
-                            //WelcomeLoginPage();
-                          },
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        // add your code here.
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return SearchPage();
+                              //WelcomeLoginPage();
+                            },
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding:
+                        EdgeInsets.only(left: ScreenUtil().setWidth(12)),
+                        height: ScreenUtil().setHeight(38),
+                        width: ScreenUtil().setWidth(275),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: secondaryColor,
                         ),
-                      );*/
-
-                  },
-                  child: Container(
-                    padding: EdgeInsets.only(left: ScreenUtil().setWidth(12)),
-                    height: ScreenUtil().setHeight(38),
-                    width: ScreenUtil().setWidth(275),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.0),
-                      color: secondaryColor,
+                        child: Center(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.search,
+                                color: Color(0xff05122B),
+                              ),
+                              SizedBox(
+                                width: ScreenUtil().setWidth(12),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    bottom: ScreenUtil().setWidth(4)),
+                                child: Text(
+                                  "Search city, building, location ",
+                                  style: TextStyle(
+                                      fontFamily: 'work',
+                                      fontSize: ScreenUtil().setHeight(12),
+                                      fontWeight: FontWeight.normal,
+                                      color: primaryColor),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                    child: Center(
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.search,
-                            color: Color(0xff05122B),
-                          ),
-                          SizedBox(
-                            width: ScreenUtil().setWidth(12),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(
-                                bottom: ScreenUtil().setWidth(4)),
-                            child: Text(
-                              "Search city, building, location ",
-                              style: TextStyle(
-                                  fontFamily: 'work',
-                                  fontSize: ScreenUtil().setHeight(12),
-                                  fontWeight: FontWeight.normal,
-                                  color: primaryColor),
+
+                  ],
+                ),
+                SizedBox(
+                  height: ScreenUtil().setHeight(15),
+                ),
+                _buildCatList(),
+                SizedBox(
+                  height: ScreenUtil().setHeight(15),
+                ),
+                proppertyList!.length!=0?_buildPropertyList():Container(
+                  height: ScreenUtil().setHeight(300),
+                  width: ScreenUtil().screenWidth,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("No properties found.\nPlease add property.",style: TextStyle(
+                          color: lineColor,
+                          fontSize: ScreenUtil().setWidth(14),
+                          fontFamily: 'work',
+                          fontWeight: FontWeight.bold,
+                        ),textAlign: TextAlign.center,),
+                        SizedBox(
+                          height: ScreenUtil().setHeight(15),
+                        ),
+                        Container(
+                          height: ScreenUtil().setHeight(35),
+                          margin: EdgeInsets.only(
+                              bottom: ScreenUtil().setHeight(30),
+                              left:  ScreenUtil().setWidth(25),
+                              right: ScreenUtil().setWidth(25)),
+                          child:Container(
+                            child: GestureDetector(
+                              onTap: () {
+                              },
+                              child: RoundedButton(
+                                text: 'Add Property',
+                                press: () {},
+                                color: primaryColor,
+                              ),
                             ),
                           ),
-                        ],
-                      ),
+
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: ScreenUtil().setWidth(12),
-                ),
-                Container(
-                  height: ScreenUtil().setHeight(38),
-                  width: ScreenUtil().setHeight(38),
-                  child: Container(
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: primaryColor,
-                      ),
-                      width: ScreenUtil().setHeight(30),
-                      height: ScreenUtil().setHeight(30),
-                      child: Image.asset("assets/images/filter.png")),
-                )
               ],
             ),
-            SizedBox(
-              height: ScreenUtil().setHeight(15),
-            ),
-            _buildCatList(),
-            SizedBox(
-              height: ScreenUtil().setHeight(15),
-            ),
-            _buildPropertyList(),
-          ],
-        ),
+          ),
+
+        ],
       ),
     );
   }
@@ -142,7 +229,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildCatList() {
     return Container(
       alignment: Alignment.centerLeft,
-      height: ScreenUtil().setHeight(25),
+      height: ScreenUtil().setHeight(27),
       child: ListView.builder(
         itemCount: catList!.length,
         scrollDirection: Axis.horizontal,
@@ -158,9 +245,9 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          selectedIndex = i;
+          selectedIndex = catList![i].id;
         });
-        getPropertyAPI(catList![i].id.toString());
+        getPropertyAPI(catList![i].id!);
       },
       child: Container(
         margin: EdgeInsets.only(right: ScreenUtil().setWidth(10)),
@@ -169,18 +256,22 @@ class _HomePageState extends State<HomePage> {
         height: ScreenUtil().setHeight(14),
         decoration: BoxDecoration(
             border: Border.all(
-                color: selectedIndex == i ? appColor : borderColor, width: 0.2),
-            color: selectedIndex == i ? secondaryColor : Colors.transparent,
+                color: selectedIndex == catList![i].id ? appColor : borderColor,
+                width: 0.2),
+            color: selectedIndex == catList![i].id
+                ? secondaryColor
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(5.0)),
         child: Center(
           child: Text(
             catList![i].name!,
             style: TextStyle(
-              color: selectedIndex == i ? lineColor : darkTextColor,
+              color:
+              selectedIndex == catList![i].id ? lineColor : darkTextColor,
               fontSize: ScreenUtil().setWidth(13),
               fontFamily: 'work',
               fontWeight:
-                  selectedIndex == i ? FontWeight.w800 : FontWeight.w400,
+              selectedIndex == i ? FontWeight.w800 : FontWeight.w400,
             ),
           ),
         ),
@@ -204,7 +295,6 @@ class _HomePageState extends State<HomePage> {
   Widget _buildProList(int i) {
     return proppertyList!.length == 0
         ? Container(
-      alignment: Alignment.center,
       margin: EdgeInsets.only(top: ScreenUtil().setHeight(55)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -230,65 +320,91 @@ class _HomePageState extends State<HomePage> {
     )
         : GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return PropertyDetailsPage(proppertyList![i].id.toString());
-            },
-          ),
-        );
+        _navigateAndDisplaySelection(context,i);
+
       },
       child: Container(
         margin: EdgeInsets.only(bottom: ScreenUtil().setWidth(15)),
         decoration: BoxDecoration(
             color: secondaryColor,
             border: Border.all(color: secondaryColor, width: 0.2),
-            borderRadius: BorderRadius.circular(10.0)),
+            borderRadius: BorderRadius.circular(20)),
         height: ScreenUtil().setHeight(235),
         child: Column(
           children: [
-            ColorFiltered(
-              colorFilter: ColorFilter.mode(
-                Colors.grey.shade100,
-                BlendMode.darken,
-              ),
+            Container(
               child: Container(
+                decoration: BoxDecoration(
+                  //color: Color(0xffFFE500),
+                    color: Color(0xffF5F6F8)),
                 height: ScreenUtil().setHeight(160),
                 child: Stack(
                   children: [
                     ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: proppertyList![i].images!.length,
+                      itemCount: 1,
+                      padding: EdgeInsets.all(0),
+                      physics: NeverScrollableScrollPhysics(),
                       controller: controller1,
                       itemBuilder: (BuildContext context, int index1) {
                         return Container(
-                          margin:
-                          EdgeInsets.only(right: proppertyList![i].images!.length!=proppertyList![i].images!.length?ScreenUtil().setWidth(10):ScreenUtil().setWidth(1)),
+                          color: Color(0xffF5F6F8),
+                          margin: EdgeInsets.only(
+                              right: proppertyList![i].images!.length !=
+                                  proppertyList![i].images!.length
+                                  ? ScreenUtil().setWidth(0)
+                                  : ScreenUtil().setWidth(0)),
                           child: Stack(
                             children: [
-                              proppertyList![i].images!.length!=0?Container(
-                                height: ScreenUtil().setHeight(250),
-                                width:
-                                MediaQuery.of(context).size.width-ScreenUtil().setWidth(28),
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                          proppertyList![i].images![index1].image!),
-                                      fit: BoxFit.cover),
+                              proppertyList![i].thamblain != null
+                                  ? ClipRRect(
+                                borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(20),
+                                    topLeft: Radius.circular(20)),
+                                child: Container(
+                                  height:
+                                  ScreenUtil().setHeight(250),
+                                  width: MediaQuery.of(context)
+                                      .size
+                                      .width -
+                                      ScreenUtil().setWidth(31),
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        colorFilter:
+                                        new ColorFilter.mode(
+                                            Colors.black
+                                                .withOpacity(
+                                                0.2),
+                                            BlendMode.darken),
+                                        image:
+                                        CachedNetworkImageProvider(
+                                            proppertyList![i]
+                                                .thamblain!),
+                                        fit: BoxFit.cover),
+                                  ),
                                 ),
-                              ):Container(
+                              )
+                                  : Container(
                                 height: ScreenUtil().setHeight(250),
-                                width:
-                                MediaQuery.of(context).size.width,
+                                width: MediaQuery.of(context)
+                                    .size
+                                    .width,
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
-                                      image: AssetImage("assets/images/property_img.png"),
+                                      image: AssetImage(
+                                          "assets/images/property_img.png"),
+                                      colorFilter:
+                                      new ColorFilter.mode(
+                                          Colors.black
+                                              .withOpacity(0.2),
+                                          BlendMode.darken),
                                       fit: BoxFit.cover),
-                                  border: Border.all(color: secondaryColor, width: 0.2),
+                                  border: Border.all(
+                                      color: secondaryColor,
+                                      width: 0.2),
                                 ),
                               ),
-                              Container(
+                              /* Container(
                                   width: MediaQuery.of(context).size.width *
                                       0.9,
 
@@ -306,190 +422,178 @@ class _HomePageState extends State<HomePage> {
                                         dotHeight: 5.0,
                                         dotColor: borderColor,
                                         activeDotColor: secondaryColor),
-                                  ))
+                                  ))*/
                             ],
                           ),
                         );
                       },
                     ),
-
-                    Column(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: ClipRRect(
-                                        borderRadius:
-                                        BorderRadius.circular(5),
-                                        child: Container(
-                                            height:
-                                            ScreenUtil().setHeight(26),
-                                            width: ScreenUtil().setWidth(80),
-                                            color: Color(0xffFFE500),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                              children: [
-                                                Image.asset(
-                                                    "assets/images/verified.png",
-                                                    height: ScreenUtil()
-                                                        .setHeight(14),
-                                                    width: ScreenUtil()
-                                                        .setWidth(18)),
-                                                SizedBox(
-                                                  width: ScreenUtil()
-                                                      .setWidth(5),
-                                                ),
-                                                Text(
-                                                  "Verified",
-                                                  style: TextStyle(
-                                                    color: appColor,
-                                                    fontSize: ScreenUtil()
-                                                        .setWidth(12),
-                                                    fontFamily: 'work',
-                                                    fontWeight:
-                                                    FontWeight.w400,
-                                                  ),
-                                                ),
-                                              ],
-                                            )),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) {
-                                              return EditPropertyOnRentPage(proppertyList![i].id.toString());
-                                            },
-                                          ),
-                                        );
-                                        /*    isLiked1(proppertyList![i].id,
-                                        proppertyList![0]);*/
-                                      },
+                        GestureDetector(
+                          onTap: () {
+                            _onShare(
+                              context,
+                              proppertyList![i],
+                              "For ${proppertyList![i].purpose!}: ${proppertyList![i].propertyType!} in ${proppertyList![i].propertyName!} in ${proppertyList![i].area!}, ${proppertyList![i].city!}.",
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ClipRRect(
+                              borderRadius:
+                              BorderRadius.circular(100),
+                              child: Container(
+                                  height: ScreenUtil().setHeight(26),
+                                  width: ScreenUtil().setHeight(26),
+                                  color: appColor,
+                                  child: Center(
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(100),
-                                          child: Container(
-                                              height: ScreenUtil().setHeight(26),
-                                              width: ScreenUtil().setHeight(26),
-                                              color: secondaryColor,
-                                              child: Icon(
-                                                Icons.edit_note_outlined,
-                                                color: Color(0xff1C1B1F),
-                                                size: ScreenUtil().setHeight(14),
-                                              )),
+                                        padding:
+                                        const EdgeInsets.all(8.0),
+                                        child: Image.asset(
+                                          "assets/images/share.png",
+                                          height:
+                                          ScreenUtil().setHeight(22),
+                                          width:
+                                          ScreenUtil().setHeight(22),
                                         ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                      ))),
                             ),
-                            SizedBox(
-                              height: ScreenUtil().setHeight(40),
-                            ),
-                            Container(
-                              height: ScreenUtil().setHeight(80),
+                          ),
+                        ),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return EditPropertyOnRentPage(proppertyList![i]
+                                          .id
+                                          .toString());
+                                      //WelcomeLoginPage();
+                                    },
+                                  ),
+                                );
+                              },
                               child: Padding(
-                                padding: EdgeInsets.only(
-                                    left: ScreenUtil().setWidth(12),
-                                    top: ScreenUtil().setWidth(12)),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              proppertyList![i].propertyName!,
-                                              style: TextStyle(
-                                                color: secondaryColor,
-                                                fontSize:
-                                                ScreenUtil().setWidth(12),
-                                                fontFamily: 'work',
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: ScreenUtil().setHeight(5),
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "AED "+proppertyList![i].price.toString(),
-                                              style: TextStyle(
-                                                color: secondaryColor,
-                                                fontSize:
-                                                ScreenUtil().setWidth(15),
-                                                fontFamily: 'work',
-                                                fontWeight: FontWeight.w800,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: ScreenUtil().setHeight(5),
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              proppertyList![i]
-                                                  .propertyAddress !=
-                                                  null
-                                                  ? proppertyList![i]
-                                                  .propertyAddress!
-                                                  : "Dubai , UAE",
-                                              style: TextStyle(
-                                                color: secondaryColor,
-                                                fontSize:
-                                                ScreenUtil().setWidth(12),
-                                                fontFamily: 'work',
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                padding: const EdgeInsets.all(8.0),
+                                child: ClipRRect(
+                                  borderRadius:
+                                  BorderRadius.circular(100),
+                                  child: Container(
+                                      height: ScreenUtil().setHeight(26),
+                                      width: ScreenUtil().setHeight(26),
+                                      color: appColor,
+                                      child: Center(
+                                          child: Icon(Icons.edit,size: ScreenUtil().setHeight(12),color: secondaryColor,))),
                                 ),
                               ),
-                            ),
+                            )
+
                           ],
                         ),
                       ],
+                    ),
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Container(
+                        alignment: Alignment.bottomLeft,
+                        child: Padding(
+                          padding: EdgeInsets.only(),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left:
+                                            ScreenUtil().setWidth(7)),
+                                        child: Text(
+                                          "AED " +
+                                              formatAmount(
+                                                  proppertyList![i]
+                                                      .price
+                                                      .toString()),
+                                          style: TextStyle(
+                                            color: secondaryColor,
+                                            fontSize:
+                                            ScreenUtil().setWidth(18),
+                                            fontFamily: 'workdark',
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: ScreenUtil().setHeight(0),
+                                  ),
+                                  Container(
+                                    width: ScreenUtil().screenWidth -
+                                        ScreenUtil().setWidth(31),
+                                    padding: EdgeInsets.only(
+                                        top: ScreenUtil().setHeight(5),
+                                        bottom:
+                                        ScreenUtil().setHeight(5)),
+                                    decoration: BoxDecoration(
+                                      color:
+                                      Colors.black.withOpacity(0.5),
+                                      /*     border: Border.all(
+                                                color: inactiveColor,
+                                                width: 0.1),*/
+                                    ),
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                          left: ScreenUtil().setWidth(7)),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              proppertyList![i]
+                                                  .propertyAddress !=
+                                                  null
+                                                  ? "For ${proppertyList![i].purpose!}: ${proppertyList![i].propertyType!} in ${proppertyList![i].tower!}, ${proppertyList![i].area!}, ${proppertyList![i].city!}. "
+                                                  : "For Rent: Dubai , UAE",
+                                              maxLines: 2,
+                                              style: TextStyle(
+                                                color: secondaryColor,
+                                                fontSize: ScreenUtil()
+                                                    .setWidth(12),
+                                                overflow:
+                                                TextOverflow.ellipsis,
+                                                fontFamily: 'work',
+                                                fontWeight:
+                                                FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -506,11 +610,14 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Row(
                     children: [
+                      SizedBox(
+                        width: ScreenUtil().setWidth(4),
+                      ),
                       Row(
                         children: [
                           Image.asset("assets/images/bed.png",
                               height: ScreenUtil().setHeight(15),
-                              color: appColor,
+                              color: Color(0xffA6A6A6),
                               width: ScreenUtil().setWidth(18)),
                           SizedBox(
                             width: ScreenUtil().setWidth(5),
@@ -534,7 +641,7 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Image.asset("assets/images/bath.png",
                               height: ScreenUtil().setHeight(15),
-                              color: appColor,
+                              color: Color(0xffA6A6A6),
                               width: ScreenUtil().setWidth(18)),
                           SizedBox(
                             width: ScreenUtil().setWidth(5),
@@ -558,16 +665,18 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Image.asset("assets/images/crop.png",
                               height: ScreenUtil().setHeight(15),
-                              color: appColor,
+                              color: Color(0xffA6A6A6),
                               width: ScreenUtil().setWidth(18)),
                           SizedBox(
                             width: ScreenUtil().setWidth(5),
                           ),
                           Text(
                             proppertyList![i].propertySize != null
-                                ? proppertyList![i].propertySize!.toString() +
-                                " SQFT"
-                                : "2300 SQFT",
+                                ? proppertyList![i]
+                                .propertySize!
+                                .toString() +
+                                " sq.ft."
+                                : "2300 sq.ft.",
                             style: TextStyle(
                               color: darkTextColor,
                               fontSize: ScreenUtil().setWidth(12),
@@ -584,53 +693,109 @@ class _HomePageState extends State<HomePage> {
                     height: ScreenUtil().setHeight(10),
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return EnquiryDetailsPage(proppertyList![i].id);
-                              },
-                            ),
-                          );
-                        //  _callENquiryAPI(proppertyList![0], "Whatsapp");
+                          isLiked(
+                              proppertyList![i].id, proppertyList![i]);
                         },
                         child: Container(
+                          alignment: Alignment.centerLeft,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5.0),
-                            color: appColor,
                           ),
-                          width: ScreenUtil().setWidth(100),
+                          width: ScreenUtil().setWidth(95),
                           height: ScreenUtil().setHeight(32),
                           child: Center(
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Image.asset("assets/images/enqyiry.png",
-                                    color: secondaryColor,
-                                    height: ScreenUtil().setHeight(15),
-                                    width: ScreenUtil().setWidth(18)),
+                                Container(
+                                    height: ScreenUtil().setHeight(26),
+                                    width: ScreenUtil().setHeight(26),
+                                    child: Icon(
+                                      !proppertyList![i].liked!
+                                          ? Icons.favorite_border
+                                          : Icons.favorite,
+                                      color: !proppertyList![i].liked!
+                                          ? appColor
+                                          : Colors.red,
+                                      size: ScreenUtil().setHeight(16),
+                                    )),
                                 SizedBox(
-                                  width: ScreenUtil().setWidth(5),
+                                  width: ScreenUtil().setWidth(0),
                                 ),
                                 Text(
-                                  "Enquiry",
+                                  "Likes ( ${proppertyList![i].like!.toString()} ) ",
                                   style: TextStyle(
-                                    color: secondaryColor,
+                                    color: darkTextColor,
                                     fontSize: ScreenUtil().setWidth(12),
                                     fontFamily: 'work',
                                     height: ScreenUtil().setWidth(1),
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w800,
                                   ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                      )
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isDispose=true;
+                          });
+                          Future.delayed(const Duration(milliseconds: 0), () {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                  builder: (context) => MyBottomSheet(
+                                      proppertyList![i].comment,
+                                      proppertyList![i].id,"home","")),
+                            );
+                          });
+
+                          /*  MyBottomSheet(proppertyList![i].comment,
+                                    proppertyList![i].id);*/
+                          //_commentBottomSheet(proppertyList![i].comment);
+                          //       new MyBottomSheet(proppertyList![i].comment,proppertyList![i].id).show(context);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          width: ScreenUtil().setWidth(125),
+                          height: ScreenUtil().setHeight(32),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: ScreenUtil().setWidth(6),
+                                ),
+                                Container(
+                                    height: ScreenUtil().setHeight(26),
+                                    width: ScreenUtil().setHeight(26),
+                                    child: Icon(
+                                      Icons.chat_bubble_outline,
+                                      color: appColor,
+                                      size: ScreenUtil().setHeight(14),
+                                    )),
+                                Text(
+                                  "Comments ( ${proppertyList![i].totalComment} )",
+                                  style: TextStyle(
+                                    color: darkTextColor,
+                                    fontSize: ScreenUtil().setWidth(10),
+                                    fontFamily: 'work',
+                                    height: ScreenUtil().setWidth(1),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   )
                 ],
@@ -642,17 +807,22 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
   Future<void> getCategory() async {
     catList!.clear();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    prefs.getString("purpose");
+    prefs.getInt("property_type");
+
     setState(() {
       catloading = true;
+      prefs.setBool("isHome", true);
     });
+
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getcategory',
+      '/realpro/api/user/getcategory'
+          ,
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -669,28 +839,25 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         catloading = false;
       });
-      if (mounted == true) {
-
-      }
+      if (mounted == true) {}
       if (getdata["status"]) {
         gecategoryData = GecategoryData.fromJson(jsonDecode(responseBody));
         catList!.addAll(gecategoryData.data!);
       } else {}
+    } else {
+      setState(() {
+        catloading = false;
+      });
     }
-    else
-      {
-        setState(() {
-          catloading = false;
-        });
-      }
   }
 
-  Future<void> getPropertyAPI(String id) async {
+  Future<void> getPropertyAPI(int id, [int ?indexWhere]) async {
     proppertyList!.clear();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    print("Id::${id.toString()}");
     setState(() {
       isloading = true;
+
     });
     var uri = Uri.https(
       apiBaseUrl,
@@ -699,7 +866,7 @@ class _HomePageState extends State<HomePage> {
     Map<String, dynamic> body = {
       'pagenumber': "1",
       'limit': "20",
-      'category_id': id,
+      'category_id': id.toString(),
     };
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await post(uri, headers: headers, body: body);
@@ -718,13 +885,19 @@ class _HomePageState extends State<HomePage> {
       if (getdata["status"]) {
         getPropertyData = GetPropertyData.fromJson(jsonDecode(responseBody));
         proppertyList!.addAll(getPropertyData.data!);
+        if(indexWhere!=null)
+        {
+          print("indexWhere::$indexWhere");
+          proppertyList![indexWhere]=getPropertyData.data![indexWhere];
+        }
       } else {}
     }
   }
 
+
+
   Future<void> isLiked(int? id, PropertyList propertyList) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
 
     var uri = Uri.https(
       apiBaseUrl,
@@ -746,8 +919,10 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           if (propertyList.liked!) {
             propertyList.liked = false;
+            propertyList.like = propertyList.like! - 1;
           } else {
             propertyList.liked = true;
+            propertyList.like = propertyList.like! + 1;
           }
         });
       }
@@ -756,45 +931,16 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _launchCall(CreatedBy? createdBy) {
-    launch("tel://${createdBy!.mobileNumber!}");
-  }
 
-  void _launchMail(CreatedBy? createdBy) {
-    launch("mailto:${createdBy!.email!}");
-  }
-
-  whatsapp(CreatedBy? createdBy, PropertyList propertyList) async {
-    var contact = "${createdBy!.mobileNumber!}";
-    var androidUrl =
-        "whatsapp://send?phone=$contact&text=Hi, I need To know More about ${propertyList.propertyName} this property and its Location is ${propertyList.propertyAddress}";
-    var iosUrl =
-        "https://wa.me/$contact?text=${Uri.parse('Hi,  I need To know More about ${propertyList.propertyName} this property and its Location is ${propertyList.propertyAddress}')}";
-
-    try {
-      if (Platform.isIOS) {
-        await launchUrl(Uri.parse(iosUrl));
-      } else {
-        await launchUrl(Uri.parse(androidUrl));
-      }
-    } on Exception {
-      Message(context, "oops! you didn't install whatsapp yet");
-    }
-  }
-
-  Future<void> _callENquiryAPI(PropertyList propertyList, String type) async {
+  Future<void> isCollect(int? id, PropertyList propertyList) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    setState(() {
-      isloading = true;
-    });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/addenquiry',
+      '/realpro/api/user/property_add_collect',
     );
     Map<String, dynamic> body = {
-      'property_id': propertyList.id.toString(),
-      'type': type
+      'property_id': id.toString(),
     };
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await post(uri, headers: headers, body: body);
@@ -803,22 +949,128 @@ class _HomePageState extends State<HomePage> {
     String responseBody = response.body;
     var getdata = json.decode(response.body);
 
-    print("EnquiryResposne::$responseBody");
+    print("PropResposne::$responseBody");
     if (statusCode == 200) {
       if (mounted == true) {
         setState(() {
-          isloading = false;
+          if (propertyList.collected!) {
+            propertyList.collected = false;
+          } else {
+            propertyList.collected = true;
+          }
         });
-        if (type == "phone") {
-          _launchCall(propertyList.createdBy!);
-        } else if (type == "mail") {
-          _launchMail(propertyList.createdBy!);
-        } else {
-          whatsapp(propertyList.createdBy!, propertyList);
-        }
       }
       if (getdata["status"]) {
       } else {}
     }
   }
+  Future<void> isCommentLiked(int? id, Comment commentList) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/user/comment_like',
+    );
+    Map<String, dynamic> body = {
+      'comment_id': id.toString(),
+    };
+    final headers = {'Authorization': '${prefs.getString('access_token')}'};
+    Response response = await post(uri, headers: headers, body: body);
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    var getdata = json.decode(response.body);
+
+    print("commentLikeResponse::$responseBody");
+    if (statusCode == 200) {
+      if (mounted == true) {
+        setState(() {
+          if (commentList.liked == 1) {
+            commentList.liked = 0;
+            commentList.countCommentLike = commentList.countCommentLike! - 1;
+          } else {
+            commentList.liked = 1;
+            commentList.countCommentLike = commentList.countCommentLike! + 1;
+          }
+        });
+      }
+      if (getdata["status"]) {
+      } else {}
+    }
+  }
+
+
+
+
+
+  String convertToAgo(String dateTime) {
+    DateTime input =
+    DateFormat('yyyy-MM-DDTHH:mm:ss.SSSSSSZ').parse(dateTime, true);
+    Duration diff = DateTime.now().difference(input);
+
+    if (diff.inDays >= 1) {
+      return '${diff.inDays} day${diff.inDays == 1 ? '' : 's'} ago';
+    } else if (diff.inHours >= 1) {
+      return '${diff.inHours} hour${diff.inHours == 1 ? '' : 's'} ago';
+    } else if (diff.inMinutes >= 1) {
+      return '${diff.inMinutes} minute${diff.inMinutes == 1 ? '' : 's'} ago';
+    } else if (diff.inSeconds >= 1) {
+      return '${diff.inSeconds} second${diff.inSeconds == 1 ? '' : 's'} ago';
+    } else {
+      return 'just now';
+    }
+  }
+
+  void _onShare(
+      BuildContext context, PropertyList reelsList, String title) async {
+    final response = await get(Uri.parse(reelsList.images![0].image!));
+    final directory = await getTemporaryDirectory();
+    File file = await File('${directory.path}/Image.png')
+        .writeAsBytes(response.bodyBytes);
+
+    await Share.shareXFiles([XFile(file.path)], text: title);
+    /*   final box = context.findRenderObject() as RenderBox?;
+    await Share.share(title,
+        subject: file.path,
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);*/
+  }
+
+  String formatAmount(String id) {
+    String price = id;
+    String priceInText = "";
+    int counter = 0;
+    for (int i = (price.length - 1); i >= 0; i--) {
+      counter++;
+      String str = price[i];
+      if ((counter % 3) != 0 && i != 0) {
+        priceInText = "$str$priceInText";
+      } else if (i == 0) {
+        priceInText = "$str$priceInText";
+      } else {
+        priceInText = ",$str$priceInText";
+      }
+    }
+    return priceInText.trim();
+  }
+  Future<void> _navigateAndDisplaySelection(BuildContext context, int i) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await   Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (context) => PropertyDetailsPage(proppertyList![i].id.toString(),proppertyList![i].video!)),
+    );
+
+    // When a BuildContext is used from a StatefulWidget, the mounted property
+    // must be checked after an asynchronous gap.
+    if (!mounted) return;
+    getPropertyAPI(0,proppertyList!.indexWhere((element) => element.id == result));
+    // After the Selection Screen returns a result, hide any previous snackbars
+    // and show the new result.
+    /*  ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('$result')));*/
+  }
+
+
 }
+

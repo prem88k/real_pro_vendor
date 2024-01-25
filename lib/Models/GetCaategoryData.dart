@@ -26,18 +26,21 @@ class GecategoryData {
 
 class CategoryList {
   int? id;
+  int? propertyId;
   String? name;
 
-  CategoryList({this.id, this.name});
+  CategoryList({this.id, this.propertyId, this.name});
 
   CategoryList.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    propertyId = json['property_id'];
     name = json['name'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
+    data['property_id'] = this.propertyId;
     data['name'] = this.name;
     return data;
   }

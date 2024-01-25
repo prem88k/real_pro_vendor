@@ -31,8 +31,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     });
   }
 
-  late String token;
 
+  late String token;
+  final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
     getToken();
@@ -59,110 +60,118 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           margin: EdgeInsets.only(
               left: ScreenUtil().setWidth(30),
               right: ScreenUtil().setWidth(30)),
-          child: Column(
-            children: [
-              Container(
-                height: ScreenUtil().setHeight(100),
-                alignment: Alignment.center,
-                child: Image(
-                  image: AssetImage("assets/images/login_bg.png"),
-                  fit: BoxFit.fill,
-                  height: ScreenUtil().setHeight(120),
-                  width: double.infinity,
-                ),
-              ),
-              SizedBox(
-                height: ScreenUtil().setHeight(20),
-              ),
-              Container(
-                alignment: Alignment.center,
-                child: Text(
-                  'Reset Password',
-                  style: TextStyle(
-                    color: primaryTextColor,
-                    fontSize: ScreenUtil().setWidth(22),
-                    fontFamily: 'work',
-                    fontWeight: FontWeight.w600,
+          child: Form(
+
+            child: Column(
+              children: [
+                Container(
+                  height: ScreenUtil().setHeight(100),
+                  alignment: Alignment.center,
+                  child: Image(
+                    image: AssetImage("assets/images/login_bg.png"),
+                    fit: BoxFit.fill,
+                    height: ScreenUtil().setHeight(120),
+                    width: double.infinity,
                   ),
                 ),
-              ),
-              SizedBox(
-                height: ScreenUtil().setHeight(35),
-              ),
-              Container(
-                height: ScreenUtil().setHeight(95),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Enter registered email address',
-                          style: TextStyle(
-                            color: darkTextColor,
-                            fontSize: ScreenUtil().setWidth(12),
-                            fontFamily: 'work',
-                            fontWeight: FontWeight.w100,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: ScreenUtil().setHeight(5),
-                    ),
-                    TextFieldWidget(
-                      controller: _emailController,
-                      title: "Email",
-                    ),
-                    SizedBox(
-                      height: ScreenUtil().setHeight(3),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Password reset OTP shared to your Email',
-                          style: TextStyle(
-                            color: Color(0xff979797),
-                            fontSize: ScreenUtil().setWidth(12),
-                            fontFamily: 'work',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                SizedBox(
+                  height: ScreenUtil().setHeight(20),
                 ),
-              ),
-              SizedBox(
-                height: ScreenUtil().setHeight(15),
-              ),
-              isloading
-                  ? CircularProgressIndicator(
-                      color: appColor,
-                    )
-                  : GestureDetector(
-                      onTap: () {
-                        final bool emailValid = RegExp(
-                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                            .hasMatch(_emailController.text);
-                        if (_emailController.text.isEmpty) {
-                          Message(context, "Enter Email");
-                        } else if (!emailValid) {
-                          Message(context, "Enter valid Email");
-                        } else {
-                          ForgotPassword();
-                        }
-                      },
-                      child: RoundedButton(
-                        text: 'Sent',
-                        press: () {},
+                Container(
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Reset Password',
+                    style: TextStyle(
+                      color: primaryTextColor,
+                      fontSize: ScreenUtil().setWidth(22),
+                      fontFamily: 'work',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: ScreenUtil().setHeight(35),
+                ),
+                Container(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Enter registered email address',
+                            style: TextStyle(
+                              color: darkTextColor,
+                              fontSize: ScreenUtil().setWidth(12),
+                              fontFamily: 'work',
+                              fontWeight: FontWeight.w100,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(5),
+                      ),
+                      TextFieldWidget(
+                        controller: _emailController,
+                        title: "Email",
+                        validator: (value) {
+                          if (_emailController.text.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(
+                        height: ScreenUtil().setHeight(3),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Password reset OTP shared to your Email',
+                            style: TextStyle(
+                              color: Color(0xff979797),
+                              fontSize: ScreenUtil().setWidth(12),
+                              fontFamily: 'work',
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: ScreenUtil().setHeight(15),
+                ),
+                isloading
+                    ? CircularProgressIndicator(
                         color: appColor,
-                      )),
-              SizedBox(
-                height: ScreenUtil().setHeight(15),
-              ),
-            ],
+                      )
+                    : GestureDetector(
+                        onTap: () {
+                          final bool emailValid = RegExp(
+                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              .hasMatch(_emailController.text);
+                          if (_emailController.text.isEmpty) {
+                            Message(context, "Enter Email");
+                          } else if (!emailValid) {
+                            Message(context, "Enter valid Email");
+                          } else {
+                            ForgotPassword();
+                          }
+                        },
+                        child: RoundedButton(
+                          text: 'Sent',
+                          press: () {},
+                          color: appColor,
+                        )),
+                SizedBox(
+                  height: ScreenUtil().setHeight(15),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -223,7 +232,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       setState(() {
         isloading = false;
       });
-      Message(context, getdata["message"]);
+      ErrorMessage(context, getdata["message"]);
     }
   }
 }

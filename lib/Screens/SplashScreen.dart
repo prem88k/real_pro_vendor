@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:real_pro_vendor/Screens/LoginPageVendor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Constants/Colors.dart';
 import '../Presentation/BottomNavigationBarVendor.dart';
@@ -65,7 +66,7 @@ class _SplashScreenState extends State<SplashScreen>
           decoration: BoxDecoration(
             color: Colors.transparent,
             image: DecorationImage(
-              image: AssetImage("assets/images/splash_bg.png"),
+              image: AssetImage("assets/images/intro.jpeg"),
               // colorFilter: ColorFilter.mode(Colors.black, BlendMode.color),
               fit: BoxFit.cover,
             ),
@@ -131,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   startTime() async {
-    return new Timer(Duration(milliseconds: 5500), NavigatorPage);
+    return new Timer(Duration(milliseconds: 3500), NavigatorPage);
   }
 
   Future<void> NavigatorPage() async {
@@ -143,7 +144,7 @@ class _SplashScreenState extends State<SplashScreen>
         context,
         MaterialPageRoute(
           builder: (context) {
-            return IntroductionScreen();
+            return LoginPageVendor();
           },
         ),
       );
@@ -162,7 +163,7 @@ class _SplashScreenState extends State<SplashScreen>
           context,
           MaterialPageRoute(
             builder: (context) {
-              return IntroductionScreen();
+              return LoginPageVendor();
             },
           ),
         );

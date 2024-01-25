@@ -21,3 +21,4 @@ const boxColor= Color(0xffB4B4D3);
 const dividerColor = Color(0xffE4E4EC);
 const lineColor = Color(0xff05122B);
 const boxBackgroundColor = Color(0xffEDEDED);
+const textFieldBorderColor = Color(0xff979797);

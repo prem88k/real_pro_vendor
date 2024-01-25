@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
@@ -24,7 +25,8 @@ class RegistrationOtpVendor extends StatefulWidget {
 class _RegistrationOtpVendorState extends State<RegistrationOtpVendor> {
   final TextEditingController _otpController = TextEditingController();
   bool isloading = false;
-
+  Timer ?_timer;
+  int _start = 59;
   bool isVisibleV = false;
 
   void showWidget() {
@@ -35,9 +37,34 @@ class _RegistrationOtpVendorState extends State<RegistrationOtpVendor> {
 
   late String token;
 
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+          (Timer timer) {
+        if (_start == 0) {
+          setState(() {
+            timer.cancel();
+          });
+        } else {
+          setState(() {
+            _start--;
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer!.cancel();
+    super.dispose();
+  }
   @override
   void initState() {
     getToken();
+    startTimer();
+
     // TODO: implement initState
     super.initState();
   }
@@ -95,14 +122,14 @@ class _RegistrationOtpVendorState extends State<RegistrationOtpVendor> {
                 height: ScreenUtil().setHeight(15),
               ),
               Container(
-                height: ScreenUtil().setHeight(80),
+                height: ScreenUtil().setHeight(50),
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Enter the OTP sent to Example@gmail.com',
+                          'Enter the OTP sent to ${widget.email}',
                           style: TextStyle(
                             color: primaryTextColor,
                             fontSize: ScreenUtil().setWidth(13),
@@ -112,29 +139,32 @@ class _RegistrationOtpVendorState extends State<RegistrationOtpVendor> {
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height: ScreenUtil().setHeight(10),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Enter a different Email Address',
-                          style: TextStyle(
-                            color: appColor,
-                            fontSize: ScreenUtil().setWidth(12),
-                            fontFamily: 'work',
-                            fontWeight: FontWeight.w800,
+
+/*
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.pop(context);
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Enter a different Email Address',
+                            style: TextStyle(
+                              color: appColor,
+                              fontSize: ScreenUtil().setWidth(12),
+                              fontFamily: 'work',
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+*/
                   ],
                 ),
               ),
-              SizedBox(
-                height: ScreenUtil().setHeight(15),
-              ),
+
               Theme(
                 data: Theme.of(context).copyWith(
                   unselectedWidgetColor: inactiveColor,
@@ -167,16 +197,24 @@ class _RegistrationOtpVendorState extends State<RegistrationOtpVendor> {
               SizedBox(
                 height: ScreenUtil().setHeight(15),
               ),
-              Container(
-                height: ScreenUtil().setHeight(40),
-                child: Center(
-                  child: Text(
-                    'Resend OTP',
-                    style: TextStyle(
-                      color: darkTextColor,
-                      fontSize: ScreenUtil().setWidth(12),
-                      fontFamily: 'work',
-                      fontWeight: FontWeight.w600,
+              GestureDetector(
+                onTap: (){
+                  if(_start==0)
+                    {
+                      startTimer();
+                    }
+                },
+                child: Container(
+                  height: ScreenUtil().setHeight(40),
+                  child: Center(
+                    child: Text(
+                      _start==0?'Resend OTP':"0:"+_start.toString(),
+                      style: TextStyle(
+                        color: darkTextColor,
+                        fontSize: ScreenUtil().setWidth(12),
+                        fontFamily: 'work',
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -451,13 +489,13 @@ class _RegistrationOtpVendorState extends State<RegistrationOtpVendor> {
         setState(() {
           isloading = false;
         });
-        Message(context, getdata["data"]["message"]);
+        ErrorMessage(context, getdata["message"]);
       }
     } else {
       setState(() {
         isloading = false;
       });
-      Message(context, getdata["message"]);
+      ErrorMessage(context, getdata["message"]);
     }
   }
 }
