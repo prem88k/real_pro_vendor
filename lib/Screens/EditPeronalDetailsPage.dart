@@ -25,7 +25,7 @@ class EditPeronalDetailsPage extends StatefulWidget {
 
 class _EditPeronalDetailsPageState extends State<EditPeronalDetailsPage> {
 
-  final TextEditingController _aboutCompanyeController = TextEditingController();
+  final TextEditingController _aboutMeController = TextEditingController();
   final TextEditingController _nationalityController = TextEditingController();
   final TextEditingController _languageController = TextEditingController();
   final TextEditingController _experienceController = TextEditingController();
@@ -109,7 +109,7 @@ class _EditPeronalDetailsPageState extends State<EditPeronalDetailsPage> {
                   children: [
                     Container(
                       child: Text(
-                        'About Company',
+                        'Description',
                         style: TextStyle(
                           color: primaryColor,
                           fontSize: ScreenUtil().setWidth(12),
@@ -118,10 +118,43 @@ class _EditPeronalDetailsPageState extends State<EditPeronalDetailsPage> {
                         ),
                       ),
                     ),
-                    TextFieldUpload(
-                      title:widget.getCountData.user!.aboutCompany != null ?  widget.getCountData.user!.aboutCompany.toString() : "Add About Company",
-                      controller: _aboutCompanyeController,
+                    SizedBox(
+                      height: ScreenUtil().setHeight(15),
                     ),
+                    TextFormField(
+                      controller: _aboutMeController,
+                      keyboardType: TextInputType.text,
+                      textAlignVertical: TextAlignVertical.center,
+                      maxLines: 5,
+                      maxLength: 250,
+                      style: TextStyle(
+                        fontSize: ScreenUtil().setHeight(13),
+                        color: primaryColor,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'work',
+                      ),
+                      validator: (value) {
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        filled: false,
+                        hintText: "Example: About me",
+                        hintStyle: TextStyle(
+                            fontFamily: 'work',
+                            fontSize:  ScreenUtil().setWidth(12),
+                            fontWeight: FontWeight.w400,
+                            color: lightTextColor),
+                        border: OutlineInputBorder(
+                            borderSide:
+                            BorderSide(color: textFieldBorderColor),
+                            borderRadius: BorderRadius.circular(10)),
+                        contentPadding: EdgeInsets.only(
+                            left: ScreenUtil().setWidth(20),
+                            top: ScreenUtil().setHeight(15),
+                            bottom: ScreenUtil().setHeight(15)),
+                      ),
+                    ),
+
                   ],
                 ),
               ),
@@ -221,10 +254,10 @@ class _EditPeronalDetailsPageState extends State<EditPeronalDetailsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    child: Text("Location",
+                    child: Text("Locations you specialize in ",
                         style: TextStyle(
                             fontSize: ScreenUtil()
-                                .setHeight(14),
+                                .setWidth(12),
                             color: primaryColor,
                             fontFamily: 'work',
                             fontWeight:
@@ -249,7 +282,7 @@ class _EditPeronalDetailsPageState extends State<EditPeronalDetailsPage> {
 
                 },
                 child: RoundedButton(
-                  text: 'Edit Profile',
+                  text: 'Update',
                   press: () {},
                   color: appColor,
                 ),
@@ -360,10 +393,10 @@ class _EditPeronalDetailsPageState extends State<EditPeronalDetailsPage> {
                   bottom: ScreenUtil().setHeight(5)
               ),
               child: Container(
-                height: ScreenUtil().setHeight(34),
+                height: ScreenUtil().setHeight(40),
                 width: ScreenUtil().setWidth(250),
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: textFieldBorderColor)
                 ),
                 child: TextFormField(
@@ -371,7 +404,7 @@ class _EditPeronalDetailsPageState extends State<EditPeronalDetailsPage> {
                   keyboardType: TextInputType.text,
                   textAlignVertical: TextAlignVertical.center,
                   style: TextStyle(
-                    fontSize: ScreenUtil().setHeight(14),
+                    fontSize: ScreenUtil().setWidth(12),
                     color: primaryColor,
                     fontWeight: FontWeight.w400,
                     fontFamily: 'work',
@@ -548,7 +581,7 @@ class _EditPeronalDetailsPageState extends State<EditPeronalDetailsPage> {
     var request = new http.MultipartRequest("POST", url);
     request.headers['Authorization']=prefs.getString('access_token')!;
     request.fields['email'] =prefs.getString('email')!;
-    request.fields['about_company'] =_aboutCompanyeController.text;
+    request.fields['description'] =_aboutMeController.text;
     request.fields['nationality'] = _nationalityController.text;
     request.fields['language'] =_languageController.text;
     request.fields['experience'] =_experienceController.text;
@@ -584,7 +617,7 @@ class _EditPeronalDetailsPageState extends State<EditPeronalDetailsPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return BottomNavigationBarVendor();
+                    return BottomNavigationBarVendor(3);
                   },
                 ),
               );

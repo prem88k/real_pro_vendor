@@ -1,17 +1,6 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../Constants/Api.dart';
-import '../Constants/Colors.dart';
-import '../Presentation/BottomNavigationBarVendor.dart';
-import '../Presentation/common_button.dart';
-import '../Presentation/common_textfeild.dart';
-import 'package:http/http.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:convert';
-import 'LoginPageVendor.dart';
-import 'RegistrationOtpVendor.dart';
+import 'dart:io';
+import 'package:real_pro_vendor/Screens/AddInfo.dart';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,13 +12,21 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Constants/Api.dart';
+import '../Constants/Colors.dart';
+import '../Presentation/BottomNavigationBarVendor.dart';
+import '../Presentation/common_button.dart';
+import '../Presentation/common_textfeild.dart';
+import 'LoginPageVendor.dart';
+import 'RegistrationOtpVendor.dart';
+
 FirebaseAuth _auth = FirebaseAuth.instance;
 
 class RegistrationPageVendor extends StatefulWidget {
   String name;
   String email;
-  RegistrationPageVendor(this. name, this. email);
 
+  RegistrationPageVendor(this.name, this.email);
 
   @override
   State<RegistrationPageVendor> createState() => _RegistrationPageVendorState();
@@ -43,11 +40,12 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
   late String imageUrl;
   late String uId;
   String? deviceId;
-  bool isloading=false;
+  bool isloading = false;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _agencyNameController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _brnController = TextEditingController();
@@ -65,7 +63,9 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     //token = (await FirebaseMessaging.instance.getToken())!;
     //print("token $token");
   }
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +74,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),
-     /* appBar: AppBar(
+      /* appBar: AppBar(
         backgroundColor: Colors.transparent,
         bottomOpacity: 0,
         elevation: 0,
@@ -93,7 +93,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
         child: Container(
           margin: EdgeInsets.only(
               left: ScreenUtil().setWidth(30),
-              bottom:ScreenUtil().setHeight(30) ,
+              bottom: ScreenUtil().setHeight(30),
               right: ScreenUtil().setWidth(30)),
           child: Form(
             key: _formKey,
@@ -144,8 +144,14 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         controller: _emailController,
                         title: "Email",
                         validator: (value) {
+                          final bool emailValid = RegExp(
+                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              .hasMatch(_emailController.text);
                           if (_emailController.text.isEmpty) {
                             return 'This field is required';
+                          }
+                          else if (!emailValid) {
+                            Message(context, "Enter a valid email address");
                           }
                           return null;
                         },
@@ -215,7 +221,6 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
-
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,7 +239,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                       TextFieldWidget(
                         controller: _nameController,
                         title: "Agent Name",
-                        validator:(value) {
+                        validator: (value) {
                           if (_nameController.text.isEmpty) {
                             return "This field is required";
                           }
@@ -244,7 +249,6 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
-
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,7 +267,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                       TextFieldWidget(
                         controller: _agencyNameController,
                         title: "Agency Name",
-                        validator:(value) {
+                        validator: (value) {
                           if (_agencyNameController.text.isEmpty) {
                             return "This field is required";
                           }
@@ -273,7 +277,6 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
-
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,9 +305,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
-
                 Container(
-
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -332,28 +333,31 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
-
                 SizedBox(
                   height: ScreenUtil().setHeight(20),
                 ),
-
-                isloading?CircularProgressIndicator(color: appColor,):GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (_formKey.currentState!.validate()) {
-                        // Validation passed, navigate to the next page
-                        checkValidation();
-                      } else {
-                        // Validation failed, show an error message
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Please fill in the required field.'),
-                          ),
-                        );
-                      }
-                    });
-                //    checkValidation();
-                    /*      Navigator.push(
+                isloading
+                    ? CircularProgressIndicator(
+                        color: appColor,
+                      )
+                    : GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (_formKey.currentState!.validate()) {
+                              // Validation passed, navigate to the next page
+                              checkValidation();
+                            } else {
+                              // Validation failed, show an error message
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Please fill in the required field.'),
+                                ),
+                              );
+                            }
+                          });
+                          //    checkValidation();
+                          /*      Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) {
@@ -361,14 +365,13 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         },
                       ),
                     );*/
-                  },
-                  child: RoundedButton(
-                    text: 'Register Now',
-                    press: () {},
-                    color: appColor,
-                  ),
-                ),
-
+                        },
+                        child: RoundedButton(
+                          text: 'Register Now',
+                          press: () {},
+                          color: appColor,
+                        ),
+                      ),
                 SizedBox(
                   height: ScreenUtil().setHeight(20),
                 ),
@@ -376,9 +379,9 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                   child: Row(children: <Widget>[
                     Expanded(
                         child: Divider(
-                          color: primaryColor,
-                          height: 0.2,
-                        )),
+                      color: primaryColor,
+                      height: 0.2,
+                    )),
                     SizedBox(
                       width: ScreenUtil().setHeight(15),
                     ),
@@ -395,16 +398,16 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ),
                     Expanded(
                         child: Divider(
-                          color: primaryColor,
-                          height: 0.2,
-                        )),
+                      color: primaryColor,
+                      height: 0.2,
+                    )),
                   ]),
                 ),
                 SizedBox(
                   height: ScreenUtil().setHeight(15),
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: !Platform.isIOS?MainAxisAlignment.center:MainAxisAlignment.spaceEvenly,
                   children: [
                     GestureDetector(
                       onTap: () {
@@ -478,7 +481,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                       ),
                     ),
                     SizedBox(width: ScreenUtil().setWidth(5)),
-                    Container(
+                    !Platform.isIOS?Container():  Container(
                       height: ScreenUtil().setHeight(65),
                       width: ScreenUtil().setWidth(90),
                       decoration: BoxDecoration(
@@ -520,32 +523,23 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
 
   void checkValidation() {
     if (_emailController.text.isEmpty) {
-  //    print('Entered Text: ${_emailController.text}');
-     // Message(context, "Enter Email Address");
-    }
-    else if (_mobileController.text.isEmpty) {
+      //    print('Entered Text: ${_emailController.text}');
+      // Message(context, "Enter Email Address");
+    } else if (_mobileController.text.isEmpty) {
       Message(context, "Enter Mobile Number");
-    }
-    else if (_nameController.text.isEmpty) {
+    } else if (_nameController.text.isEmpty) {
       Message(context, "Enter Agent Name");
-    }
-    else if (_passwordController.text.isEmpty) {
+    } else if (_passwordController.text.isEmpty) {
       Message(context, "Enter Password");
-    }
-    else if (_agencyNameController.text.isEmpty) {
+    } else if (_agencyNameController.text.isEmpty) {
       Message(context, "Enter Agency Name");
-    }
-    else if (_confirmPasswordController.text.isEmpty) {
+    } else if (_confirmPasswordController.text.isEmpty) {
       Message(context, "Re-enter Password");
-    }
-    else if (_brnController.text.isEmpty) {
+    } else if (_brnController.text.isEmpty) {
       Message(context, "Enter BRN");
-    }
-    else if(_passwordController.text!=_confirmPasswordController.text)
-    {
+    } else if (_passwordController.text != _confirmPasswordController.text) {
       Message(context, "Password & Confirm Password not matched");
-    }
-    else {
+    } else {
       RegisterAPI();
     }
   }
@@ -562,7 +556,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     );
     final headers = {'Accept': 'application/json'};
     Map<String, dynamic> body = {
-      'fcm':token,
+      'fcm': token,
       'role': "agent",
       'name': _nameController.text,
       'password': _passwordController.text,
@@ -573,7 +567,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       'agency_name': _agencyNameController.text
     };
 
-   /* 'location': _addressController.text,
+    /* 'location': _addressController.text,
     'country_code': "+971",
     'agent_ref': _refNumController.text,
     'broker_orn': _ornController.text,
@@ -622,7 +616,11 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
             context,
             MaterialPageRoute(
               builder: (context) {
-                return  RegistrationOtpVendor(_passwordController.text,_emailController.text, _nameController.text,_mobileController.text);
+                return RegistrationOtpVendor(
+                    _passwordController.text,
+                    _emailController.text,
+                    _nameController.text,
+                    _mobileController.text);
               },
             ),
           );
@@ -642,10 +640,17 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
   }
 
   Future<String?> signInWithGoogle() async {
+    final googleCurrentUser =
+        GoogleSignIn().currentUser ?? await GoogleSignIn().signIn();
+    if (googleCurrentUser != null)
+      await GoogleSignIn().disconnect().catchError((e, stack) {
+        print("Error");
+      });
+    await _auth.signOut();
     final GoogleSignInAccount? googleUser =
-    await GoogleSignIn(scopes: <String>["email"]).signIn();
+        await GoogleSignIn(scopes: <String>["email"]).signIn();
     final GoogleSignInAuthentication googleAuth =
-    await googleUser!.authentication;
+        await googleUser!.authentication;
 
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
@@ -653,7 +658,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     );
 
     final UserCredential authResult =
-    await _auth.signInWithCredential(credential);
+        await _auth.signInWithCredential(credential);
     final User? user = authResult.user;
 
     if (user != null) {
@@ -666,7 +671,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       email = user.email!;
       imageUrl = user.photoURL!;
       uId = user.uid;
-      postRegisterGoogleData(uId, name, email);
+      postRegisterGoogleData(uId, name, email,user.phoneNumber!=null?user.phoneNumber!:"",imageUrl);
       // Only taking the first part of the name, i.e., First Name
       if (name.contains(" ")) {
         name = name.substring(0, name.indexOf(" "));
@@ -687,7 +692,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
   }
 
   Future<void> postRegisterGoogleData(
-      String? accessToken, String name, String email) async {
+      String? accessToken, String name, String email, String phone, String imageUrl) async {
     setState(() {
       isloading = true;
     });
@@ -720,6 +725,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       'platform': deviceName,
       'email': email,
       'fcm_token': token,
+      'mobile_number': phone,
+
       'role': "agent",
     };
     String jsonBody = json.encode(body);
@@ -757,8 +764,11 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
         prefs.setString("profileImage",
             getdata["0"]["original"]["user"]["image"].toString());
         prefs.setBool("isLogging", true);
+        prefs.setBool("isSocial", true);
+        prefs.setString("socialDP",imageUrl);
         if(getdata["isLogin"])
         {
+          print(getdata["isLogin"]);
           Future.delayed(const Duration(milliseconds: 1000), () {
             Navigator.pushReplacement(
               context,
@@ -772,9 +782,12 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
         }
         else
         {
+          print("--false---");
+          print(getdata["isLogin"]);
+
           Future.delayed(const Duration(milliseconds: 2000), () {
             Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => RegistrationPageVendor(name,email)));
+                builder: (context) => AddInfo(name,email)));
           });
         }
         /*bookTable();*/
@@ -791,6 +804,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       ErrorMessage(context, getdata["message"]);
     }
   }
+
   Future<OAuthCredential?> _loginWithFacebook() async {
     print("FBLOgin");
     final fb = FacebookLogin();
@@ -802,13 +816,13 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     // Check result status
     switch (res.status) {
       case FacebookLoginStatus.success:
-      // The user is suceessfully logged in
-      // Send access token to server for validation and auth
+        // The user is suceessfully logged in
+        // Send access token to server for validation and auth
         final FacebookAccessToken? accessToken = res.accessToken;
         final AuthCredential authCredential =
-        FacebookAuthProvider.credential(accessToken!.token);
+            FacebookAuthProvider.credential(accessToken!.token);
         final result =
-        await FirebaseAuth.instance.signInWithCredential(authCredential);
+            await FirebaseAuth.instance.signInWithCredential(authCredential);
         // Get profile data from facebook for use in the app
         final profile = await fb.getUserProfile();
         print('Hello, ${profile!.name}! You ID: ${profile.userId}');
@@ -819,18 +833,17 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
         final email = await fb.getUserEmail();
         // But user can decline permission
         if (email != null) print('And your email is $email');
-        postRegisterGoogleData(profile.userId, profile.name!, email!);
+        postRegisterGoogleData(profile.userId, profile.name!, email!,"",imageUrl!);
         break;
       case FacebookLoginStatus.cancel:
-      // In case the user cancels the login process
+        // In case the user cancels the login process
         break;
       case FacebookLoginStatus.error:
-      // Login procedure failed
+        // Login procedure failed
         print('Error while log in: ${res.error}');
         break;
     }
   }
-
 }
 
 ScaffoldFeatureController<SnackBar, SnackBarClosedReason> Message(

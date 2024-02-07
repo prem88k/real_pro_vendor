@@ -226,10 +226,6 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                               if (_emailController.text.isNotEmpty &&
                                   _passwordController.text.isNotEmpty) {
                                 // Validation passed, initiate the login
-                                setState(() {
-                                  isloading = true;
-                                });
-
                                 // Call the login function
                                 Login();
                               } else {
@@ -363,6 +359,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                   children: [
                     GestureDetector(
                       onTap: () {
+
                         signInWithGoogle();
                       },
                       child: Container(
@@ -622,15 +619,6 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
     );
   }
 
-  void checkValidation() {
-    if (_emailController.text.isEmpty) {
-      Message(context, "Enter Email Address");
-    } else if (_passwordController.text.isEmpty) {
-      Message(context, "Enter Password");
-    } else {
-      Login();
-    }
-  }
 
   Future<void> Login() async {
     setState(() {
@@ -685,26 +673,18 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
         prefs.setBool("isLogging", true);
 
         /*bookTable();*/
-        if(getdata["isLogin"])
-          {
-            Future.delayed(const Duration(milliseconds: 1000), () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return BottomNavigationBarVendor();
-                  },
-                ),
-              );
-            });
-          }
-        else
-          {
-            Future.delayed(const Duration(milliseconds: 2000), () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => RegistrationPageVendor(name,email)));
-            });
-          }
+        if(getdata["status"])
+
+          Future.delayed(const Duration(milliseconds: 1000), () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return BottomNavigationBarVendor();
+                },
+              ),
+            );
+          });
       } else {
         setState(() {
           isloading = false;
@@ -747,7 +727,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
         final email = await fb.getUserEmail();
         // But user can decline permission
         if (email != null) print('And your email is $email');
-        postRegisterGoogleData(profile.userId, profile.name!, email!);
+        postRegisterGoogleData(profile.userId, profile.name!, email!,"",imageUrl);
         break;
       case FacebookLoginStatus.cancel:
         // In case the user cancels the login process
@@ -760,6 +740,13 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
   }
 
   Future<String?> signInWithGoogle() async {
+    final googleCurrentUser =
+        GoogleSignIn().currentUser ?? await GoogleSignIn().signIn();
+    if (googleCurrentUser != null)
+      await GoogleSignIn().disconnect().catchError((e, stack) {
+        print("Error");
+      });
+    await _auth.signOut();
     final GoogleSignInAccount? googleUser =
         await GoogleSignIn(scopes: <String>["email"]).signIn();
     final GoogleSignInAuthentication googleAuth =
@@ -784,7 +771,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
       email = user.email!;
       imageUrl = user.photoURL!;
       uId = user.uid;
-      postRegisterGoogleData(uId, name, email);
+      postRegisterGoogleData(uId, name, email,user.phoneNumber!=null?user.phoneNumber!:"",imageUrl);
       // Only taking the first part of the name, i.e., First Name
       if (name.contains(" ")) {
         name = name.substring(0, name.indexOf(" "));
@@ -805,7 +792,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
   }
 
   Future<void> postRegisterGoogleData(
-      String? accessToken, String name, String email) async {
+      String? accessToken, String name, String email, String phone, String? imageUrl) async {
     setState(() {
       isloading = true;
     });
@@ -837,7 +824,9 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
       'device_id': deviceId,
       'platform': deviceName,
       'email': email,
-     // 'fcm_token': token,
+      'mobile_number': phone,
+
+      // 'fcm_token': token,
       'role': "agent",
     };
     String jsonBody = json.encode(body);
@@ -875,6 +864,8 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
         prefs.setString("profileImage",
             getdata["0"]["original"]["user"]["image"].toString());
         prefs.setBool("isLogging", true);
+        prefs.setBool("isSocial", true);
+        prefs.setString("socialDP",imageUrl!);
         if(getdata["isLogin"])
         {
           print(getdata["isLogin"]);
@@ -1010,6 +1001,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
       'platform': deviceName,
       'email': email,
       'fcm': "dkjsdksldks",
+      'role':"user"
     };
     String jsonBody = json.encode(body);
     final encoding = Encoding.getByName('utf-8');
@@ -1044,6 +1036,8 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
             "phone", getdata["0"]["original"]["user"]["mobile_number"].toString());
         prefs.setString("phone",
             getdata["0"]["original"]["user"]["mobile_number"].toString());
+        prefs.setString("profileImage",
+            getdata["0"]["original"]["user"]["image"].toString());
         prefs.setBool("isLogging", true);
         bool? isLogging = prefs.getBool("isHome");
 

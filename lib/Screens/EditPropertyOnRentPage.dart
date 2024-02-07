@@ -258,7 +258,8 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     getPropertyDetails.data![0].location == null ?
     _locationController.text :
     _locationController.text = getPropertyDetails.data![0].location.toString();
-
+    print("---"+getPropertyDetails.data![0].propertyTypeId!.toString());
+    propertyType= getPropertyDetails.data![0].propertyTypeId!.toString();
     getPropertyDetails.data?[0].floor == null ?
     " " : _floorController.text = getPropertyDetails.data![0].floor.toString();
 
@@ -277,11 +278,9 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     getPropertyDetails.data?[0].price == null ?
     " " : _amountController.text = getPropertyDetails.data![0].price.toString();
 
-    getPropertyDetails.data![0].categoryId == null ?
-     propertyType : propertyType = getPropertyDetails.data![0].categoryId.toString();
-    if(getPropertyDetails.data![0].categoryId != null)
+    if(getPropertyDetails.data![0].propertyTypeId != null)
       {
-        getCategory(propertyType!);
+        getCategory(getPropertyDetails.data![0].propertyTypeId!.toString());
 
       }
     getPropertyDetails.data![0].category!.id == null ?
@@ -2479,7 +2478,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
               ),
               child: Container(
                 height: ScreenUtil().setHeight(34),
-                width: ScreenUtil().setWidth(250),
+                width: ScreenUtil().setWidth(240),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: textFieldBorderColor)

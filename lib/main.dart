@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Real Pro',
       theme: ThemeData(
+        fontFamily: 'work',
         primarySwatch: Colors.blue,
       ),
       home: SplashScreen(),

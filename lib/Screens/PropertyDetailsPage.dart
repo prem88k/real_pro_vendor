@@ -98,7 +98,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: isLoadingD && details!.length == 0
+      body: isLoadingD && details!.length < 0
           ? Center(
           child: CircularProgressIndicator(
             color: appColor,
@@ -587,7 +587,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                                   left: ScreenUtil().setWidth(10)),
                               // width: ScreenUtil().setWidth(200),
                               child: Text(
-                                "For ${details![0].purpose!}: ${details![0].propertyType!} in ${details![0].tower!}, ${details![0].area!}, ${details![0].city!} ",
+                                "For ${details![0].purpose!}: ${details![0].propertyType!} in ${details![0].tower!=null?details![0].tower!:""}, ${details![0].area!}, ${details![0].city!} ",
                                 style: TextStyle(
                                   color: primaryColor,
                                   fontSize: ScreenUtil().setHeight(11),
@@ -1000,7 +1000,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                                   Container(
                                     width: ScreenUtil().setHeight(100),
                                     child: Text(
-                                      details![0].tower!,
+                                      details![0].propertyName!,
                                       style: TextStyle(
                                         color: lineColor,
                                         fontSize:

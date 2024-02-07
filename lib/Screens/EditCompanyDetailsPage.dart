@@ -27,6 +27,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
   final TextEditingController _companyNameController = TextEditingController();
   final TextEditingController _companyAddressController = TextEditingController();
   final TextEditingController _brokerOrnController = TextEditingController();
+  final TextEditingController _companyDetailsController = TextEditingController();
 
   bool isloading=false;
 
@@ -251,7 +252,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
                   children: [
                     Container(
                       child: Text(
-                        'Agent ORN',
+                        'ORN',
                         style: TextStyle(
                           color: primaryColor,
                           fontSize: ScreenUtil().setWidth(12),
@@ -267,7 +268,67 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
                   ],
                 ),
               ),
+              SizedBox(
+                height: ScreenUtil().setHeight(7),
+              ),
 
+              Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: Text(
+                        'Description',
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontSize: ScreenUtil().setWidth(12),
+                          fontFamily: 'work',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: ScreenUtil().setHeight(15),
+                    ),
+
+                    TextFormField(
+                      controller: _companyDetailsController,
+                      keyboardType: TextInputType.text,
+                      textAlignVertical: TextAlignVertical.center,
+                      maxLines: 5,
+                      maxLength: 250,
+                      style: TextStyle(
+                        fontSize:  ScreenUtil().setWidth(12.5),
+                        color: primaryColor,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'work',
+                      ),
+
+                      validator: (value) {
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        filled: false,
+                        hintText: "Description",
+                        hintStyle: TextStyle(
+                            fontFamily: 'work',
+                            fontSize:   ScreenUtil().setWidth(12.5),
+                            fontWeight: FontWeight.w400,
+                            color: lightTextColor),
+                        border: OutlineInputBorder(
+                            borderSide:
+                            BorderSide(color: textFieldBorderColor),
+                            borderRadius: BorderRadius.circular(10)),
+                        contentPadding: EdgeInsets.only(
+                            left: ScreenUtil().setWidth(20),
+                            top: ScreenUtil().setHeight(15),
+                            bottom: ScreenUtil().setHeight(15)),
+                      ),
+                    ),
+
+                  ],
+                ),
+              ),
               SizedBox(
                 height: ScreenUtil().setHeight(25),
               ),
@@ -279,7 +340,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
 
                 },
                 child: RoundedButton(
-                  text: 'Edit Profile',
+                  text: 'Update',
                   press: () {},
                   color: appColor,
                 ),
@@ -333,6 +394,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
     request.fields['company_address'] = _companyAddressController.text;
     request.fields['broker_orn'] =_brokerOrnController.text;
     request.fields['country_code'] ="+971";
+    request.fields['about_company'] =_companyDetailsController.text;
 
     if(image!=null)
     {
@@ -380,7 +442,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return BottomNavigationBarVendor();
+                    return BottomNavigationBarVendor(3);
                   },
                 ),
               );

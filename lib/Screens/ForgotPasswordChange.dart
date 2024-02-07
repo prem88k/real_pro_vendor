@@ -101,7 +101,7 @@ class _ForgotPasswordChangePageState extends State<ForgotPasswordChangePage> {
                   height: ScreenUtil().setHeight(35),
                 ),
                 Container(
-                  height: ScreenUtil().setHeight(195),
+                  height: ScreenUtil().setHeight(230),
                   child: Column(
                     children: [
                       Row(

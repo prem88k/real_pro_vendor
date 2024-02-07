@@ -30,7 +30,6 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _brnController = TextEditingController();
   bool isloading=false;
-  final TextEditingController _aboutController = TextEditingController();
 
   bool isVisibleV = false;
   File? image;
@@ -114,7 +113,7 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
                   children: [
                     Container(
                       child: Text(
-                        'Email',
+                        'Name',
                         style: TextStyle(
                           color: primaryColor,
                           fontSize: ScreenUtil().setWidth(12),
@@ -206,32 +205,7 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
                   ],
                 ),
               ),
-              SizedBox(
-                height: ScreenUtil().setHeight(7),
-              ),
 
-              Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      child: Text(
-                        'About Me',
-                        style: TextStyle(
-                          color: primaryColor,
-                          fontSize: ScreenUtil().setWidth(12),
-                          fontFamily: 'work',
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    TextFieldUpload(
-                      title: widget.getCountData.user!.description != null ? widget.getCountData.user!.description.toString() : "About Me",
-                      controller: _aboutController,
-                    ),
-                  ],
-                ),
-              ),
 
               /*  TextFieldUpload(
                 title: 'Agency Name',
@@ -300,7 +274,6 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
     request.fields['email'] =prefs.getString('email')!;
     request.fields['mobile_number'] =_mobileController.text;
     request.fields['name'] = _nameController.text;
-    request.fields['description'] = _aboutController.text;
     request.fields['agent_brn'] =_brnController.text;
     request.fields['agency_name'] = _agencyNameController.text;
     request.fields['country_code'] ="+971";
@@ -343,7 +316,7 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return BottomNavigationBarVendor();
+                    return BottomNavigationBarVendor(3);
                   },
                 ),
               );

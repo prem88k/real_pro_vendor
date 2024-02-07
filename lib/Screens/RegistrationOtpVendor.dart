@@ -201,7 +201,8 @@ class _RegistrationOtpVendorState extends State<RegistrationOtpVendor> {
                 onTap: (){
                   if(_start==0)
                     {
-                      startTimer();
+                      ResendOTP();
+                      //startTimer();
                     }
                 },
                 child: Container(
@@ -210,7 +211,7 @@ class _RegistrationOtpVendorState extends State<RegistrationOtpVendor> {
                     child: Text(
                       _start==0?'Resend OTP':"0:"+_start.toString(),
                       style: TextStyle(
-                        color: darkTextColor,
+                        color: appColor,
                         fontSize: ScreenUtil().setWidth(12),
                         fontFamily: 'work',
                         fontWeight: FontWeight.w600,
@@ -485,6 +486,65 @@ class _RegistrationOtpVendorState extends State<RegistrationOtpVendor> {
             ),
           );
         });
+      } else {
+        setState(() {
+          isloading = false;
+        });
+        ErrorMessage(context, getdata["message"]);
+      }
+    } else {
+      setState(() {
+        isloading = false;
+      });
+      ErrorMessage(context, getdata["message"]);
+    }
+  }
+
+  Future<void> ResendOTP() async {
+    setState(() {
+      isloading = true;
+    });
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/realpro/api/auth/user/resendotp',
+    );
+    final headers = {'Accept': 'application/json'};
+    Map<String, dynamic> body = {
+      'email': widget.email,
+    };
+    String jsonBody = json.encode(body);
+    final encoding = Encoding.getByName('utf-8');
+
+    Response response = await post(
+      uri,
+      headers: headers,
+      body: body,
+      encoding: encoding,
+    );
+    var getdata = json.decode(response.body);
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    print("responseStep1::$responseBody");
+    if (statusCode == 200) {
+      if (getdata["status"]) {
+        setState(() {
+          isloading = false;
+          _start=59;
+        });
+        Message(context, "OTP Resent Successfully");
+        startTimer();
+        /* prefs.setString("access_token", "Bearer ${getdata["0"]["original"]["access_token"].toString()}");
+        prefs.setString("name", getdata["0"]["original"]["user"]["name"].toString());
+        prefs.setString("UserId", "${getdata["0"]["original"]["user"]["id"].toString()}");
+        prefs.setString("email", getdata["0"]["original"]["user"]["email"].toString());
+        prefs.setString("phone", getdata["0"]["original"]["user"]["mobile_number"].toString());
+        prefs.setBool("isLogging", true);*/
+
+        /*bookTable();*/
+
       } else {
         setState(() {
           isloading = false;

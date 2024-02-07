@@ -24,14 +24,14 @@ import '../Presentation/common_button.dart';
 import 'PropertyDetailsPage.dart';
 import 'SearchBarPage.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class ListedProperty extends StatefulWidget {
+  const ListedProperty({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<ListedProperty> createState() => _ListedPropertyState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _ListedPropertyState extends State<ListedProperty> {
   final TextEditingController _searchController = TextEditingController();
   int? selectedIndex=0;
   late GecategoryData gecategoryData;
@@ -67,28 +67,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print("123");
-    badList!.addAll(["0", "1", "2", "3", "4", "5", "6", "7"]);
-    bathroomList!.addAll(["0", "1", "2", "3", "4", "5", "6", "7"]);
-    furnushedList!
-        .addAll(["Furnished", "UnFurnished", "Partly Furnished", "All"]);
-    sortList!
-        .addAll(["Newest First", "Oldest First", "Price--Low to High", "Price--High to Low"]);
-    commentList!.addAll([
-      "test21213232",
-      "test34344",
-      "Partly Furnished",
-      "All",
-      "test21213232",
-      "test34344",
-      "Partly Furnished",
-      "All"
-    ]);
-    popularList!
-        .addAll(["Chiller Free", "Pool", "Balcony", "Brand New", "Metro"]);
-    filterList!.addAll(["Buy", "Rent"]);
     getPropertyAPI(0);
-    getCategory();
   }
 
   @override
@@ -104,6 +83,27 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       backgroundColor: Color(0xffF5F6F8),
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+            color: secondaryColor
+        ),
+        backgroundColor: appColor,
+        elevation: 0,
+        centerTitle: true,
+        title:
+        Container(
+          child: Text(
+            'Listed Properties',
+            style: TextStyle(
+              color: secondaryColor,
+              fontSize: ScreenUtil().setWidth(15),
+              fontFamily: 'work',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+
       body: isloading || catloading
           ? Center(
           child: CircularProgressIndicator(
@@ -118,104 +118,13 @@ class _HomePageState extends State<HomePage> {
                 right: ScreenUtil().setWidth(15)),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        // add your code here.
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return SearchPage();
-                              //WelcomeLoginPage();
-                            },
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding:
-                        EdgeInsets.only(left: ScreenUtil().setWidth(12)),
-                        height: ScreenUtil().setHeight(38),
-                        width: ScreenUtil().setWidth(275),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          color: secondaryColor,
-                        ),
-                        child: Center(
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.search,
-                                color: Color(0xff05122B),
-                              ),
-                              SizedBox(
-                                width: ScreenUtil().setWidth(12),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    bottom: ScreenUtil().setWidth(4)),
-                                child: Text(
-                                  "Search city, building, location ",
-                                  style: TextStyle(
-                                      fontFamily: 'work',
-                                      fontSize: ScreenUtil().setHeight(12),
-                                      fontWeight: FontWeight.normal,
-                                      color: primaryColor),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                  ],
-                ),
-                SizedBox(
-                  height: ScreenUtil().setHeight(15),
-                ),
-                _buildCatList(),
-                SizedBox(
-                  height: ScreenUtil().setHeight(15),
-                ),
-                proppertyList!.length==0?Container():  Container(
-                  height: ScreenUtil().setHeight(35),
-                  margin: EdgeInsets.only(
-                    bottom: ScreenUtil().setHeight(15),
-                  ),
-                  child:Container(
-                    width:ScreenUtil().setWidth(125) ,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return BottomNavigationBarVendor(1);
-                            },
-                          ),
-                        );
-                      },
-                      child: RoundedButton(
-                        text: 'Add Property',
-                        press: () {},
-                        color: appColor,
-                      ),
-                    ),
-                  ),
-
-                ),
-
                 proppertyList!.length!=0?_buildPropertyList():Container(
                   height: ScreenUtil().setHeight(300),
                   width: ScreenUtil().screenWidth,
                   child: Center(
                     child: Column(
-
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-
                         Text("No properties found.\nPlease add property.",style: TextStyle(
                           color: lineColor,
                           fontSize: ScreenUtil().setWidth(14),
@@ -265,58 +174,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildCatList() {
-    return Container(
-      alignment: Alignment.centerLeft,
-      height: ScreenUtil().setHeight(27),
-      child: ListView.builder(
-        itemCount: catList!.length,
-        scrollDirection: Axis.horizontal,
-        shrinkWrap: true,
-        itemBuilder: (context, i) {
-          return _buildList(i);
-        },
-      ),
-    );
-  }
 
-  Widget _buildList(int i) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedIndex = catList![i].id;
-        });
-        getPropertyAPI(catList![i].id!);
-      },
-      child: Container(
-        margin: EdgeInsets.only(right: ScreenUtil().setWidth(10)),
-        padding: EdgeInsets.only(
-            right: ScreenUtil().setWidth(14), left: ScreenUtil().setWidth(14)),
-        height: ScreenUtil().setHeight(14),
-        decoration: BoxDecoration(
-            border: Border.all(
-                color: selectedIndex == catList![i].id ? appColor : borderColor,
-                width: 0.2),
-            color: selectedIndex == catList![i].id
-                ? secondaryColor
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(5.0)),
-        child: Center(
-          child: Text(
-            catList![i].name!,
-            style: TextStyle(
-              color:
-              selectedIndex == catList![i].id ? lineColor : darkTextColor,
-              fontSize: ScreenUtil().setWidth(13),
-              fontFamily: 'work',
-              fontWeight:
-              selectedIndex == i ? FontWeight.w800 : FontWeight.w400,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildPropertyList() {
     return Expanded(
@@ -358,13 +216,14 @@ class _HomePageState extends State<HomePage> {
       ),
     )
         : Column(
-          children: [
-            GestureDetector(
-      onTap: () {
+      children: [
+
+        GestureDetector(
+          onTap: () {
             _navigateAndDisplaySelection(context,i);
 
-      },
-      child: Container(
+          },
+          child: Container(
             margin: EdgeInsets.only(bottom: ScreenUtil().setWidth(15)),
             decoration: BoxDecoration(
                 color: secondaryColor,
@@ -845,55 +704,12 @@ class _HomePageState extends State<HomePage> {
                 )
               ],
             ),
-      ),
-    ),
-          ],
-        );
+          ),
+        ),
+      ],
+    );
   }
 
-  Future<void> getCategory() async {
-    catList!.clear();
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs.getString("purpose");
-    prefs.getInt("property_type");
-
-    setState(() {
-      catloading = true;
-      prefs.setBool("isHome", true);
-    });
-
-    var uri = Uri.https(
-      apiBaseUrl,
-      '/realpro/api/user/getcategory'
-          ,
-    );
-    final headers = {'Authorization': '${prefs.getString('access_token')}'};
-    Response response = await get(
-      uri,
-      headers: headers,
-    );
-
-    int statusCode = response.statusCode;
-    String responseBody = response.body;
-    var getdata = json.decode(response.body);
-
-    print("CategoryResposne::$responseBody");
-    if (statusCode == 200) {
-      setState(() {
-        catloading = false;
-      });
-      if (mounted == true) {}
-      if (getdata["status"]) {
-        gecategoryData = GecategoryData.fromJson(jsonDecode(responseBody));
-        catList!.addAll(gecategoryData.data!);
-      } else {}
-    } else {
-      setState(() {
-        catloading = false;
-      });
-    }
-  }
 
   Future<void> getPropertyAPI(int id, [int ?indexWhere]) async {
     proppertyList!.clear();
@@ -976,72 +792,6 @@ class _HomePageState extends State<HomePage> {
   }
 
 
-  Future<void> isCollect(int? id, PropertyList propertyList) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    var uri = Uri.https(
-      apiBaseUrl,
-      '/realpro/api/user/property_add_collect',
-    );
-    Map<String, dynamic> body = {
-      'property_id': id.toString(),
-    };
-    final headers = {'Authorization': '${prefs.getString('access_token')}'};
-    Response response = await post(uri, headers: headers, body: body);
-
-    int statusCode = response.statusCode;
-    String responseBody = response.body;
-    var getdata = json.decode(response.body);
-
-    print("PropResposne::$responseBody");
-    if (statusCode == 200) {
-      if (mounted == true) {
-        setState(() {
-          if (propertyList.collected!) {
-            propertyList.collected = false;
-          } else {
-            propertyList.collected = true;
-          }
-        });
-      }
-      if (getdata["status"]) {
-      } else {}
-    }
-  }
-  Future<void> isCommentLiked(int? id, Comment commentList) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    var uri = Uri.https(
-      apiBaseUrl,
-      '/realpro/api/user/comment_like',
-    );
-    Map<String, dynamic> body = {
-      'comment_id': id.toString(),
-    };
-    final headers = {'Authorization': '${prefs.getString('access_token')}'};
-    Response response = await post(uri, headers: headers, body: body);
-
-    int statusCode = response.statusCode;
-    String responseBody = response.body;
-    var getdata = json.decode(response.body);
-
-    print("commentLikeResponse::$responseBody");
-    if (statusCode == 200) {
-      if (mounted == true) {
-        setState(() {
-          if (commentList.liked == 1) {
-            commentList.liked = 0;
-            commentList.countCommentLike = commentList.countCommentLike! - 1;
-          } else {
-            commentList.liked = 1;
-            commentList.countCommentLike = commentList.countCommentLike! + 1;
-          }
-        });
-      }
-      if (getdata["status"]) {
-      } else {}
-    }
-  }
 
 
 

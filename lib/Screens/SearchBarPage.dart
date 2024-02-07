@@ -610,51 +610,6 @@ class _SearchPageState extends State<SearchPage> {
                                   "Comments ( ${proppertyList![i].totalComment} )",
                                   style: TextStyle(
                                     color: darkTextColor,
-                                    fontSize: ScreenUtil().setWidth(10),
-                                    fontFamily: 'work',
-                                    height: ScreenUtil().setWidth(1),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          isCollect(
-                              proppertyList![i].id, proppertyList![i]);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          width: ScreenUtil().setWidth(80),
-                          height: ScreenUtil().setHeight(32),
-                          child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: ScreenUtil().setWidth(6),
-                                ),
-                                Container(
-                                    height: ScreenUtil().setHeight(26),
-                                    width: ScreenUtil().setHeight(26),
-                                    child: Icon(
-                                      !proppertyList![i].collected!
-                                          ? Icons.bookmark_border
-                                          : Icons.bookmark,
-                                      color: !proppertyList![i].collected!
-                                          ? appColor
-                                          : Colors.red,
-                                      size: ScreenUtil().setHeight(14),
-                                    )),
-                                Text(
-                                  "Save",
-                                  style: TextStyle(
-                                    color: darkTextColor,
                                     fontSize: ScreenUtil().setWidth(12),
                                     fontFamily: 'work',
                                     height: ScreenUtil().setWidth(1),
@@ -665,7 +620,8 @@ class _SearchPageState extends State<SearchPage> {
                             ),
                           ),
                         ),
-                      )
+                      ),
+
                     ],
                   )
                 ],

@@ -92,6 +92,7 @@ dev_dependencies:
   geocoding: ^2.0.1
   place_picker: ^0.10.0
   sign_in_with_apple: ^5.0.0
+  dropdown_search: ^2.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

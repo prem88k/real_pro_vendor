@@ -151,9 +151,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       )
                     : GestureDetector(
                         onTap: () {
-                          final bool emailValid = RegExp(
-                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                              .hasMatch(_emailController.text);
+                            final bool emailValid = RegExp(
+                                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                .hasMatch(_emailController.text);
                           if (_emailController.text.isEmpty) {
                             Message(context, "Enter Email");
                           } else if (!emailValid) {

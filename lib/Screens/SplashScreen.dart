@@ -97,15 +97,7 @@ class _SplashScreenState extends State<SplashScreen>
                         children: [
                           Padding(
                               padding: const EdgeInsets.all(5.0),
-                              child: Text(
-                                "RealPro",
-                                style: TextStyle(
-                                  color: secondaryColor,
-                                  fontSize: ScreenUtil().setWidth(18),
-                                  fontFamily: 'work',
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              )),
+                              child: Image.asset("assets/images/trans_logo.png",width: ScreenUtil().setWidth(100),)),
                           SizedBox(
                             height: size.height * 0.035,
                           ),

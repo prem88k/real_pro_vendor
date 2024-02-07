@@ -117,7 +117,7 @@ class _NotificationPageState extends State<NotificationPage> {
                   top: ScreenUtil().setHeight(10)),
               padding: EdgeInsets.only(
                   left: ScreenUtil().setWidth(10),
-                  right: ScreenUtil().setWidth(10),
+                  right: ScreenUtil().setWidth(0),
                   bottom: ScreenUtil().setHeight(15),
                   top: ScreenUtil().setHeight(15)),
               width: ScreenUtil().screenWidth,

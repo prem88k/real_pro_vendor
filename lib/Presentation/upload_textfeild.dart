@@ -36,10 +36,11 @@ class _TextFieldUploadState extends State<TextFieldUpload> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(0), vertical:ScreenUtil().setWidth(5)),
       child: Container(
-        height:  widget.title=="What is your concern?"? ScreenUtil().setHeight(85):ScreenUtil().setHeight(45),
+        height:  widget.title=="Add Description"? ScreenUtil().setHeight(60):ScreenUtil().setHeight(45),
         child: TextFormField(
-          maxLines: widget.title=="What is your concern?"?5:1,
-          minLines: widget.title=="What is your concern?"?5:1,
+          maxLines: widget.title=="Add Description"?3:1,
+          minLines: widget.title=="Add Description"?3:1,
+
           textAlignVertical: TextAlignVertical.center,
             style: TextStyle(
               fontSize: ScreenUtil().setWidth(12.5),
