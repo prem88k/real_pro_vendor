@@ -216,6 +216,8 @@ class _UploadPostPageState extends State<UploadPostPage> {
 
   late GetAreaData getAreaData;
   List<AreaList>? areaList = [];
+  List<TowerList>? towerListNew = [];
+
   AreaList? _areaList;
   TowerList? _towerList;
 
@@ -1052,7 +1054,8 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                       getTower(value.id.toString());
                                       setState(() {
                                         selectedTower = value.id.toString();
-                                        dropdownTowerValue= value.id.toString();
+                                        dropdownTowerValue =
+                                            value.id.toString();
                                         selectedTowerName =
                                             value.towerName.toString();
                                       });
@@ -2898,6 +2901,15 @@ class _UploadPostPageState extends State<UploadPostPage> {
       if (getdata["success"]) {
         getTowerData = GetTowerData.fromJson(jsonDecode(responseBody));
         towerList!.addAll(getTowerData.data!);
+        int index = towerList!.indexWhere((item) => item.areaId == 0);
+        print("--$index");
+        towerListNew!.add(towerList![index]);
+        print(towerList![index]);
+        towerList!.remove(towerList![index]);
+        print(towerListNew!.map((element) {
+          element.areaId.toString();
+        }));
+        towerList!.add(towerListNew![0]);
       } else {}
     } else {
       setState(() {
