@@ -353,7 +353,7 @@ class _AddInfoState extends State<AddInfo> {
     print("Tpkoen::$token");
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/edit_profile',
+      '/api/user/edit_profile',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
 

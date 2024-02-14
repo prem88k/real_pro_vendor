@@ -2649,7 +2649,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getcategory/${id}',
+      '/api/user/getcategory/${id}',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2688,7 +2688,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/get_amenities',
+      '/api/user/get_amenities',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2726,7 +2726,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/get_packages',
+      '/api/user/get_packages',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2765,7 +2765,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/get_propertytype',
+      '/api/user/get_propertytype',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2804,7 +2804,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getcity',
+      '/api/user/getcity',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2842,7 +2842,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getarea/${id}',
+      '/api/user/getarea/${id}',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2880,7 +2880,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/gettower/${id}',
+      '/api/user/gettower/${id}',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2954,7 +2954,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
     print("Tpkoen::$token");*/
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var url = Uri.https(apiBaseUrl, '/realpro/api/user/addproperty');
+    var url = Uri.https(apiBaseUrl, '/api/user/addproperty');
     //----------------------------------------------------------
     var request = new http.MultipartRequest("POST", url);
     request.headers['Authorization'] = prefs.getString('access_token')!;

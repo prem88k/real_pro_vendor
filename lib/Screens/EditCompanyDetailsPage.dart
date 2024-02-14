@@ -385,7 +385,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var url = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/edit_profile',
+      '/api/user/edit_profile',
     );
     var request = new http.MultipartRequest("POST", url);
     request.headers['Authorization']=prefs.getString('access_token')!;

@@ -601,7 +601,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/comment_like',
+      '/api/user/comment_like',
     );
     Map<String, dynamic> body = {
       'comment_id': id.toString(),
@@ -665,7 +665,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var uri = Uri.https(
       apiBaseUrl,
-      isReply ? '/realpro/api/user/add_comment_reply':'/realpro/api/user/add_comment',
+      isReply ? '/api/user/add_comment_reply':'/api/user/add_comment',
     );
     Map<String, dynamic> body = {
       'product_id': widget.productId.toString(),
@@ -697,7 +697,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/get_comment',
+      '/api/user/get_comment',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Map<String, dynamic> body = {

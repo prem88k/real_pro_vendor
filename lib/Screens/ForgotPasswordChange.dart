@@ -201,7 +201,7 @@ class _ForgotPasswordChangePageState extends State<ForgotPasswordChangePage> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/auth/user/resetpassword',
+      '/api/auth/user/resetpassword',
     );
     final headers = {'Accept': 'application/json'};
     // String? token = await FirebaseMessaging.instance.getToken();

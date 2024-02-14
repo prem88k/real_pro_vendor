@@ -138,7 +138,7 @@ class _FollowersListPageState extends State<FollowersListPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/user_follower_list',
+      '/api/user/user_follower_list',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
 

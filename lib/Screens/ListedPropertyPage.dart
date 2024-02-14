@@ -721,7 +721,7 @@ class _ListedPropertyState extends State<ListedProperty> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getMyproperty',
+      '/api/user/getMyproperty',
     );
     Map<String, dynamic> body = {
       'pagenumber': "1",
@@ -761,7 +761,7 @@ class _ListedPropertyState extends State<ListedProperty> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/property_like',
+      '/api/user/property_like',
     );
     Map<String, dynamic> body = {
       'property_id': id.toString(),

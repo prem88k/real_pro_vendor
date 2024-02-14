@@ -1208,7 +1208,7 @@ class _ProfilePageState extends State<ProfilePage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getcounts',
+      '/api/user/getcounts',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -1265,7 +1265,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var url = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/edit_profile',
+      '/api/user/edit_profile',
     );
     var request = new http.MultipartRequest("POST", url);
     request.headers['Authorization'] = prefs.getString('access_token')!;
@@ -1331,7 +1331,7 @@ class _ProfilePageState extends State<ProfilePage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/deleteaccount',
+      '/api/user/deleteaccount',
     );
     print('${prefs.getString('token')}');
 

@@ -865,7 +865,7 @@ class _HomePageState extends State<HomePage> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getcategory'
+      '/api/user/getcategory'
           ,
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
@@ -905,7 +905,7 @@ class _HomePageState extends State<HomePage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getMyproperty',
+      '/api/user/getMyproperty',
     );
     Map<String, dynamic> body = {
       'pagenumber': "1",
@@ -945,7 +945,7 @@ class _HomePageState extends State<HomePage> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/property_like',
+      '/api/user/property_like',
     );
     Map<String, dynamic> body = {
       'property_id': id.toString(),
@@ -981,7 +981,7 @@ class _HomePageState extends State<HomePage> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/property_add_collect',
+      '/api/user/property_add_collect',
     );
     Map<String, dynamic> body = {
       'property_id': id.toString(),
@@ -1013,7 +1013,7 @@ class _HomePageState extends State<HomePage> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/comment_like',
+      '/api/user/comment_like',
     );
     Map<String, dynamic> body = {
       'comment_id': id.toString(),

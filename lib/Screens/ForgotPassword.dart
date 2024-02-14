@@ -185,7 +185,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/auth/user/forgetpassword',
+      '/api/auth/user/forgetpassword',
     );
     final headers = {'Accept': 'application/json'};
     // String? token = await FirebaseMessaging.instance.getToken();

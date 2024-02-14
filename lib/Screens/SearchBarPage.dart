@@ -641,7 +641,7 @@ class _SearchPageState extends State<SearchPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/searchproperty/$search',
+      '/api/user/searchproperty/$search',
     );
    /* Map<String, dynamic> body = {
       'pagenumber': "1",
@@ -711,7 +711,7 @@ class _SearchPageState extends State<SearchPage> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/property_like',
+      '/api/user/property_like',
     );
     Map<String, dynamic> body = {
       'property_id': id.toString(),
@@ -747,7 +747,7 @@ class _SearchPageState extends State<SearchPage> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/property_add_collect',
+      '/api/user/property_add_collect',
     );
     Map<String, dynamic> body = {
       'property_id': id.toString(),

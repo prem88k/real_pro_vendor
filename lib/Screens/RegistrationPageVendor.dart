@@ -150,8 +150,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                           if (_emailController.text.isEmpty) {
                             return 'This field is required';
                           }
-                          else if (!emailValid) {
-                            Message(context, "Enter a valid email address");
+                           if (!emailValid) {
+                            return "Enter a valid email address";
                           }
                           return null;
                         },
@@ -322,11 +322,11 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                       ),
                       TextFieldWidget(
                         controller: _mobileController,
-                        title: "Mobile",
+                        title: "Mobile (Optional)",
                         validator: (value) {
-                          if (_mobileController.text.isEmpty) {
+                          /*if (_mobileController.text.isEmpty) {
                             return "This field is required";
-                          }
+                          }*/
                           return null;
                         },
                       ),
@@ -342,7 +342,6 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                       )
                     : GestureDetector(
                         onTap: () {
-                          setState(() {
                             if (_formKey.currentState!.validate()) {
                               // Validation passed, navigate to the next page
                               checkValidation();
@@ -355,7 +354,6 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                                 ),
                               );
                             }
-                          });
                           //    checkValidation();
                           /*      Navigator.push(
                       context,
@@ -444,7 +442,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         ),
                       ),
                     ),
-                    SizedBox(width: ScreenUtil().setWidth(5)),
+                 /*   SizedBox(width: ScreenUtil().setWidth(5)),
                     GestureDetector(
                       onTap: () {
                         _loginWithFacebook();
@@ -479,7 +477,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                           ],
                         ),
                       ),
-                    ),
+                    ),*/
                     SizedBox(width: ScreenUtil().setWidth(5)),
                     !Platform.isIOS?Container():  Container(
                       height: ScreenUtil().setHeight(65),
@@ -522,26 +520,31 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
   }
 
   void checkValidation() {
-    if (_emailController.text.isEmpty) {
-      //    print('Entered Text: ${_emailController.text}');
-      // Message(context, "Enter Email Address");
-    } else if (_mobileController.text.isEmpty) {
-      Message(context, "Enter Mobile Number");
-    } else if (_nameController.text.isEmpty) {
-      Message(context, "Enter Agent Name");
-    } else if (_passwordController.text.isEmpty) {
-      Message(context, "Enter Password");
-    } else if (_agencyNameController.text.isEmpty) {
-      Message(context, "Enter Agency Name");
-    } else if (_confirmPasswordController.text.isEmpty) {
-      Message(context, "Re-enter Password");
-    } else if (_brnController.text.isEmpty) {
-      Message(context, "Enter BRN");
-    } else if (_passwordController.text != _confirmPasswordController.text) {
-      Message(context, "Password & Confirm Password not matched");
-    } else {
-      RegisterAPI();
-    }
+    final bool emailValid = RegExp(
+        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(_emailController.text);
+    setState(() {
+      if (_formKey.currentState!.validate()) {
+        // Check additional conditions, such as non-empty text fields
+        if (_emailController.text.isNotEmpty &&
+            _passwordController.text.isNotEmpty&&emailValid&&_confirmPasswordController.text.isNotEmpty&&_agencyNameController.text.isNotEmpty&&_agencyNameController.text.isNotEmpty&&_brnController.text.isNotEmpty) {
+          // Validation passed, initiate the login
+          // Call the login function
+          RegisterAPI();
+        } else {
+          // Show an error message for empty text fields
+        }
+      } else {
+        // Validation failed, show an error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+            Text('Please fill in the required field.'),
+          ),
+        );
+      }
+    });
+
   }
 
   Future<void> RegisterAPI() async {
@@ -552,7 +555,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     print("Tpkoen::$token");
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/auth/user/registerotp',
+      '/api/auth/user/registerotp',
     );
     final headers = {'Accept': 'application/json'};
     Map<String, dynamic> body = {
@@ -563,7 +566,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       'email': _emailController.text,
       'agent_brn': _brnController.text,
       'company_name': _agencyNameController.text,
-      'mobile_number': _mobileController.text,
+      'mobile_number': _mobileController.text.isNotEmpty?_mobileController.text:"",
       'agency_name': _agencyNameController.text
     };
 
@@ -715,7 +718,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/auth/user/sociallogin',
+      '/api/auth/user/sociallogin',
     );
     final headers = {'Accept': 'application/json'};
     Map<String, dynamic> body = {

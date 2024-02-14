@@ -435,7 +435,7 @@ class _RegistrationOtpVendorState extends State<RegistrationOtpVendor> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/auth/user/register',
+      '/api/auth/user/register',
     );
     final headers = {'Accept': 'application/json'};
     Map<String, dynamic> body = {
@@ -508,7 +508,7 @@ class _RegistrationOtpVendorState extends State<RegistrationOtpVendor> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/auth/user/resendotp',
+      '/api/auth/user/resendotp',
     );
     final headers = {'Accept': 'application/json'};
     Map<String, dynamic> body = {

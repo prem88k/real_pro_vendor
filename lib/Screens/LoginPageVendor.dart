@@ -394,7 +394,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                       ),
                     ),
                     SizedBox(width: ScreenUtil().setWidth(5)),
-                    GestureDetector(
+                   /* GestureDetector(
                       onTap: () {
                         _loginWithFacebook();
                       },
@@ -428,7 +428,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                           ],
                         ),
                       ),
-                    ),
+                    ),*/
                     SizedBox(width: ScreenUtil().setWidth(5)),
                     !Platform.isIOS?Container():GestureDetector(
                       onTap: (){
@@ -629,7 +629,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/auth/user/login',
+      '/api/auth/user/login',
     );
     final headers = {'Accept': 'application/json'};
     Map<String, dynamic> body = {
@@ -815,7 +815,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/auth/user/sociallogin',
+      '/api/auth/user/sociallogin',
     );
     final headers = {'Accept': 'application/json'};
     Map<String, dynamic> body = {
@@ -991,7 +991,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/auth/user/apple/login',
+      '/api/auth/user/apple/login',
     );
     final headers = {'Accept': 'application/json'};
     Map<String, dynamic> body = {

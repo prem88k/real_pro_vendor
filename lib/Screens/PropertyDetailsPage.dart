@@ -1750,7 +1750,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/property_by_id',
+      '/api/user/property_by_id',
     );
     Map<String, dynamic> body = {
       'property_id': widget.property_id,
@@ -1793,7 +1793,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/property_like',
+      '/api/user/property_like',
     );
     Map<String, dynamic> body = {
       'property_id': id.toString(),
@@ -1831,7 +1831,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/property_like',
+      '/api/user/property_like',
     );
     Map<String, dynamic> body = {
       'property_id': id.toString(),
@@ -1870,7 +1870,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getproperty',
+      '/api/user/getproperty',
     );
     Map<String, dynamic> body = {
       'pagenumber': "1",
@@ -1903,7 +1903,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/property_add_collect',
+      '/api/user/property_add_collect',
     );
     Map<String, dynamic> body = {
       'property_id': id.toString(),
@@ -1936,7 +1936,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/property_add_collect',
+      '/api/user/property_add_collect',
     );
     Map<String, dynamic> body = {
       'property_id': id.toString(),

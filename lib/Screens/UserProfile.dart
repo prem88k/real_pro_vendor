@@ -1048,7 +1048,7 @@ class _UserProfileState extends State<UserProfile>
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getcategory',
+      '/api/user/getcategory',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -1086,7 +1086,7 @@ class _UserProfileState extends State<UserProfile>
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/user_profile',
+      '/api/user/user_profile',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(

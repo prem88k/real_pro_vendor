@@ -2099,7 +2099,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
 
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getcategory/${id}',
+      '/api/user/getcategory/${id}',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2151,7 +2151,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/get_amenities',
+      '/api/user/get_amenities',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2189,7 +2189,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/get_propertytype',
+      '/api/user/get_propertytype',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2231,7 +2231,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getcity',
+      '/api/user/getcity',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2269,7 +2269,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getarea/${id}',
+      '/api/user/getarea/${id}',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2307,7 +2307,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/gettower/${id}',
+      '/api/user/gettower/${id}',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(
@@ -2344,7 +2344,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/property_by_id',
+      '/api/user/property_by_id',
     );
     Map<String, dynamic> body = {
       'property_id': widget.property_id,
@@ -2385,7 +2385,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/delete_image_by_property',
+      '/api/user/delete_image_by_property',
     );
     Map<String, dynamic> body = {'product_id': product_id, 'image_id': id};
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
@@ -2420,7 +2420,7 @@ class _EditPropertyOnRentPageState extends State<EditPropertyOnRentPage> {
     print("Tpkoen::$token");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var url = Uri.https(
-        apiBaseUrl, '/realpro/api/user/updateproperty/${widget.property_id}');
+        apiBaseUrl, '/api/user/updateproperty/${widget.property_id}');
     //----------------------------------------------------------
     var request = new http.MultipartRequest("POST", url);
 

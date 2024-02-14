@@ -306,7 +306,7 @@ class _EnquiryDetailsPageState extends State<EnquiryDetailsPage> {
     });
     var uri = Uri.https(
       apiBaseUrl,
-      '/realpro/api/user/getenquiry/${widget.property_id}',
+      '/api/user/getenquiry/${widget.property_id}',
     );
     final headers = {'Authorization': '${prefs.getString('access_token')}'};
     Response response = await get(

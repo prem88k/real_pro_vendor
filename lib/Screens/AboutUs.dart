@@ -35,7 +35,7 @@ class _HomePageState extends State<AboutUs>  {
 
   @override
   Widget build(BuildContext context) {
-   /* themeChange = Provider.of<DarkThemeProvider>(context);
+    /* themeChange = Provider.of<DarkThemeProvider>(context);
     colorsInf = getColor(context);*/
     Size size = MediaQuery.of(context).size;
     return Scaffold(
@@ -51,7 +51,7 @@ class _HomePageState extends State<AboutUs>  {
       ),
       body:SingleChildScrollView(
         child: Container(
-          margin: EdgeInsets.all(size.height*0.03),
+            margin: EdgeInsets.all(size.height*0.03),
             child: Column(
               children: [
 
@@ -87,7 +87,7 @@ class _HomePageState extends State<AboutUs>  {
                 ),
 
                 Text(
-                  "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).",
+                  "Real Pro app offers a social platform developed exclusively for Real Estate! Real Estate Agents managing properties for rent or sale in the UAE can showcase the videos and walkthroughs of properties and get instant reaction from the users on the Real Pro app. With are easy to use Agent's app, you can check your followers, likes and comments on your properties, and chat directly with a prospective buyer, tenant, or investor.",
                   style: TextStyle(
                       fontFamily: 'work',
                       fontWeight: FontWeight.normal,
@@ -101,7 +101,7 @@ class _HomePageState extends State<AboutUs>  {
 
                 Container(
                   alignment: Alignment.topLeft,
-                  child: Text("Our Background",
+                  child: Text("Description",
                     style: TextStyle(
                         fontFamily: 'work',
                         fontWeight: FontWeight.bold,
@@ -113,7 +113,7 @@ class _HomePageState extends State<AboutUs>  {
                 SizedBox(
                   height: size.height * 0.010,
                 ),
-                Text("It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).",
+                Text("Showcase the videos and walkthrough of properties in the UAE, check your followers, likes and comments on your properties, and chat directly with a prospective buyer, tenant, or investor.",
                   style: TextStyle(
                       fontFamily: 'work',
                       fontWeight: FontWeight.normal,
@@ -124,178 +124,10 @@ class _HomePageState extends State<AboutUs>  {
                 SizedBox(
                   height: size.height * 0.020,
                 ),
-
-                Container(
-                  alignment: Alignment.topLeft,
-                  child: Text("Our Vision",
-                    style: TextStyle(
-                        fontFamily: 'work',
-                        fontWeight: FontWeight.bold,
-                        fontSize: size.width * 0.04,
-                        color: lineColor
-                    ),),
-                ),
-                SizedBox(
-                  height: size.height * 0.010,
-                ),
-
-            Text(
-                "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).",
-              style: TextStyle(
-                  fontFamily: 'work',
-                  fontWeight: FontWeight.normal,
-                  fontSize: size.width * 0.03,
-                  color: lineColor
-              ),),
-
-                SizedBox(
-                  height: size.height * 0.020,
-                ),
-
-                Container(
-                  alignment: Alignment.topLeft,
-                  child: Text("Our Services",
-                    style: TextStyle(
-                        fontFamily: 'work',
-                        fontWeight: FontWeight.bold,
-                        fontSize: size.width * 0.04,
-                        color: lineColor
-                    ),),
-                ),
-
-                SizedBox(
-                  height: size.height * 0.010,
-                ),
-
-                Text(
-                     "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
-                  style: TextStyle(
-                      fontFamily: 'work',
-                      fontWeight: FontWeight.normal,
-                      fontSize: size.width * 0.03,
-                      color: lineColor
-                  ),
-                ),
-
                 SizedBox(
                   height: size.height * 0.015,
                 ),
 
-                Container(
-                  alignment: Alignment.topLeft,
-                  child: Text("For Property Owners",
-                    style: TextStyle(
-                        fontFamily: 'work',
-                        fontWeight: FontWeight.normal,
-                        fontSize: size.width * 0.035,
-                        color: lineColor
-                    ),),
-                ),
-
-                SizedBox(
-                  height: size.height * 0.010,
-                ),
-
-                Column(
-                  children: jobSeaker.map((strone){
-                   return Row(
-                        children:[
-                          Text("\u2022",  style: TextStyle(
-                              fontFamily: 'work',
-                              fontWeight: FontWeight.normal,
-                              fontSize: size.width * 0.07,
-                              color: lineColor
-                          ),), //bullet text
-                          SizedBox(width: 10,), //space between bullet and text
-                          Expanded(
-                            child:Text(strone,
-                              style: TextStyle(
-                                  fontFamily: 'work',
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: size.width * 0.03,
-                                  color: lineColor
-                              ),
-                            ), //text
-                          )
-                        ]
-                    );
-                  }).toList(),
-                ),
-
-                SizedBox(
-                  height: size.height * 0.015,
-                ),
-
-                Container(
-                  alignment: Alignment.topLeft,
-                  child: Text("For Vebdors",
-                    style: TextStyle(
-                        fontFamily: 'work',
-                        fontWeight: FontWeight.normal,
-                        fontSize: size.width * 0.035,
-                        color: lineColor
-                    ),),
-                ),
-
-                SizedBox(
-                  height: size.height * 0.010,
-                ),
-
-                Column(
-                  children: jobEmp.map((str){
-                    return Row(
-                        children:[
-                          Text("\u2022",  style: TextStyle(
-                              fontFamily: 'work',
-                              fontWeight: FontWeight.normal,
-                              fontSize: size.width * 0.07,
-                              color: lineColor
-                          ),), //bullet text
-                          SizedBox(width: 10,), //space between bullet and text
-                          Expanded(
-                            child:Text(str,
-                              style: TextStyle(
-                                  fontFamily: 'work',
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: size.width * 0.03,
-                                  color: lineColor
-                              ),
-                            ), //text
-                          )
-                        ]
-                    );
-                  }).toList(),
-                ),
-
-                SizedBox(
-                  height: size.height * 0.020,
-                ),
-
-                Container(
-                  alignment: Alignment.topLeft,
-                  child: Text("Join Us on the Journey",
-                    style: TextStyle(
-                        fontFamily: 'work',
-                        fontWeight: FontWeight.bold,
-                        fontSize: size.width * 0.04,
-                        color: lineColor
-                    ),),
-                ),
-                SizedBox(
-                  height: size.height * 0.010,
-                ),
-
-                Text("Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
-                  style: TextStyle(
-                      fontFamily: 'work',
-                      fontWeight: FontWeight.normal,
-                      fontSize: size.width * 0.03,
-                      color: lineColor
-                  ),),
-
-                SizedBox(
-                  height: size.height * 0.020,
-                ),
 
 
               ],
