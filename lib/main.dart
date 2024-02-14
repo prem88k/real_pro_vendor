@@ -9,7 +9,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sqflite/sqflite.dart';
 
 
-CallService callService = CallService();
 NotificationService notificationService = NotificationService();
 late Database localDbInstance;
 UserService userService = UserService();
@@ -30,6 +29,7 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 
 
 Future<void> main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());

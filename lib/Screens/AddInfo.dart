@@ -261,11 +261,11 @@ class _AddInfoState extends State<AddInfo> {
                       ),
                       TextFieldWidget(
                         controller: _mobileController,
-                        title: "Mobile",
+                        title: "Mobile (Optional)",
                         validator: (value) {
-                          if (_mobileController.text.isEmpty) {
+                          /*if (_mobileController.text.isEmpty) {
                             return "This field is required";
-                          }
+                          }*/
                           return null;
                         },
                       ),
@@ -326,9 +326,9 @@ class _AddInfoState extends State<AddInfo> {
   //    print('Entered Text: ${_emailController.text}');
      // Message(context, "Enter Email Address");
     }
-    else if (_mobileController.text.isEmpty) {
+    /*else if (_mobileController.text.isEmpty) {
       Message(context, "Enter Mobile Number");
-    }
+    }*/
     else if (_nameController.text.isEmpty) {
       Message(context, "Enter Agent Name");
     }
@@ -364,7 +364,7 @@ class _AddInfoState extends State<AddInfo> {
       'email': _emailController.text,
       'agent_brn': _brnController.text,
       'company_name': _agencyNameController.text,
-      'mobile_number': _mobileController.text,
+      'mobile_number': _mobileController.text.isNotEmpty?_mobileController.text:"",
       'agency_name': _agencyNameController.text
     };
 

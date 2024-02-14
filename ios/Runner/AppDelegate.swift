@@ -10,6 +10,7 @@ import Firebase
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+      FirebaseConfiguration().setLoggerLevel(FirebaseLoggerLevel.min)
         FirebaseApp.configure()
     GeneratedPluginRegistrant.register(with: self)
             GMSServices.provideAPIKey("AIzaSyCkW__vI2DazIWYjIMigyxwDtc_kyCBVIo")

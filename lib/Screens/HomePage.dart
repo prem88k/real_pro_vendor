@@ -929,10 +929,10 @@ class _HomePageState extends State<HomePage> {
       if (getdata["status"]) {
         getPropertyData = GetPropertyData.fromJson(jsonDecode(responseBody));
         proppertyList!.addAll(getPropertyData.data!);
-        if(indexWhere!=null)
+        if(indexWhere!=null||indexWhere!=-1)
         {
           print("indexWhere::$indexWhere");
-          proppertyList![indexWhere]=getPropertyData.data![indexWhere];
+          proppertyList![indexWhere!]=getPropertyData.data![indexWhere];
         }
       } else {}
     }

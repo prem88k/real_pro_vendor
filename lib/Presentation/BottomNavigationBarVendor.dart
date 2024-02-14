@@ -59,59 +59,52 @@ class _BottomNavigationBarVendorState extends State<BottomNavigationBarVendor> {
           child: Scaffold(
       key: _formKey,
       body: callPage(currentIndex!),
-      bottomNavigationBar: SizedBox(
-        height: ScreenUtil().setHeight(60),
-        child: SalomonBottomBar(
-            backgroundColor: secondaryColor,
-            currentIndex: currentIndex!,
-            onTap: (i) => setState(() => currentIndex = i),
-            itemShape: StadiumBorder(side: BorderSide.none),
-            items: [
-              /// Home
-              SalomonBottomBarItem(
-                icon: Icon(Icons.home_work_outlined,color: currentIndex == 0?appColor:borderColor,),
-                title: Text("Properties",style:  TextStyle(
-                    fontFamily: 'work',
-                    fontSize: ScreenUtil().setWidth(12),
-                    fontWeight: FontWeight.bold,
-                    color:  currentIndex == 0?darkTextColor:borderColor),),
-                selectedColor: primaryColor,
+      bottomNavigationBar: SalomonBottomBar(
+          backgroundColor: secondaryColor,
+          currentIndex: currentIndex!,
+          onTap: (i) => setState(() => currentIndex = i),
+          itemShape: StadiumBorder(side: BorderSide.none),
+          items: [
+            /// Home
+            SalomonBottomBarItem(
+              icon: Icon(Icons.home_work_outlined,color: currentIndex == 0?appColor:borderColor,),
+              title: Text("Properties",style:  TextStyle(
+                  fontFamily: 'work',
+                  fontWeight: FontWeight.bold,
+                  color:  currentIndex == 0?darkTextColor:borderColor),),
+              selectedColor: primaryColor,
 
-              ),
+            ),
 
-              /// ADD
-              SalomonBottomBarItem(
-                icon: Icon(Icons.drive_folder_upload,color: currentIndex == 1?appColor:borderColor,),
-                title: Text("Upload",style:  TextStyle(
-                    fontFamily: 'work',
-                    fontSize: ScreenUtil().setWidth(12),
-                    fontWeight: FontWeight.bold,
-                    color:  currentIndex == 1?darkTextColor:borderColor)),
-                selectedColor:primaryColor,
-              ),
+            /// ADD
+            SalomonBottomBarItem(
+              icon: Icon(Icons.drive_folder_upload,color: currentIndex == 1?appColor:borderColor,),
+              title: Text("Upload",style:  TextStyle(
+                  fontFamily: 'work',
+                  fontWeight: FontWeight.bold,
+                  color:  currentIndex == 1?darkTextColor:borderColor)),
+              selectedColor:primaryColor,
+            ),
 
-              SalomonBottomBarItem(
-                icon: Icon(Icons.forum_outlined,color: currentIndex == 2?appColor:borderColor,),
-                title: Text("Message",style:  TextStyle(
-                    fontFamily: 'work',
-                    fontSize: ScreenUtil().setWidth(12),
-                    fontWeight: FontWeight.bold,
-                    color:  currentIndex == 1?darkTextColor:borderColor)),
-                selectedColor:primaryColor,
-              ),
+            SalomonBottomBarItem(
+              icon: Icon(Icons.forum_outlined,color: currentIndex == 2?appColor:borderColor,),
+              title: Text("Message",style:  TextStyle(
+                  fontFamily: 'work',
+                  fontWeight: FontWeight.bold,
+                  color:  currentIndex == 1?darkTextColor:borderColor)),
+              selectedColor:primaryColor,
+            ),
 
-              /// Profile
-              SalomonBottomBarItem(
-                icon: Icon(Icons.person,color: currentIndex == 3?appColor:borderColor,),
-                title: Text("Profile",style:  TextStyle(
-                    fontFamily: 'work',
-                    fontSize: ScreenUtil().setWidth(12),
-                    fontWeight: FontWeight.bold,
-                    color:  currentIndex == 2?darkTextColor:borderColor)),
-                selectedColor:primaryColor,
-              ),
-            ],
-        ),
+            /// Profile
+            SalomonBottomBarItem(
+              icon: Icon(Icons.person,color: currentIndex == 3?appColor:borderColor,),
+              title: Text("Profile",style:  TextStyle(
+                  fontFamily: 'work',
+                  fontWeight: FontWeight.bold,
+                  color:  currentIndex == 2?darkTextColor:borderColor)),
+              selectedColor:primaryColor,
+            ),
+          ],
       ),
     ),
         );
