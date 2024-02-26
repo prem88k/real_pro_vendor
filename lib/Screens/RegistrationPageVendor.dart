@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:real_pro_vendor/Screens/AddInfo.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,6 +43,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
   late String imageUrl;
   late String uId;
   String? deviceId;
+  bool isSocial = false;
+
   bool isloading = false;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -147,11 +152,13 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                           final bool emailValid = RegExp(
                               r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                               .hasMatch(_emailController.text);
-                          if (_emailController.text.isEmpty) {
-                            return 'This field is required';
-                          }
-                           if (!emailValid) {
-                            return "Enter a valid email address";
+                          if(!isSocial) {
+                            if (_emailController.text.isEmpty) {
+                              return 'This field is required';
+                            }
+                            if (!emailValid) {
+                              return "Enter a valid email address";
+                            }
                           }
                           return null;
                         },
@@ -159,7 +166,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
-                SizedBox(height: 8.0),
+                SizedBox(height: ScreenUtil().setHeight(8)),
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,8 +188,16 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         isPassword: true,
                         obs: true,
                         validator: (value) {
-                          if (_passwordController.text.isEmpty) {
-                            return "This field is required";
+                          final bool passValid = RegExp(
+                              r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#&*~]).{6,}$')
+                              .hasMatch(_passwordController.text);
+                          if (!isSocial) {
+                            if (_passwordController.text.isEmpty) {
+                              return "This field is required";
+                            }
+                            else if (!passValid) {
+                              return 'Password should be 8-12 character, contain 1 capital letter, 1 number and 1 special character';
+                            }
                           }
                           return null;
                         },
@@ -190,7 +205,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
-                SizedBox(height: 8.0),
+                SizedBox(height: ScreenUtil().setHeight(8)),
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,8 +227,23 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         isPassword: true,
                         obs: true,
                         validator: (value) {
-                          if (_confirmPasswordController.text.isEmpty) {
-                            return "This field is required";
+                          final bool emailValid = RegExp(
+                              r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#&*~]).{6,}$')
+                              .hasMatch(_confirmPasswordController.text);
+                          if (!isSocial) {
+                            if (_confirmPasswordController.text.isEmpty) {
+                              return 'This field is required';
+                            } else if (_confirmPasswordController.text.length < 5) {
+                              return '5 Character required';
+                            }
+                            else if(!emailValid)
+                            {
+                              return 'Password should be 8-12 character, contain 1 capital letter, 1 number and 1 special character';
+                            }
+                            else if (_confirmPasswordController.text !=
+                                _passwordController.text) {
+                              return 'Password and confirm password does not matched';
+                            }
                           }
                           return null;
                         },
@@ -221,6 +251,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
+                                SizedBox(height: ScreenUtil().setHeight(8)),
+
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,8 +272,10 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         controller: _nameController,
                         title: "Agent Name",
                         validator: (value) {
-                          if (_nameController.text.isEmpty) {
-                            return "This field is required";
+                          if(!isSocial) {
+                            if (_nameController.text.isEmpty) {
+                              return "This field is required";
+                            }
                           }
                           return null;
                         },
@@ -249,6 +283,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
+                                SizedBox(height: ScreenUtil().setHeight(8)),
+
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,8 +304,10 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         controller: _agencyNameController,
                         title: "Agency Name",
                         validator: (value) {
-                          if (_agencyNameController.text.isEmpty) {
-                            return "This field is required";
+                          if(!isSocial) {
+                            if (_agencyNameController.text.isEmpty) {
+                              return "This field is required";
+                            }
                           }
                           return null;
                         },
@@ -277,6 +315,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
+                                SizedBox(height: ScreenUtil().setHeight(8)),
+
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,8 +336,10 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         controller: _brnController,
                         title: "BRN",
                         validator: (value) {
-                          if (_brnController.text.isEmpty) {
-                            return "This field is required";
+                          if(!isSocial) {
+                            if (_brnController.text.isEmpty) {
+                              return "This field is required";
+                            }
                           }
                           return null;
                         },
@@ -305,6 +347,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
+                                SizedBox(height: ScreenUtil().setHeight(8)),
+
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,7 +448,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                 SizedBox(
                   height: ScreenUtil().setHeight(15),
                 ),
-                Row(
+           /*     Row(
                   mainAxisAlignment: !Platform.isIOS?MainAxisAlignment.center:MainAxisAlignment.spaceEvenly,
                   children: [
                     GestureDetector(
@@ -442,7 +486,119 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         ),
                       ),
                     ),
-                 /*   SizedBox(width: ScreenUtil().setWidth(5)),
+                    SizedBox(width: ScreenUtil().setWidth(5)),
+                    GestureDetector(
+                      onTap: () {
+                        Message(context, "Something went wrong");
+                          _loginWithFacebook();
+                      },
+                      child: Container(
+                        height: ScreenUtil().setHeight(65),
+                        width: ScreenUtil().setWidth(90),
+                        decoration: BoxDecoration(
+                            color: secondaryColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/images/facebook.png",
+                              width: ScreenUtil().setHeight(20),
+                              height: ScreenUtil().setHeight(20),
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(
+                              height: ScreenUtil().setHeight(10),
+                            ),
+                            Text(
+                              'Facebook',
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontSize: ScreenUtil().setWidth(12),
+                                fontFamily: 'work',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: ScreenUtil().setWidth(5)),
+                    !Platform.isIOS?Container():  Container(
+                      height: ScreenUtil().setHeight(65),
+                      width: ScreenUtil().setWidth(90),
+                      decoration: BoxDecoration(
+                          color: secondaryColor,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/images/apple.png",
+                            width: ScreenUtil().setHeight(20),
+                            height: ScreenUtil().setHeight(20),
+                            fit: BoxFit.contain,
+                          ),
+                          SizedBox(
+                            height: ScreenUtil().setHeight(10),
+                          ),
+                          Text(
+                            'Apple',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: ScreenUtil().setWidth(12),
+                              fontFamily: 'work',
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),*/
+                Column(
+                  mainAxisAlignment: !Platform.isIOS?MainAxisAlignment.center:MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+
+                        signInWithGoogle();
+                      },
+                      child: Container(
+                        height: ScreenUtil().setHeight(45),
+                        width: ScreenUtil().setWidth(200),
+                        decoration: BoxDecoration(
+                            color: secondaryColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: ScreenUtil().setWidth(25),
+                            ),
+                            Image.asset(
+                              "assets/images/google.png",
+                              width: ScreenUtil().setHeight(20),
+                              height: ScreenUtil().setHeight(20),
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(
+                              width: ScreenUtil().setWidth(25),
+                            ),
+                            Text(
+                              'Sign in with Google',
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontSize: ScreenUtil().setWidth(12),
+                                fontFamily: 'work',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    /*  SizedBox(width: ScreenUtil().setWidth(5)),
                     GestureDetector(
                       onTap: () {
                         _loginWithFacebook();
@@ -478,39 +634,53 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         ),
                       ),
                     ),*/
-                    SizedBox(width: ScreenUtil().setWidth(5)),
-                    !Platform.isIOS?Container():  Container(
-                      height: ScreenUtil().setHeight(65),
-                      width: ScreenUtil().setWidth(90),
-                      decoration: BoxDecoration(
-                          color: secondaryColor,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "assets/images/apple.png",
-                            width: ScreenUtil().setHeight(20),
-                            height: ScreenUtil().setHeight(20),
-                            fit: BoxFit.contain,
-                          ),
-                          SizedBox(
-                            height: ScreenUtil().setHeight(10),
-                          ),
-                          Text(
-                            'Apple',
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: ScreenUtil().setWidth(12),
-                              fontFamily: 'work',
-                              fontWeight: FontWeight.w400,
+                    SizedBox(
+                      height: ScreenUtil().setHeight(10),
+                    ),
+                    !Platform.isIOS?Container():  GestureDetector(
+                      onTap: () {
+
+                        _appleLogin();
+                      },
+                      child: Container(
+                        height: ScreenUtil().setHeight(45),
+                        width: ScreenUtil().setWidth(200),
+                        decoration: BoxDecoration(
+                            color: secondaryColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: ScreenUtil().setWidth(25),
                             ),
-                          ),
-                        ],
+                            Image.asset(
+                              "assets/images/apple.png",
+                              width: ScreenUtil().setHeight(20),
+                              height: ScreenUtil().setHeight(20),
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(
+                              width: ScreenUtil().setWidth(25),
+                            ),
+                            Text(
+                              'Sign in with Apple',
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontSize: ScreenUtil().setWidth(12),
+                                fontFamily: 'work',
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
+
+
                   ],
                 ),
+
               ],
             ),
           ),
@@ -524,6 +694,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
         .hasMatch(_emailController.text);
     setState(() {
+      isSocial = false;
+
       if (_formKey.currentState!.validate()) {
         // Check additional conditions, such as non-empty text fields
         if (_emailController.text.isNotEmpty &&
@@ -651,9 +823,9 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       });
     await _auth.signOut();
     final GoogleSignInAccount? googleUser =
-        await GoogleSignIn(scopes: <String>["email"]).signIn();
+    await GoogleSignIn(scopes: <String>["email"]).signIn();
     final GoogleSignInAuthentication googleAuth =
-        await googleUser!.authentication;
+    await googleUser!.authentication;
 
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
@@ -661,7 +833,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     );
 
     final UserCredential authResult =
-        await _auth.signInWithCredential(credential);
+    await _auth.signInWithCredential(credential);
     final User? user = authResult.user;
 
     if (user != null) {
@@ -695,12 +867,14 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
   }
 
   Future<void> postRegisterGoogleData(
-      String? accessToken, String name, String email, String phone, String imageUrl) async {
+      String? accessToken, String name, String email, String phone, String? imageUrl) async {
     setState(() {
       isloading = true;
+      isSocial = true;
+
     });
-    String? token = await FirebaseMessaging.instance.getToken();
-    print("Tpkoen::$token");
+    /*String? token = await FirebaseMessaging.instance.getToken();
+    print("Tpkoen::$token");*/
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       setState(() {
@@ -727,9 +901,9 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       'device_id': deviceId,
       'platform': deviceName,
       'email': email,
-      'fcm_token': token,
       'mobile_number': phone,
 
+      // 'fcm_token': token,
       'role': "agent",
     };
     String jsonBody = json.encode(body);
@@ -751,7 +925,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
         setState(() {
           isloading = false;
         });
-        Message(context, getdata["message"]);
+        Message(context,getdata["message"]);
         prefs.setString("access_token",
             "Bearer ${getdata["0"]["original"]["access_token"].toString()}");
         prefs.setString(
@@ -768,7 +942,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
             getdata["0"]["original"]["user"]["image"].toString());
         prefs.setBool("isLogging", true);
         prefs.setBool("isSocial", true);
-        prefs.setString("socialDP",imageUrl);
+        prefs.setString("socialDP",imageUrl!);
         if(getdata["isLogin"])
         {
           print(getdata["isLogin"]);
@@ -804,7 +978,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       setState(() {
         isloading = false;
       });
-      ErrorMessage(context, getdata["message"]);
+      ErrorMessage(context, "This Email is registerd with us please try another one");
     }
   }
 
@@ -847,7 +1021,166 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
         break;
     }
   }
-}
+
+
+  Future<void> _appleLogin() async {
+
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+      webAuthenticationOptions: WebAuthenticationOptions(
+        // TODO: Set the `clientId` and `redirectUri` arguments to the values you entered in the Apple Developer portal during the setup
+        clientId:
+        'de.lunaone.flutter.signinwithappleexample.service',
+
+        redirectUri:
+        // For web your redirect URI needs to be the host of the "current page",
+        // while for Android you will be using the API server that redirects back into your app via a deep link
+        Uri.parse(
+          'https://flutter-sign-in-with-apple-example.glitch.me/callbacks/sign_in_with_apple',
+        ),
+      ),
+      // TODO: Remove these if you have no need for them
+      nonce: 'example-nonce',
+      state: 'example-state',
+    );
+
+    // ignore: avoid_print
+    print("abc::${credential.userIdentifier}");
+    print("abc::${credential.authorizationCode}");
+    print("abc::${credential.givenName}");
+    print("abc::${credential.identityToken}");
+
+    appleLoginAPI(credential.userIdentifier,credential.givenName!=null?credential.givenName!:"anonymous",credential.email!=null?credential.email!:"anonymous@gmail.com");
+    // This is the endpoint that will convert an authorization code obtained
+    // via Sign in with Apple into a session in your system
+    final signInWithAppleEndpoint = Uri(
+      scheme: 'https',
+      host: 'flutter-sign-in-with-apple-example.glitch.me',
+      path: '/sign_in_with_apple',
+      queryParameters: <String, String>{
+        'code': credential.authorizationCode,
+        if (credential.givenName != null)
+          'firstName': credential.givenName!,
+        if (credential.familyName != null)
+          'lastName': credential.familyName!,
+        'useBundleId':
+        !kIsWeb && (Platform.isIOS || Platform.isMacOS)
+            ? 'true'
+            : 'false',
+        if (credential.state != null) 'state': credential.state!,
+      },
+    );
+
+    final session = await http.Client().post(
+      signInWithAppleEndpoint,
+    );
+
+    // If we got this far, a session based on the Apple ID credential has been created in your system,
+    // and you can now set this as the app's session
+    // ignore: avoid_print
+    print(session);
+
+  }
+
+  Future<void> appleLoginAPI(
+      String? accessToken, String? name, String? email) async {
+    setState(() {
+      isloading = true;
+      isSocial = true;
+
+    });
+    /*   String? token = await FirebaseMessaging.instance.getToken();
+    print("Tpkoen::$token");*/
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      setState(() {
+        deviceName = 'android';
+        deviceId = androidInfo.id;
+        print("DeviceId::$deviceId");
+      });
+    } else {
+      var iosdeviceinfo = await deviceInfo.iosInfo;
+      setState(() {
+        deviceName = 'ios';
+        deviceId = iosdeviceinfo.identifierForVendor!;
+      });
+    }
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var uri = Uri.https(
+      apiBaseUrl,
+      '/api/auth/user/apple/login',
+    );
+    final headers = {'Accept': 'application/json'};
+    Map<String, dynamic> body = {
+      'name': name,
+      'social_id': accessToken,
+      'device_id': deviceId,
+      'platform': deviceName,
+      'email': email,
+      'fcm': "dkjsdksldks",
+      'role':"user"
+    };
+    String jsonBody = json.encode(body);
+    final encoding = Encoding.getByName('utf-8');
+
+    Response response = await post(
+      uri,
+      headers: headers,
+      body: body,
+      encoding: encoding,
+    );
+    var getdata = json.decode(response.body);
+
+    int statusCode = response.statusCode;
+    String responseBody = response.body;
+    print("responseStepSocial::$responseBody");
+    if (statusCode == 200) {
+      if (getdata["status"]) {
+        setState(() {
+          isloading = false;
+        });
+
+        Message(context, "Login Successfully");
+        prefs.setString("access_token",
+            "Bearer ${getdata["0"]["original"]["access_token"].toString()}");
+        prefs.setString(
+            "name", getdata["0"]["original"]["user"]["name"].toString());
+        prefs.setString(
+            "UserId", "${getdata["0"]["original"]["user"]["id"].toString()}");
+        prefs.setString(
+            "email", getdata["0"]["original"]["user"]["email"].toString());
+        prefs.setString(
+            "phone", getdata["0"]["original"]["user"]["mobile_number"].toString());
+        prefs.setString("phone",
+            getdata["0"]["original"]["user"]["mobile_number"].toString());
+        prefs.setString("profileImage",
+            getdata["0"]["original"]["user"]["image"].toString());
+        prefs.setBool("isLogging", true);
+        bool? isLogging = prefs.getBool("isHome");
+
+        print("=-----$isLogging");
+        Future.delayed(const Duration(milliseconds: 2000), () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => AddInfo(name!,email!)));
+        });
+      }
+      else {
+        setState(() {
+          isloading = false;
+        });
+        ErrorMessage(context, getdata["message"]);
+      }
+      /*bookTable();*/
+    } else {
+      setState(() {
+        isloading = false;
+      });
+      ErrorMessage(context, getdata["message"]);
+    }
+  }}
 
 ScaffoldFeatureController<SnackBar, SnackBarClosedReason> Message(
     BuildContext context, String message) {

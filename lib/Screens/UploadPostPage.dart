@@ -57,6 +57,8 @@ class _UploadPostPageState extends State<UploadPostPage> {
   }
 
   bool isloading = false;
+  bool isUploadloading = false;
+
   bool catloading = false;
 
   final TextEditingController _houseTitleController = TextEditingController();
@@ -555,7 +557,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Text("Upload Property Images*",
+                              Text("Upload Property Images",
                                   style: TextStyle(
                                       fontSize: ScreenUtil().setHeight(10),
                                       color: primaryColor,
@@ -1066,7 +1068,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                 SizedBox(
                                   height: ScreenUtil().setHeight(10),
                                 ),
-                                selectedTower == "Other"
+                                selectedTowerName == "Other"
                                     ? TextFormField(
                                         controller: _towerController,
                                         keyboardType: TextInputType.text,
@@ -1938,7 +1940,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                         height: ScreenUtil().setHeight(15),
                       ),
 
-                      GestureDetector(
+                      isUploadloading?CircularProgressIndicator(color: appColor,):   GestureDetector(
                           onTap: () {
                             setState(() {
                               if (_formKey.currentState!.validate()) {
@@ -1946,9 +1948,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                 if (_houseTitleController.text.isNotEmpty &&
                                     _bedroomController.text.isNotEmpty) {
                                   // Validation passed, initiate the login
-                                  setState(() {
-                                    isloading = true;
-                                  });
                                   // Call the login function
                                   uploadPropertyAPI();
                                 } else {
@@ -2918,21 +2917,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
     }
   }
 
-  void checkValidation() {
-    if (_houseTitleController.text.isEmpty) {
-      Message(context, "Enter House Name");
-    } else if (_bedroomController.text.isEmpty) {
-      Message(context, "Enter Bedroom Count");
-    } else if (_toiletController.text.isEmpty) {
-      Message(context, "Enter Bathroom Count");
-    } else if (_sqftController.text.isEmpty) {
-      Message(context, "Enter Property Size");
-    } else if (_amountController.text.isEmpty) {
-      Message(context, "Enter Amount");
-    } else {
-      uploadPropertyAPI();
-    }
-  }
 
   Future<void> uploadPropertyAPI() async {
     List<String> textController = [];
@@ -2948,7 +2932,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
     print(thumbnailType);
     print("thumImage ${thumbnailImage}");
     setState(() {
-      isloading = true;
+      isUploadloading = true;
     });
 /*    String? token = await FirebaseMessaging.instance.getToken();
     print("Tpkoen::$token");*/
@@ -3009,7 +2993,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
       request.files.add(await MultipartFile.fromPath('video', _videoPath!));
     }
 
-    if (imageFilePathList != null) {
+    if (imageFilePathList != null||imageFilePathList!.isNotEmpty) {
       for (int i = 0; i < imageFilePathList!.length; i++) {
         request.files.add(await MultipartFile.fromPath(
             'image[]', imageFilePathList![i].path));
@@ -3027,7 +3011,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
           var getdata = json.decode(value);
           if (getdata["status"]) {
             setState(() {
-              isloading = false;
+              isUploadloading = false;
             });
             FocusScope.of(context).requestFocus(FocusNode());
             Message(context, "Add Property Successfully");
@@ -3052,7 +3036,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
           print("ResponseSellerVerification" + value);
           var getdata = json.decode(value);
           setState(() {
-            isloading = false;
+            isUploadloading = false;
           });
           Message(context, getdata['message']);
         });

@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Real Pro Vendor</string>
+	<string>RealPro Vendor</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -22,10 +22,7 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
-		<key>FacebookAppID</key>
-    	<string>fb197774540062818</string>
-    	<key>FacebookClientToken</key>
-    	<string>090ab9308bba6d012fd8efff03ade9f3</string>
+
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -43,10 +40,7 @@
             <string>fetch</string>
             <string>remote-notification</string>
         </array>
-	<key>FacebookAppID</key>
-    <string>fb197774540062818</string>
-    <key>FacebookClientToken</key>
-    <string>090ab9308bba6d012fd8efff03ade9f3</string>
+
 	<key>CFBundleURLTypes</key>
     <array>
     		<dict>
@@ -84,7 +78,10 @@
             </dict>
         </dict>
     </dict>
-    <key>NSPhotoLibraryUsageDescription</key> <string>RealproPhoto Library Access </string>
+    <key>NSCameraUsageDescription</key>
+    	<string>This app requires access to the camera for upload property/profile image.
+            </string>
+    <key>NSPhotoLibraryUsageDescription</key> <string>This app requires access to the photo for upload property/profile image.</string>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -98,11 +95,12 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
 	<key>NSLocationWhenInUseUsageDescription</key>
-    <string>This application requires location services to work</string>
-<key>FirebaseAppDelegateProxyEnabled</key>
-<false/>
+    <string>This App needs location access for select address of property.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    	<string>Your location is required for access google map.</string>
     <key>NSLocationAlwaysUsageDescription</key>
-    <string>This application requires location services to work</string>
+    <string>This App needs location access for select address of property.</string>
 </dict>
 </plist>

@@ -132,7 +132,8 @@ class _ConversationsTabState extends State<ConversationsTab> {
                                     ],
                                   ),
                                   trailing: !conversation[MESSAGE_READ]
-                                      ? Badge(label: Text("New"))
+                                      ?  ClipRRect(
+                                      borderRadius: BorderRadius.circular(100),child: Container(color: Colors.red,width: 5,height: 5,),)
                                       : null,
                                   onTap: () async {
                                     /// Show progress dialog

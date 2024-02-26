@@ -18,4 +18,7 @@ samples, guidance on mobile development, and a full API reference.
 
 8B8FBD4C-4F61-4163-B49E-418893136429
 
+flutter build appbundle --no-sound-null-safety
+
+
 7tM41xXUvySuQi0CYTuVBXkIHOp2 - apple id

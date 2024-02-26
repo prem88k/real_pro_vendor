@@ -101,14 +101,13 @@ class _ForgotPasswordChangePageState extends State<ForgotPasswordChangePage> {
                   height: ScreenUtil().setHeight(35),
                 ),
                 Container(
-                  height: ScreenUtil().setHeight(230),
                   child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
-                            'Enter registered email address', style: TextStyle(
+                            'Enter the OTP sent to your registered email address', style: TextStyle(
                             color: darkTextColor  ,
                             fontSize: ScreenUtil().setWidth(12),
                             fontFamily: 'work',
@@ -134,8 +133,14 @@ class _ForgotPasswordChangePageState extends State<ForgotPasswordChangePage> {
                         title: "Password",
                         isPassword: true,
                         validator: (value) {
+                          final bool passValid = RegExp(
+                              r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#&*~]).{6,}$')
+                              .hasMatch(_passwordController.text);
                           if (_passwordController.text.isEmpty) {
                             return 'This field is required';
+                          }
+                          else if (!passValid) {
+                            return 'Password should be 8-12 character, contain 1 capital letter, 1 number and 1 special character';
                           }
                           return null;
                         },
@@ -146,8 +151,19 @@ class _ForgotPasswordChangePageState extends State<ForgotPasswordChangePage> {
                         title: "Re Enter Password",
                         isPassword: true,
                         validator: (value) {
+                          final bool passValid = RegExp(
+                              r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#&*~]).{6,}$')
+                              .hasMatch(_cPasswordController.text);
                           if (_cPasswordController.text.isEmpty) {
                             return 'This field is required';
+                          }
+                          else if(!passValid)
+                          {
+                            return 'Password should be 8-12 character, contain 1 capital letter, 1 number and 1 special character';
+                          }
+                          else if (_cPasswordController.text !=
+                              _passwordController.text) {
+                            return 'Password and confirm password does not matched';
                           }
                           return null;
                         },

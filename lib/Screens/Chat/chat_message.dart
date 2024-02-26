@@ -35,7 +35,7 @@ class ChatMessage extends StatelessWidget {
       child: Row(
         children: <Widget>[
           /// User receiver photo Left
-          !isUserSender! ? _userProfilePhoto : Container(width: 0, height: 0),
+         // !isUserSender! ? _userProfilePhoto : Container(width: 0, height: 0),
 
           SizedBox(width: 10),
 

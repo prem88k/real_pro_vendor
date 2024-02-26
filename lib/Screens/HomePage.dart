@@ -370,7 +370,6 @@ class _HomePageState extends State<HomePage> {
                 color: secondaryColor,
                 border: Border.all(color: secondaryColor, width: 0.2),
                 borderRadius: BorderRadius.circular(20)),
-            height: ScreenUtil().setHeight(235),
             child: Column(
               children: [
 
@@ -670,7 +669,6 @@ class _HomePageState extends State<HomePage> {
                                   color: darkTextColor,
                                   fontSize: ScreenUtil().setWidth(12),
                                   fontFamily: 'work',
-                                  height: ScreenUtil().setWidth(1),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -694,7 +692,6 @@ class _HomePageState extends State<HomePage> {
                                   color: darkTextColor,
                                   fontSize: ScreenUtil().setWidth(12),
                                   fontFamily: 'work',
-                                  height: ScreenUtil().setWidth(1),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -723,7 +720,6 @@ class _HomePageState extends State<HomePage> {
                                   color: darkTextColor,
                                   fontSize: ScreenUtil().setWidth(12),
                                   fontFamily: 'work',
-                                  height: ScreenUtil().setWidth(1),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -774,7 +770,6 @@ class _HomePageState extends State<HomePage> {
                                         color: darkTextColor,
                                         fontSize: ScreenUtil().setWidth(12),
                                         fontFamily: 'work',
-                                        height: ScreenUtil().setWidth(1),
                                         fontWeight: FontWeight.w800,
                                       ),
                                     ),
@@ -829,7 +824,6 @@ class _HomePageState extends State<HomePage> {
                                         color: darkTextColor,
                                         fontSize: ScreenUtil().setWidth(12),
                                         fontFamily: 'work',
-                                        height: ScreenUtil().setWidth(1),
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -929,11 +923,11 @@ class _HomePageState extends State<HomePage> {
       if (getdata["status"]) {
         getPropertyData = GetPropertyData.fromJson(jsonDecode(responseBody));
         proppertyList!.addAll(getPropertyData.data!);
-        if(indexWhere!=null||indexWhere!=-1)
+        /*if(indexWhere!=null||indexWhere!=-1)
         {
           print("indexWhere::$indexWhere");
           proppertyList![indexWhere!]=getPropertyData.data![indexWhere];
-        }
+        }*/
       } else {}
     }
   }

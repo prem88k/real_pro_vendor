@@ -44,6 +44,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
   @override
   void initState() {
   //  _companyNameController.text = widget.getCountData.user!.companyName.toString();
+    initData();
     // TODO: implement initState
     super.initState();
   }
@@ -208,7 +209,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
                       ),
                     ),
                     TextFieldUpload(
-                      title: widget.getCountData.user!.companyName != null ? widget.getCountData.user!.companyName.toString() : "Add Company Name",
+                      title: widget.getCountData.user!.companyName != null ? widget.getCountData.user!.companyName.toString() : "Enter Company Name",
                       controller: _companyNameController,
                     ),
                   ],
@@ -235,7 +236,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
                       ),
                     ),
                     TextFieldUpload(
-                      title:  widget.getCountData.user!.companyAddress != null ? widget.getCountData.user!.companyAddress.toString() : "Add Company Address",
+                      title:  widget.getCountData.user!.companyAddress != null ? widget.getCountData.user!.companyAddress.toString() : "Enter Company Address",
                       controller: _companyAddressController,
                     ),
                   ],
@@ -262,7 +263,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
                       ),
                     ),
                     TextFieldUpload(
-                      title: widget.getCountData.user!.brokerOrn != null ? widget.getCountData.user!.brokerOrn.toString() : "Add ORN",
+                      title: widget.getCountData.user!.brokerOrn != null ? widget.getCountData.user!.brokerOrn.toString() : "Enter ORN number",
                       controller: _brokerOrnController,
                     ),
                   ],
@@ -465,6 +466,13 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
     })
         .catchError((err) => print('error : ' + err.toString()))
         .whenComplete(() {});
+  }
+
+  void initData() {
+   print(widget.getCountData.user!.aboutCompany!);
+setState(() {
+  _companyDetailsController.text=widget.getCountData.user!.aboutCompany!=null?widget.getCountData.user!.aboutCompany!:"";
+});
   }
 }
 

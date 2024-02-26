@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Constants/Api.dart';
 import '../Constants/Colors.dart';
 import '../ContactUs.dart';
+import 'LikesListPage.dart';
 import 'ListedPropertyPage.dart';
 import 'LoginPageVendor.dart';
 import 'NotificationPage.dart';
@@ -331,39 +332,52 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: ScreenUtil().setWidth(100),
-                      height: ScreenUtil().setHeight(75),
-                      decoration: BoxDecoration(
-                          color: secondaryColor,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            child: Text(
-                              getCountData.like.toString(),
-                              style: TextStyle(
-                                color: appColor,
-                                fontSize: ScreenUtil().setHeight(20),
-                                fontFamily: 'work',
-                                fontWeight: FontWeight.w500,
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return LikesListPage();
+                            },
+                          ),
+                        );
+
+                      },
+                      child: Container(
+                        width: ScreenUtil().setWidth(100),
+                        height: ScreenUtil().setHeight(75),
+                        decoration: BoxDecoration(
+                            color: secondaryColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              child: Text(
+                                getCountData.like.toString(),
+                                style: TextStyle(
+                                  color: appColor,
+                                  fontSize: ScreenUtil().setHeight(20),
+                                  fontFamily: 'work',
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                          Container(
-                            child: Text(
-                              "Likes",
-                              style: TextStyle(
-                                color: darkTextColor,
-                                fontSize: ScreenUtil().setHeight(12),
-                                fontFamily: 'work',
-                                fontWeight: FontWeight.w400,
+                            Container(
+                              child: Text(
+                                "Likes",
+                                style: TextStyle(
+                                  color: darkTextColor,
+                                  fontSize: ScreenUtil().setHeight(12),
+                                  fontFamily: 'work',
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     Container(
@@ -424,7 +438,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             Container(
                               child: Text(
-                                getCountData.following.toString(),
+                                getCountData.followers.toString(),
                                 style: TextStyle(
                                   color: appColor,
                                   fontSize: ScreenUtil().setHeight(20),

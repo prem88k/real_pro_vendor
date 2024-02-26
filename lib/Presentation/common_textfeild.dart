@@ -41,7 +41,6 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
         key: _formKey,
       autovalidateMode: AutovalidateMode.always,
         child: Container(
-          height:  widget.title=="What is your concern?"? ScreenUtil().setHeight(85):ScreenUtil().setHeight(55),
           child: TextFormField(
             maxLines: widget.title=="What is your concern?"?5:1,
             minLines: widget.title=="What is your concern?"?5:1,
@@ -89,6 +88,8 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
             },
             validator: widget.validator,
             decoration: !widget.isPassword?InputDecoration(
+              errorMaxLines: 2,
+              isDense: true,
               fillColor: widget.title=="Search Here"?Colors.transparent:Colors.transparent,
               filled: true,
               border: OutlineInputBorder(
@@ -122,6 +123,8 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
               ),
               contentPadding: EdgeInsets.only(left:  ScreenUtil().setWidth(20),top:  ScreenUtil().setHeight(20)),
             ):InputDecoration(
+              errorMaxLines: 2,
+                isDense: true,
               suffixIcon:  GestureDetector(
                 onTap: () {
                   setState(() {

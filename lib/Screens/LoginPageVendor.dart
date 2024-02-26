@@ -38,6 +38,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
   bool isVisibleV = false;
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   late String deviceName = "";
+  bool isSocial = false;
 
   String? deviceId;
   late String name;
@@ -91,7 +92,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
             child: Column(
               children: [
                 Container(
-                  height: ScreenUtil().setHeight(100),
+                  height: ScreenUtil().setHeight(85),
                   alignment: Alignment.center,
                   child: Image(
                     image: AssetImage("assets/images/login_bg.png"),
@@ -149,8 +150,10 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                         controller: _emailController,
                         title: "Email",
                         validator: (value) {
-                          if (_emailController.text.isEmpty) {
-                            return 'This field is required';
+                          if(!isSocial) {
+                            if (_emailController.text.isEmpty) {
+                              return 'This field is required';
+                            }
                           }
                           return null;
                         },
@@ -178,8 +181,10 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                         title: "Password",
                         isPassword: true,
                         validator: (value) {
-                          if (_passwordController.text.isEmpty) {
-                            return 'This field is required';
+                          if(!isSocial) {
+                            if (_passwordController.text.isEmpty) {
+                              return 'This field is required';
+                            }
                           }
                           return null;
                         },
@@ -354,7 +359,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                 SizedBox(
                   height: ScreenUtil().setHeight(15),
                 ),
-                Row(
+                Column(
                   mainAxisAlignment: !Platform.isIOS?MainAxisAlignment.center:MainAxisAlignment.spaceEvenly,
                   children: [
                     GestureDetector(
@@ -363,14 +368,17 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                         signInWithGoogle();
                       },
                       child: Container(
-                        height: ScreenUtil().setHeight(65),
-                        width: ScreenUtil().setWidth(90),
+                        height: ScreenUtil().setHeight(45),
+                        width: ScreenUtil().setWidth(200),
                         decoration: BoxDecoration(
                             color: secondaryColor,
                             borderRadius: BorderRadius.circular(10)),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
+                            SizedBox(
+                              width: ScreenUtil().setWidth(25),
+                            ),
                             Image.asset(
                               "assets/images/google.png",
                               width: ScreenUtil().setHeight(20),
@@ -378,10 +386,10 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                               fit: BoxFit.contain,
                             ),
                             SizedBox(
-                              height: ScreenUtil().setHeight(10),
+                              width: ScreenUtil().setWidth(25),
                             ),
                             Text(
-                              'Google',
+                              'Sign in with Google',
                               style: TextStyle(
                                 color: primaryColor,
                                 fontSize: ScreenUtil().setWidth(12),
@@ -393,8 +401,8 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                         ),
                       ),
                     ),
-                    SizedBox(width: ScreenUtil().setWidth(5)),
-                   /* GestureDetector(
+                  /*  SizedBox(width: ScreenUtil().setWidth(5)),
+                    GestureDetector(
                       onTap: () {
                         _loginWithFacebook();
                       },
@@ -429,20 +437,26 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                         ),
                       ),
                     ),*/
-                    SizedBox(width: ScreenUtil().setWidth(5)),
-                    !Platform.isIOS?Container():GestureDetector(
-                      onTap: (){
+                    SizedBox(
+                      height: ScreenUtil().setHeight(10),
+                    ),
+                    !Platform.isIOS?Container():  GestureDetector(
+                      onTap: () {
+
                         _appleLogin();
                       },
                       child: Container(
-                        height: ScreenUtil().setHeight(65),
-                        width: ScreenUtil().setWidth(90),
+                        height: ScreenUtil().setHeight(45),
+                        width: ScreenUtil().setWidth(200),
                         decoration: BoxDecoration(
                             color: secondaryColor,
                             borderRadius: BorderRadius.circular(10)),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
+                            SizedBox(
+                              width: ScreenUtil().setWidth(25),
+                            ),
                             Image.asset(
                               "assets/images/apple.png",
                               width: ScreenUtil().setHeight(20),
@@ -450,10 +464,10 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                               fit: BoxFit.contain,
                             ),
                             SizedBox(
-                              height: ScreenUtil().setHeight(10),
+                              width: ScreenUtil().setWidth(25),
                             ),
                             Text(
-                              'Apple',
+                              'Sign in with Apple',
                               style: TextStyle(
                                 color: primaryColor,
                                 fontSize: ScreenUtil().setWidth(12),
@@ -465,6 +479,8 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
                         ),
                       ),
                     ),
+
+
                   ],
                 ),
                 SizedBox(height: ScreenUtil().setHeight(2)),
@@ -795,6 +811,8 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
       String? accessToken, String name, String email, String phone, String? imageUrl) async {
     setState(() {
       isloading = true;
+      isSocial = true;
+
     });
     /*String? token = await FirebaseMessaging.instance.getToken();
     print("Tpkoen::$token");*/
@@ -901,7 +919,7 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
       setState(() {
         isloading = false;
       });
-      ErrorMessage(context, getdata["message"]);
+      ErrorMessage(context, "This Email is registerd with us please try another one");
     }
   }
 
@@ -971,6 +989,8 @@ class _LoginPageVendorState extends State<LoginPageVendor> {
       String? accessToken, String? name, String? email) async {
     setState(() {
       isloading = true;
+      isSocial = true;
+
     });
     /*   String? token = await FirebaseMessaging.instance.getToken();
     print("Tpkoen::$token");*/

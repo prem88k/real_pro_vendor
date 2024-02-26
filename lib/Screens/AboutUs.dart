@@ -99,7 +99,7 @@ class _HomePageState extends State<AboutUs>  {
                   height: size.height * 0.020,
                 ),
 
-                Container(
+              /*  Container(
                   alignment: Alignment.topLeft,
                   child: Text("Description",
                     style: TextStyle(
@@ -123,7 +123,7 @@ class _HomePageState extends State<AboutUs>  {
 
                 SizedBox(
                   height: size.height * 0.020,
-                ),
+                ),*/
                 SizedBox(
                   height: size.height * 0.015,
                 ),

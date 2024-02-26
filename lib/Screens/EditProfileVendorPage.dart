@@ -62,7 +62,7 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
   getToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      profileImage=prefs.getString("profileImage")!;
+      profileImage=prefs.getString("profileImage")!=null?prefs.getString("profileImage")!:"";
     });
   }
 

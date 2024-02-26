@@ -118,7 +118,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
             size: ScreenUtil().setHeight(22) //change your color here
             ),
       ),
-      body: profileImage==""?CircularProgressIndicator():WillPopScope(
+      body: WillPopScope(
         onWillPop: () => _onWillPop(),
         child: SingleChildScrollView(
           child: Container(
@@ -136,7 +136,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
                         children: [
-                          profileImage == "abc"
+                          profileImage == ""
                               ? CircleAvatar(
                                   backgroundImage: AssetImage(
                                     "assets/images/user_icon.png",
@@ -652,13 +652,10 @@ class _MyBottomSheetState extends State<MyBottomSheet>
   Future<void> getPref() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      print("--profileImage::$profileImage");
-      profileImage = prefs.getString("profileImage") != "null"
+      profileImage = prefs.getString("profileImage") != null
           ? prefs.getString("profileImage")!
-          : "abc";
+          : "";
     });
-    print("--profileImage::$profileImage");
-
   }
 
   Future<void> _sendComment() async {
@@ -703,7 +700,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
     Map<String, dynamic> body = {
       'product_id': widget.productId.toString(),
     };
-    Response response = await post(uri, headers: headers, body: body);
+    Response response = await post(uri,headers: headers, body: body);
 
     int statusCode = response.statusCode;
     String responseBody = response.body;

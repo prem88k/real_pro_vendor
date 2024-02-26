@@ -2,6 +2,8 @@ class GetCountData {
   bool? status;
   int? like;
   int? following;
+  int? followers;
+
   int? collect;
   int? views;
   User? user;
@@ -10,6 +12,7 @@ class GetCountData {
       {this.status,
         this.like,
         this.following,
+        this.followers,
         this.collect,
         this.views,
         this.user});
@@ -18,6 +21,7 @@ class GetCountData {
     status = json['status'];
     like = json['like'];
     following = json['following'];
+    followers=json['followers'];
     collect = json['collect'];
     views = json['views'];
     user = json['user'] != null ? new User.fromJson(json['user']) : null;
@@ -28,6 +32,7 @@ class GetCountData {
     data['status'] = this.status;
     data['like'] = this.like;
     data['following'] = this.following;
+    data['followers']=this.followers;
     data['collect'] = this.collect;
     data['views'] = this.views;
     if (this.user != null) {

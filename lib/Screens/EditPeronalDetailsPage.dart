@@ -226,7 +226,7 @@ class _EditPeronalDetailsPageState extends State<EditPeronalDetailsPage> {
                   children: [
                     Container(
                       child: Text(
-                        'Experience',
+                        'Experience (in years)',
                         style: TextStyle(
                           color: primaryColor,
                           fontSize: ScreenUtil().setWidth(12),

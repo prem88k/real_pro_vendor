@@ -3,11 +3,15 @@ import 'package:real_pro_vendor/Screens/Chat/ConversationsTab.dart';
 import '../Constants/Colors.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../Constants/constants.dart';
+import '../Screens/Chat/ConversationsApi.dart';
 import '../Screens/HomePage.dart';
 import '../Screens/ProfilePage.dart';
 import '../Screens/UploadPostPage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BottomNavigationBarVendor extends StatefulWidget {
   int position;
@@ -21,6 +25,7 @@ class BottomNavigationBarVendor extends StatefulWidget {
 class _BottomNavigationBarVendorState extends State<BottomNavigationBarVendor> {
   int? currentIndex;
   bool isloading = false;
+  final _conversationsApi = ConversationsApi();
 
 
   /// Set a type current number a layout class
@@ -42,6 +47,7 @@ class _BottomNavigationBarVendorState extends State<BottomNavigationBarVendor> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getPref();
     currentIndex = widget.position;
   }
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -205,5 +211,9 @@ class _BottomNavigationBarVendorState extends State<BottomNavigationBarVendor> {
       ),
     )) ??
         false;
+  }
+
+  Future<void> getPref() async {
+
   }
 }
