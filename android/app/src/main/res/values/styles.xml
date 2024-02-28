@@ -16,7 +16,7 @@
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
 
-    <string name="app_name">"RealPro"</string>
+    <string name="app_name">"RealPro Vendor"</string>
 
     <string name="facebook_application_id" translatable="false">197774540062818</string>
 

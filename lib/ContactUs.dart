@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:real_pro_vendor/Presentation/BottomNavigationBarVendor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,11 +9,13 @@ import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+
 import '../Constants/Api.dart';
 import '../Constants/Colors.dart';
 import '../Presentation/common_button.dart';
 import '../Presentation/common_textfeild.dart';
-import 'Screens/UploadPostPage.dart';
+import 'Presentation/BottomNavigationBarVendor.dart';
+import 'Screens/AddInfo.dart';
 
 
 class ContactUs extends StatefulWidget {
@@ -44,6 +45,7 @@ class _ContactUsState extends State<ContactUs> {
   @override
   void initState() {
     // TODO: implement initState
+    initData();
     super.initState();
   }
 
@@ -77,7 +79,6 @@ class _ContactUsState extends State<ContactUs> {
 
 
                 Container(
-                  height: ScreenUtil().setHeight(90),
                   child: Column(
                     children: [
                       Row(
@@ -117,7 +118,6 @@ class _ContactUsState extends State<ContactUs> {
                   ),
                 ),
                 Container(
-                  height: ScreenUtil().setHeight(90),
                   child: Column(
                     children: [
                       Row(
@@ -161,7 +161,6 @@ class _ContactUsState extends State<ContactUs> {
                   ),
                 ),
                 Container(
-                  height: ScreenUtil().setHeight(90),
                   child: Column(
                     children: [
                       Row(
@@ -202,7 +201,6 @@ class _ContactUsState extends State<ContactUs> {
                 ),
 
                 Container(
-                  height: ScreenUtil().setHeight(90),
                   child: Column(
                     children: [
                       Row(
@@ -358,6 +356,13 @@ class _ContactUsState extends State<ContactUs> {
         );
       }
     });
+  }
+
+  Future<void> initData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    _nameController.text=prefs.getString("name")!;
+    _emailController.text=prefs.getString("email")!;
+
   }
 
 }

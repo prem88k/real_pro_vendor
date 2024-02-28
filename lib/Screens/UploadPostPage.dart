@@ -58,6 +58,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
 
   bool isloading = false;
   bool isUploadloading = false;
+  bool isCompressloading = false;
 
   bool catloading = false;
 
@@ -144,6 +145,9 @@ class _UploadPostPageState extends State<UploadPostPage> {
   String? _videoPath;
 
   _pickVideo() async {
+    setState(() {
+      isCompressloading = true;
+    });
     XFile? video = await imagePicker.pickVideo(source: ImageSource.gallery);
     _video = video!;
     final info = await VideoCompress.compressVideo(
@@ -167,6 +171,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
     _videoPlayerController = VideoPlayerController.file(File(_video!.path))
       ..initialize().then((_) {
         setState(() {
+          isCompressloading = false;
           _videoPath = info!.path!;
         });
         _videoPlayerController.play();
@@ -298,7 +303,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          if (_video != null)
+                          if (_video != null&&!isCompressloading)
                             _videoPlayerController.value.isInitialized
                                 ? Container(
                                     height: ScreenUtil().setHeight(83),
@@ -312,40 +317,45 @@ class _UploadPostPageState extends State<UploadPostPage> {
                                 : CircularProgressIndicator()
                           else
                             Container(),
-                          GestureDetector(
-                            onTap: () {
-                              _pickVideo();
-                            },
-                            child: Container(
-                              height: ScreenUtil().setHeight(83),
-                              width: ScreenUtil().setWidth(83),
-                              decoration: DottedDecoration(
-                                  color: appColor,
-                                  shape: Shape.box,
-                                  borderRadius: BorderRadius.circular(
-                                      10)), // color of grid items
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.add_to_queue,
-                                    size: 34,
-                                    color: appColor,
+                          isCompressloading
+                              ? Center(child: CircularProgressIndicator(color: appColor,))
+                              :   GestureDetector(
+                                  onTap: () {
+                                    _pickVideo();
+                                  },
+                                  child: Container(
+                                    height: ScreenUtil().setHeight(83),
+                                    width: ScreenUtil().setWidth(83),
+                                    decoration: DottedDecoration(
+                                        color: appColor,
+                                        shape: Shape.box,
+                                        borderRadius: BorderRadius.circular(
+                                            10)), // color of grid items
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.add_to_queue,
+                                          size: 34,
+                                          color: appColor,
+                                        ),
+                                        SizedBox(
+                                          height: ScreenUtil().setHeight(10),
+                                        ),
+                                        Text(
+                                          "Upload Video",
+                                          style: TextStyle(
+                                              fontSize:
+                                                  ScreenUtil().setHeight(8),
+                                              color: appColor),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  SizedBox(
-                                    height: ScreenUtil().setHeight(10),
-                                  ),
-                                  Text(
-                                    "Upload Video",
-                                    style: TextStyle(
-                                        fontSize: ScreenUtil().setHeight(8),
-                                        color: appColor),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                                ),
                         ],
                       ),
 
@@ -1940,31 +1950,35 @@ class _UploadPostPageState extends State<UploadPostPage> {
                         height: ScreenUtil().setHeight(15),
                       ),
 
-                      isUploadloading?CircularProgressIndicator(color: appColor,):   GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (_formKey.currentState!.validate()) {
-                                // Check additional conditions, such as non-empty text fields
-                                if (_houseTitleController.text.isNotEmpty &&
-                                    _bedroomController.text.isNotEmpty) {
-                                  // Validation passed, initiate the login
-                                  // Call the login function
-                                  uploadPropertyAPI();
-                                } else {
-                                  // Show an error message for empty text fields
-                                }
-                              } else {
-                                // Validation failed, show an error message
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        'Please fill in the required field.'),
-                                  ),
-                                );
-                              }
-                            });
+                      isUploadloading
+                          ? CircularProgressIndicator(
+                              color: appColor,
+                            )
+                          : GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (_formKey.currentState!.validate()) {
+                                    // Check additional conditions, such as non-empty text fields
+                                    if (_houseTitleController.text.isNotEmpty &&
+                                        _bedroomController.text.isNotEmpty) {
+                                      // Validation passed, initiate the login
+                                      // Call the login function
+                                      uploadPropertyAPI();
+                                    } else {
+                                      // Show an error message for empty text fields
+                                    }
+                                  } else {
+                                    // Validation failed, show an error message
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            'Please fill in the required field.'),
+                                      ),
+                                    );
+                                  }
+                                });
 
-                            /*  if (_formKey.currentState!.validate()) {
+                                /*  if (_formKey.currentState!.validate()) {
                         // Validation passed, navigate to the next page
                         uploadPropertyAPI();
                       } else {
@@ -1975,12 +1989,12 @@ class _UploadPostPageState extends State<UploadPostPage> {
                           ),
                         );
                       }*/
-                          },
-                          child: RoundedButton(
-                            text: 'Submit',
-                            press: () {},
-                            color: appColor,
-                          )),
+                              },
+                              child: RoundedButton(
+                                text: 'Submit',
+                                press: () {},
+                                color: appColor,
+                              )),
 
                       SizedBox(
                         height: ScreenUtil().setHeight(20),
@@ -2917,7 +2931,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
     }
   }
 
-
   Future<void> uploadPropertyAPI() async {
     List<String> textController = [];
     for (int i = 0; i < _controllers.length; i++) {
@@ -2993,7 +3006,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
       request.files.add(await MultipartFile.fromPath('video', _videoPath!));
     }
 
-    if (imageFilePathList != null||imageFilePathList!.isNotEmpty) {
+    if (imageFilePathList != null || imageFilePathList!.isNotEmpty) {
       for (int i = 0; i < imageFilePathList!.length; i++) {
         request.files.add(await MultipartFile.fromPath(
             'image[]', imageFilePathList![i].path));
@@ -3003,7 +3016,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
     request.send().then((response) {
       if (response.statusCode == 200) {
         print("Uploaded!");
-        _controllers.clear();
         int statusCode = response.statusCode;
         print("response::$response");
         response.stream.transform(utf8.decoder).listen((value) {
@@ -3086,6 +3098,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
                         )
                       : GestureDetector(
                           onTap: () {
+                            _controllers.clear();
                             Future.delayed(const Duration(milliseconds: 1000),
                                 () {
                               Navigator.pushReplacement(

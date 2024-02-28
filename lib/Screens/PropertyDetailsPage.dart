@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -929,7 +929,9 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                                 height: ScreenUtil().setHeight(5),
                               ):Container(),
 
-                              details![0].type!="Villa" ? Row(
+                              details![0].type == "Villa" ||
+                                  details![0].type == "Townhouse" ||
+                                  details![0].type == "Bungalow"?Container(): Row(
                                 mainAxisAlignment:
                                 MainAxisAlignment.start,
                                 children: [
@@ -953,7 +955,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                                   Container(
                                     width: ScreenUtil().setHeight(100),
                                     child: Text(
-                                      "-",
+                                      details![0].floor!=null?details![0].floor!:"-",
                                       style: TextStyle(
                                         color: lineColor,
                                         fontSize:
@@ -965,8 +967,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                                     ),
                                   ),
                                 ],
-                              ):Container(),
-
+                              ),
                               SizedBox(
                                 height: ScreenUtil().setHeight(5),
                               ),
@@ -1119,7 +1120,7 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                                   Container(
                                     width: ScreenUtil().setWidth(150),
                                     child: Text(
-                                      details![0].createdAt!,
+                                      DateFormat('dd-MM-yyyy').format( DateTime.parse(details![0].createdAt!)),
                                       style: TextStyle(
                                         color: lineColor,
                                         fontSize:

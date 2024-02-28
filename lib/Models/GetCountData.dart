@@ -48,6 +48,8 @@ class User {
   int? newFollowers;
   int? comment;
   String? name;
+  String? last_name;
+
   String? email;
   String? fcm;
   String? deviceType;
@@ -88,6 +90,7 @@ class User {
         this.deviceType,
         this.appleId,
         this.deviceId,
+        this.last_name,
         this.platform,
         this.role,
         this.countryCode,
@@ -117,6 +120,7 @@ class User {
     productLike = json['product_like'];
     newFollowers = json['new_followers'];
     comment = json['comment'];
+    last_name=json['last_name'];
     name = json['name'];
     email = json['email'];
     fcm = json['fcm'];
@@ -153,6 +157,7 @@ class User {
     data['id'] = this.id;
     data['product_like'] = this.productLike;
     data['new_followers'] = this.newFollowers;
+    data['last_name'] = this.last_name;
     data['comment'] = this.comment;
     data['name'] = this.name;
     data['email'] = this.email;

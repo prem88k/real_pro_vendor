@@ -11,6 +11,7 @@ import '../../Constants/Colors.dart';
 import '../Constants/Api.dart';
 import '../Presentation/BottomNavigationBarVendor.dart';
 import '../Presentation/common_button.dart';
+import '../Presentation/common_textfeild.dart';
 import '../Presentation/upload_textfeild.dart';
 import 'LoginPageVendor.dart';
 
@@ -30,6 +31,7 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _brnController = TextEditingController();
   bool isloading=false;
+  final TextEditingController _lNameController = TextEditingController();
 
   bool isVisibleV = false;
   File? image;
@@ -49,6 +51,8 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
     getToken();
      profileImage = widget.getCountData.user!.image.toString();
     _nameController.text = widget.getCountData.user!.name.toString();
+    _lNameController.text = widget.getCountData.user!.last_name.toString();
+
     _mobileController.text = widget.getCountData.user!.mobileNumber.toString();
    _emailController.text = widget.getCountData.user!.email.toString();
    _brnController.text = widget.getCountData.user!.agentBrn.toString();
@@ -125,6 +129,41 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
                     TextFieldUpload(
                       title: 'Agent Name',
                       controller: _nameController,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: ScreenUtil().setHeight(7),
+              ),
+              Container(
+                height: ScreenUtil().setHeight(80),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Agent last name",
+                          style:
+                          TextStyle(
+                            color:
+                            primaryColor,
+                            fontSize:
+                            ScreenUtil().setWidth(12),
+                            fontFamily:
+                            'work',
+                            fontWeight:
+                            FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: ScreenUtil().setHeight(8),),
+                    TextFieldUpload(
+                      controller: _lNameController,
+                      title: "Agent last name",
+
                     ),
                   ],
                 ),
@@ -274,6 +313,7 @@ class _EditProfileVendorPageState extends State<EditProfileVendorPage> {
     request.fields['email'] =prefs.getString('email')!;
     request.fields['mobile_number'] =_mobileController.text;
     request.fields['name'] = _nameController.text;
+    request.fields['last_name'] = _lNameController.text;
     request.fields['agent_brn'] =_brnController.text;
     request.fields['agency_name'] = _agencyNameController.text;
     request.fields['country_code'] ="+971";

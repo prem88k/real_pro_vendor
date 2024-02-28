@@ -12,9 +12,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
    <application
-        android:label="real_pro_vendor"
+        android:label="Realpro Vendor"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@drawable/logo">
         <activity
             android:name=".MainActivity"
             android:exported="true"

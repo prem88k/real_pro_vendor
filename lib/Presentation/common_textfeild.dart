@@ -42,8 +42,8 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
       autovalidateMode: AutovalidateMode.always,
         child: Container(
           child: TextFormField(
-            maxLines: widget.title=="What is your concern?"?5:1,
-            minLines: widget.title=="What is your concern?"?5:1,
+            maxLines: widget.title=="Description"?5:1,
+            minLines: widget.title=="Description"?5:1,
             enabled: widget.isEnable,
             textAlignVertical: TextAlignVertical.center,
               style: TextStyle(
@@ -89,7 +89,6 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
             validator: widget.validator,
             decoration: !widget.isPassword?InputDecoration(
               errorMaxLines: 2,
-              isDense: true,
               fillColor: widget.title=="Search Here"?Colors.transparent:Colors.transparent,
               filled: true,
               border: OutlineInputBorder(

@@ -1,19 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:real_pro_vendor/Screens/AddInfo.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:real_pro_vendor/Screens/AddInfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../Constants/Api.dart';
 import '../Constants/Colors.dart';
@@ -52,6 +52,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final TextEditingController _agencyNameController = TextEditingController();
+  final TextEditingController _agencyLNameController = TextEditingController();
+
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _brnController = TextEditingController();
 
@@ -150,9 +152,9 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         title: "Email",
                         validator: (value) {
                           final bool emailValid = RegExp(
-                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                               .hasMatch(_emailController.text);
-                          if(!isSocial) {
+                          if (!isSocial) {
                             if (_emailController.text.isEmpty) {
                               return 'This field is required';
                             }
@@ -189,13 +191,12 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         obs: true,
                         validator: (value) {
                           final bool passValid = RegExp(
-                              r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#&*~]).{6,}$')
+                                  r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#&*~]).{8,}$')
                               .hasMatch(_passwordController.text);
                           if (!isSocial) {
                             if (_passwordController.text.isEmpty) {
                               return "This field is required";
-                            }
-                            else if (!passValid) {
+                            } else if (!passValid) {
                               return 'Password should be 8-12 character, contain 1 capital letter, 1 number and 1 special character';
                             }
                           }
@@ -227,20 +228,15 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         isPassword: true,
                         obs: true,
                         validator: (value) {
-                          final bool emailValid = RegExp(
-                              r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#&*~]).{6,}$')
+                          final bool passValid = RegExp(
+                                  r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#&*~]).{8,}$')
                               .hasMatch(_confirmPasswordController.text);
                           if (!isSocial) {
                             if (_confirmPasswordController.text.isEmpty) {
                               return 'This field is required';
-                            } else if (_confirmPasswordController.text.length < 5) {
-                              return '5 Character required';
-                            }
-                            else if(!emailValid)
-                            {
+                            } else if (!passValid) {
                               return 'Password should be 8-12 character, contain 1 capital letter, 1 number and 1 special character';
-                            }
-                            else if (_confirmPasswordController.text !=
+                            } else if (_confirmPasswordController.text !=
                                 _passwordController.text) {
                               return 'Password and confirm password does not matched';
                             }
@@ -251,8 +247,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
-                                SizedBox(height: ScreenUtil().setHeight(8)),
-
+                SizedBox(height: ScreenUtil().setHeight(8)),
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,7 +267,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         controller: _nameController,
                         title: "Agent Name",
                         validator: (value) {
-                          if(!isSocial) {
+                          if (!isSocial) {
                             if (_nameController.text.isEmpty) {
                               return "This field is required";
                             }
@@ -283,8 +278,38 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
-                                SizedBox(height: ScreenUtil().setHeight(8)),
-
+                SizedBox(height: ScreenUtil().setHeight(8)),
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        child: Text(
+                          'Agent Last Name',
+                          style: TextStyle(
+                            color: primaryTextColor,
+                            fontSize: ScreenUtil().setWidth(12),
+                            fontFamily: 'work',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      TextFieldWidget(
+                        controller: _agencyLNameController,
+                        title: "Agent Last Name",
+                        validator: (value) {
+                          if (!isSocial) {
+                            if (_agencyLNameController.text.isEmpty) {
+                              return "This field is required";
+                            }
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: ScreenUtil().setHeight(8)),
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,7 +329,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         controller: _agencyNameController,
                         title: "Agency Name",
                         validator: (value) {
-                          if(!isSocial) {
+                          if (!isSocial) {
                             if (_agencyNameController.text.isEmpty) {
                               return "This field is required";
                             }
@@ -315,8 +340,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
-                                SizedBox(height: ScreenUtil().setHeight(8)),
-
+                SizedBox(height: ScreenUtil().setHeight(8)),
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,7 +360,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                         controller: _brnController,
                         title: "BRN",
                         validator: (value) {
-                          if(!isSocial) {
+                          if (!isSocial) {
                             if (_brnController.text.isEmpty) {
                               return "This field is required";
                             }
@@ -347,8 +371,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     ],
                   ),
                 ),
-                                SizedBox(height: ScreenUtil().setHeight(8)),
-
+                SizedBox(height: ScreenUtil().setHeight(8)),
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -386,18 +409,18 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                       )
                     : GestureDetector(
                         onTap: () {
-                            if (_formKey.currentState!.validate()) {
-                              // Validation passed, navigate to the next page
-                              checkValidation();
-                            } else {
-                              // Validation failed, show an error message
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      'Please fill in the required field.'),
-                                ),
-                              );
-                            }
+                          if (_formKey.currentState!.validate()) {
+                            // Validation passed, navigate to the next page
+                            checkValidation();
+                          } else {
+                            // Validation failed, show an error message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content:
+                                    Text('Please fill in the required field.'),
+                              ),
+                            );
+                          }
                           //    checkValidation();
                           /*      Navigator.push(
                       context,
@@ -448,7 +471,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                 SizedBox(
                   height: ScreenUtil().setHeight(15),
                 ),
-           /*     Row(
+                /*     Row(
                   mainAxisAlignment: !Platform.isIOS?MainAxisAlignment.center:MainAxisAlignment.spaceEvenly,
                   children: [
                     GestureDetector(
@@ -557,11 +580,12 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                   ],
                 ),*/
                 Column(
-                  mainAxisAlignment: !Platform.isIOS?MainAxisAlignment.center:MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: !Platform.isIOS
+                      ? MainAxisAlignment.center
+                      : MainAxisAlignment.spaceEvenly,
                   children: [
                     GestureDetector(
                       onTap: () {
-
                         signInWithGoogle();
                       },
                       child: Container(
@@ -637,50 +661,48 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
                     SizedBox(
                       height: ScreenUtil().setHeight(10),
                     ),
-                    !Platform.isIOS?Container():  GestureDetector(
-                      onTap: () {
-
-                        _appleLogin();
-                      },
-                      child: Container(
-                        height: ScreenUtil().setHeight(45),
-                        width: ScreenUtil().setWidth(200),
-                        decoration: BoxDecoration(
-                            color: secondaryColor,
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: ScreenUtil().setWidth(25),
-                            ),
-                            Image.asset(
-                              "assets/images/apple.png",
-                              width: ScreenUtil().setHeight(20),
-                              height: ScreenUtil().setHeight(20),
-                              fit: BoxFit.contain,
-                            ),
-                            SizedBox(
-                              width: ScreenUtil().setWidth(25),
-                            ),
-                            Text(
-                              'Sign in with Apple',
-                              style: TextStyle(
-                                color: primaryColor,
-                                fontSize: ScreenUtil().setWidth(12),
-                                fontFamily: 'work',
-                                fontWeight: FontWeight.w400,
+                    !Platform.isIOS
+                        ? Container()
+                        : GestureDetector(
+                            onTap: () {
+                              _appleLogin();
+                            },
+                            child: Container(
+                              height: ScreenUtil().setHeight(45),
+                              width: ScreenUtil().setWidth(200),
+                              decoration: BoxDecoration(
+                                  color: secondaryColor,
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: ScreenUtil().setWidth(25),
+                                  ),
+                                  Image.asset(
+                                    "assets/images/apple.png",
+                                    width: ScreenUtil().setHeight(20),
+                                    height: ScreenUtil().setHeight(20),
+                                    fit: BoxFit.contain,
+                                  ),
+                                  SizedBox(
+                                    width: ScreenUtil().setWidth(25),
+                                  ),
+                                  Text(
+                                    'Sign in with Apple',
+                                    style: TextStyle(
+                                      color: primaryColor,
+                                      fontSize: ScreenUtil().setWidth(12),
+                                      fontFamily: 'work',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-
+                          ),
                   ],
                 ),
-
               ],
             ),
           ),
@@ -691,15 +713,29 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
 
   void checkValidation() {
     final bool emailValid = RegExp(
-        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
         .hasMatch(_emailController.text);
+    final bool passValid =
+        RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#&*~]).{8,}$')
+            .hasMatch(_passwordController.text);
+    final bool passValid1 =
+        RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#&*~]).{8,}$')
+            .hasMatch(_confirmPasswordController.text);
     setState(() {
       isSocial = false;
 
       if (_formKey.currentState!.validate()) {
         // Check additional conditions, such as non-empty text fields
         if (_emailController.text.isNotEmpty &&
-            _passwordController.text.isNotEmpty&&emailValid&&_confirmPasswordController.text.isNotEmpty&&_agencyNameController.text.isNotEmpty&&_agencyNameController.text.isNotEmpty&&_brnController.text.isNotEmpty) {
+            _passwordController.text.isNotEmpty &&
+            emailValid &&
+            _confirmPasswordController.text.isNotEmpty &&
+            _agencyNameController.text.isNotEmpty &&
+            _agencyNameController.text.isNotEmpty &&
+            _brnController.text.isNotEmpty &&
+            _confirmPasswordController.text == _passwordController.text &&
+            passValid &&
+            passValid1) {
           // Validation passed, initiate the login
           // Call the login function
           RegisterAPI();
@@ -710,13 +746,11 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
         // Validation failed, show an error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:
-            Text('Please fill in the required field.'),
+            content: Text('Please fill in the required field.'),
           ),
         );
       }
     });
-
   }
 
   Future<void> RegisterAPI() async {
@@ -734,11 +768,13 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       'fcm': token,
       'role': "agent",
       'name': _nameController.text,
+      'last_name': _agencyLNameController.text,
       'password': _passwordController.text,
       'email': _emailController.text,
       'agent_brn': _brnController.text,
       'company_name': _agencyNameController.text,
-      'mobile_number': _mobileController.text.isNotEmpty?_mobileController.text:"",
+      'mobile_number':
+          _mobileController.text.isNotEmpty ? _mobileController.text : "",
       'agency_name': _agencyNameController.text
     };
 
@@ -823,9 +859,9 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       });
     await _auth.signOut();
     final GoogleSignInAccount? googleUser =
-    await GoogleSignIn(scopes: <String>["email"]).signIn();
+        await GoogleSignIn(scopes: <String>["email"]).signIn();
     final GoogleSignInAuthentication googleAuth =
-    await googleUser!.authentication;
+        await googleUser!.authentication;
 
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
@@ -833,7 +869,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     );
 
     final UserCredential authResult =
-    await _auth.signInWithCredential(credential);
+        await _auth.signInWithCredential(credential);
     final User? user = authResult.user;
 
     if (user != null) {
@@ -846,7 +882,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       email = user.email!;
       imageUrl = user.photoURL!;
       uId = user.uid;
-      postRegisterGoogleData(uId, name, email,user.phoneNumber!=null?user.phoneNumber!:"",imageUrl);
+      postRegisterGoogleData(uId, name, email,
+          user.phoneNumber != null ? user.phoneNumber! : "", imageUrl);
       // Only taking the first part of the name, i.e., First Name
       if (name.contains(" ")) {
         name = name.substring(0, name.indexOf(" "));
@@ -866,12 +903,11 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     return null;
   }
 
-  Future<void> postRegisterGoogleData(
-      String? accessToken, String name, String email, String phone, String? imageUrl) async {
+  Future<void> postRegisterGoogleData(String? accessToken, String name,
+      String email, String phone, String? imageUrl) async {
     setState(() {
       isloading = true;
       isSocial = true;
-
     });
     /*String? token = await FirebaseMessaging.instance.getToken();
     print("Tpkoen::$token");*/
@@ -925,7 +961,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
         setState(() {
           isloading = false;
         });
-        Message(context,getdata["message"]);
+        Message(context, getdata["message"]);
         prefs.setString("access_token",
             "Bearer ${getdata["0"]["original"]["access_token"].toString()}");
         prefs.setString(
@@ -942,9 +978,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
             getdata["0"]["original"]["user"]["image"].toString());
         prefs.setBool("isLogging", true);
         prefs.setBool("isSocial", true);
-        prefs.setString("socialDP",imageUrl!);
-        if(getdata["isLogin"])
-        {
+        prefs.setString("socialDP", imageUrl!);
+        if (getdata["isLogin"]) {
           print(getdata["isLogin"]);
           Future.delayed(const Duration(milliseconds: 1000), () {
             Navigator.pushReplacement(
@@ -956,15 +991,13 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
               ),
             );
           });
-        }
-        else
-        {
+        } else {
           print("--false---");
           print(getdata["isLogin"]);
 
           Future.delayed(const Duration(milliseconds: 2000), () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => AddInfo(name,email)));
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => AddInfo(name, email)));
           });
         }
         /*bookTable();*/
@@ -978,7 +1011,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       setState(() {
         isloading = false;
       });
-      ErrorMessage(context, "This Email is registerd with us please try another one");
+      ErrorMessage(
+          context, "This Email is registerd with us please try another one");
     }
   }
 
@@ -1010,7 +1044,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
         final email = await fb.getUserEmail();
         // But user can decline permission
         if (email != null) print('And your email is $email');
-        postRegisterGoogleData(profile.userId, profile.name!, email!,"",imageUrl!);
+        postRegisterGoogleData(
+            profile.userId, profile.name!, email!, "", imageUrl!);
         break;
       case FacebookLoginStatus.cancel:
         // In case the user cancels the login process
@@ -1022,9 +1057,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     }
   }
 
-
   Future<void> _appleLogin() async {
-
     final credential = await SignInWithApple.getAppleIDCredential(
       scopes: [
         AppleIDAuthorizationScopes.email,
@@ -1032,13 +1065,12 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       ],
       webAuthenticationOptions: WebAuthenticationOptions(
         // TODO: Set the `clientId` and `redirectUri` arguments to the values you entered in the Apple Developer portal during the setup
-        clientId:
-        'de.lunaone.flutter.signinwithappleexample.service',
+        clientId: 'de.lunaone.flutter.signinwithappleexample.service',
 
         redirectUri:
-        // For web your redirect URI needs to be the host of the "current page",
-        // while for Android you will be using the API server that redirects back into your app via a deep link
-        Uri.parse(
+            // For web your redirect URI needs to be the host of the "current page",
+            // while for Android you will be using the API server that redirects back into your app via a deep link
+            Uri.parse(
           'https://flutter-sign-in-with-apple-example.glitch.me/callbacks/sign_in_with_apple',
         ),
       ),
@@ -1053,7 +1085,10 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     print("abc::${credential.givenName}");
     print("abc::${credential.identityToken}");
 
-    appleLoginAPI(credential.userIdentifier,credential.givenName!=null?credential.givenName!:"anonymous",credential.email!=null?credential.email!:"anonymous@gmail.com");
+    appleLoginAPI(
+        credential.userIdentifier,
+        credential.givenName != null ? credential.givenName! : "anonymous",
+        credential.email != null ? credential.email! : "anonymous@gmail.com");
     // This is the endpoint that will convert an authorization code obtained
     // via Sign in with Apple into a session in your system
     final signInWithAppleEndpoint = Uri(
@@ -1062,14 +1097,10 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       path: '/sign_in_with_apple',
       queryParameters: <String, String>{
         'code': credential.authorizationCode,
-        if (credential.givenName != null)
-          'firstName': credential.givenName!,
-        if (credential.familyName != null)
-          'lastName': credential.familyName!,
+        if (credential.givenName != null) 'firstName': credential.givenName!,
+        if (credential.familyName != null) 'lastName': credential.familyName!,
         'useBundleId':
-        !kIsWeb && (Platform.isIOS || Platform.isMacOS)
-            ? 'true'
-            : 'false',
+            !kIsWeb && (Platform.isIOS || Platform.isMacOS) ? 'true' : 'false',
         if (credential.state != null) 'state': credential.state!,
       },
     );
@@ -1082,7 +1113,6 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     // and you can now set this as the app's session
     // ignore: avoid_print
     print(session);
-
   }
 
   Future<void> appleLoginAPI(
@@ -1090,7 +1120,6 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
     setState(() {
       isloading = true;
       isSocial = true;
-
     });
     /*   String? token = await FirebaseMessaging.instance.getToken();
     print("Tpkoen::$token");*/
@@ -1121,7 +1150,7 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       'platform': deviceName,
       'email': email,
       'fcm': "dkjsdksldks",
-      'role':"user"
+      'role': "user"
     };
     String jsonBody = json.encode(body);
     final encoding = Encoding.getByName('utf-8');
@@ -1152,8 +1181,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
             "UserId", "${getdata["0"]["original"]["user"]["id"].toString()}");
         prefs.setString(
             "email", getdata["0"]["original"]["user"]["email"].toString());
-        prefs.setString(
-            "phone", getdata["0"]["original"]["user"]["mobile_number"].toString());
+        prefs.setString("phone",
+            getdata["0"]["original"]["user"]["mobile_number"].toString());
         prefs.setString("phone",
             getdata["0"]["original"]["user"]["mobile_number"].toString());
         prefs.setString("profileImage",
@@ -1163,11 +1192,10 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
 
         print("=-----$isLogging");
         Future.delayed(const Duration(milliseconds: 2000), () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => AddInfo(name!,email!)));
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => AddInfo(name!, email!)));
         });
-      }
-      else {
+      } else {
         setState(() {
           isloading = false;
         });
@@ -1180,7 +1208,8 @@ class _RegistrationPageVendorState extends State<RegistrationPageVendor> {
       });
       ErrorMessage(context, getdata["message"]);
     }
-  }}
+  }
+}
 
 ScaffoldFeatureController<SnackBar, SnackBarClosedReason> Message(
     BuildContext context, String message) {

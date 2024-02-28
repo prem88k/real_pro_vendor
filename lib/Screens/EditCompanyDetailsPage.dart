@@ -209,7 +209,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
                       ),
                     ),
                     TextFieldUpload(
-                      title: widget.getCountData.user!.companyName != null ? widget.getCountData.user!.companyName.toString() : "Enter Company Name",
+                      title: "Enter Company Name",
                       controller: _companyNameController,
                     ),
                   ],
@@ -236,7 +236,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
                       ),
                     ),
                     TextFieldUpload(
-                      title:  widget.getCountData.user!.companyAddress != null ? widget.getCountData.user!.companyAddress.toString() : "Enter Company Address",
+                      title:  "Enter Company Address",
                       controller: _companyAddressController,
                     ),
                   ],
@@ -263,7 +263,7 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
                       ),
                     ),
                     TextFieldUpload(
-                      title: widget.getCountData.user!.brokerOrn != null ? widget.getCountData.user!.brokerOrn.toString() : "Enter ORN number",
+                      title:  "Enter ORN number",
                       controller: _brokerOrnController,
                     ),
                   ],
@@ -469,9 +469,14 @@ class _EditCompanyDetailsPageState extends State<EditCompanyDetailsPage> {
   }
 
   void initData() {
-   print(widget.getCountData.user!.aboutCompany!);
+  // print(widget.getCountData.user!.aboutCompany!);
 setState(() {
   _companyDetailsController.text=widget.getCountData.user!.aboutCompany!=null?widget.getCountData.user!.aboutCompany!:"";
+  _companyNameController.text=widget.getCountData.user!.companyName!=null?widget.getCountData.user!.companyName!:"";
+  _companyAddressController.text=widget.getCountData.user!.companyAddress!=null?widget.getCountData.user!.companyAddress!:"";
+  _brokerOrnController.text=widget.getCountData.user!.brokerOrn!=null?widget.getCountData.user!.brokerOrn!:"";
+
+
 });
   }
 }

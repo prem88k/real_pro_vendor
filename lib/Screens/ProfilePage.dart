@@ -303,7 +303,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               Container(
                                 width: ScreenUtil().setWidth(200),
                                 child: Text(
-                                  getCountData.user!.mobileNumber != null
+                                  getCountData.user!.mobileNumber != "null"&& getCountData.user!.mobileNumber !=null
                                       ? "+971 ${getCountData.user!.mobileNumber!}"
                                       : "-",
                                   style: TextStyle(
